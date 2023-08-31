@@ -63,12 +63,30 @@ Open the `server` and `client` in separate VSCode workspaces or open the combine
 
 ### Purpose
 
-2-5 sentences describing what the system does
+The aim of our project is to create a website where users can share and view recipes essentially. Viewers will need to sign, create an account or sign in with google. Then users are free to browse our catalog of recipes. Each recipe has numerous descriptive elements we call “tags'' that inform users who are viewing a recipe what it contains. Example tags could be “vegan”, “breakfast”,”cheap” etc. Moreover users can review recipes with both free text and a star system rating. 
+
+### CRUD operations
+Create: Users will be able to create recipes, reviews, preferences and a favorites recipe list.
+
+Read: Provide users with recipes to view using the cards design pattern where users browse, search and filter them.
+Moreover, users can view other users' accounts.
+
+Update: Users will have the ability to edit their recipes, reviews, and preferences
+ 
+Delete: Users can delete their account, remove recipes from their favorites list, and delta reviews or recipes they previously posted.
+
 
 ### Pages
 
-* Home: 1-3 sentences describing what the page displays and what a user can do
-* Shopping cart: ...
+* Home page: The user is presented with a view of cards. Each card can be enlarged to view the full recipe with instructions, ingredients, associated tags and comments.
+* Recipe creation page: The user is asked to fill out recipe information according to a template, and be able to select one or more tags.
+* Settings: The user is able to alter their preferences, password, autoplaying videos, using different measurements, etc.
+* Profile: Users are able to view their history of browsed recipes, created recipes, and statistics such as which tags they view the most and relatively simple analytics about their behavior.
+* Favorites: The user has all their favorite recipes in there. 
+
+### Initial UI sketch
+Initial paper sketch of what the systems frontend could look like:
+![Initial UI Design](./images/initial_design.png)
 
 ### Entity-Relationship (ER) Diagram
 
