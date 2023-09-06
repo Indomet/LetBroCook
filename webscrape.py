@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 from bs4 import BeautifulSoup
+from numpy import info
 import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,7 +30,7 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         except Exception as e:
             print(f"Error: {e}")
 def main():
-    url="https://tasty.co/recipe/crawfish-onigiri"
+    url="https://tasty.co/recipe/triple-cheese-potatoes-shreds-croquettes"
         
     #driver = webdriver.Chrome()
     #driver.get(url)
@@ -52,11 +53,7 @@ def main():
         
     #Now we extract the info from each page
     #The info is: Ingredients, prep steps,header image, tags and possibly other info
-    
-    #extractIngredients(url)
-    #extractDescription(url)
-    #extractSteps(url)
-    print(extractTags(url))
+
     
     
 def extractServings(url:str):
@@ -102,7 +99,13 @@ def extractTags(url:str):
     allTags = soup.find_all("a",class_=tagsClass)
     return [tag.get_text() for tag in allTags]
    
-
+def extractNutritionalInfo(url:str):
+    infoClass = "list-unstyled xs-mb1"
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+    #will return an empty array if there is no nutritonal info
+    return [info.get_text() for info in soup.find_all("li",class_=infoClass)]
+    
     
 def extractSteps(url:str):
     prepClass = "xs-mb2"
