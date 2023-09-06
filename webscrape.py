@@ -1,5 +1,5 @@
+from typing import List, Tuple
 from bs4 import BeautifulSoup
-from numpy import alltrue
 import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,7 +29,7 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         except Exception as e:
             print(f"Error: {e}")
 def main():
-    url="https://tasty.co/recipe/baked-bean-shepherds-pie"
+    url="https://tasty.co/recipe/pumpkin-spice-creme-brulee"
         
     #driver = webdriver.Chrome()
     #driver.get(url)
@@ -50,7 +50,32 @@ def main():
     for title,link,img in zip(x,y,z):
         break#print(f"title is: {title} with link: {link} with img: {img}")
         
-   
+    #Now we extract the info from each page
+    #The info is: Ingredients, prep steps,header image, tags and possibly other info
+    extractIngredients(url)
+    
+def extractIngredients(url:str):
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+    
+    servingClass = "servings-display xs-text-2 xs-mb2"
+    servings=soup.find(class_=servingClass).contents
+    
+    #it will be a tuple of 3 indices. (servings)
+    ingreds : List[Tuple]=[]
+    
+    sections = soup.find_all(class_="ingredients__section xs-mt1 xs-mb3")
+
+    sectionClass = "ingredient-section-name xs-text-5 extra-bold caps xs-mb1"
+    for i,section in enumerate(sections):
+        section_name = section.find("p", class_=sectionClass).string.strip() if i!=0 else "Ingredients"
+        ingredients = [ingredient.text.strip() for ingredient in section.find_all("li", class_="ingredient xs-mb1 xs-mt0")]
+
+        print(f"Section Name: {section_name}")
+        for ingredient in ingredients:
+            print(f"- {ingredient}")
+        print("-" * 30)
+
     
 
     
