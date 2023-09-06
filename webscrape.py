@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 from bs4 import BeautifulSoup
 import requests
 from selenium.webdriver.common.by import By
@@ -29,7 +29,7 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         except Exception as e:
             print(f"Error: {e}")
 def main():
-    url="https://tasty.co/recipe/pumpkin-spice-creme-brulee"
+    url="https://tasty.co/recipe/grilled-corn-summer-pasta-salad"
         
     #driver = webdriver.Chrome()
     #driver.get(url)
@@ -54,28 +54,47 @@ def main():
     #The info is: Ingredients, prep steps,header image, tags and possibly other info
     extractIngredients(url)
     
-def extractIngredients(url:str):
+    
+def extractServings(url:str):
     htmlSource = requests.get(url).content
     soup = BeautifulSoup(htmlSource,"html5lib")
     
     servingClass = "servings-display xs-text-2 xs-mb2"
     servings=soup.find(class_=servingClass).contents
     
-    #it will be a tuple of 3 indices. (servings)
-    ingreds : List[Tuple]=[]
     
+def extractIngredients(url:str):
+    """The method takes in a url from the website Tasty.co and returns 
+        a dict with the section and its ingredients in a dict with the number of
+        servings the recipe creates
+    Args:
+        url (str): the url to the recipe on the website
+    """
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+
+    #create a dict where key is the section and the value is a list of ingredients
+    ingredsWithSection : Dict[str,List[str]] = {}
+    #get all the sections html element with all its nested sub sections and ingredients
     sections = soup.find_all(class_="ingredients__section xs-mt1 xs-mb3")
 
+    #define a class to be used to find the section
     sectionClass = "ingredient-section-name xs-text-5 extra-bold caps xs-mb1"
     for i,section in enumerate(sections):
-        section_name = section.find("p", class_=sectionClass).string.strip() if i!=0 else "Ingredients"
+        #find a section and strip to get the tag content. the if statement is to get the ingredioents section
+        #as its always the first index of these sections
+        sectionName = section.find("p", class_=sectionClass).string.strip() if i!=0 else "Ingredients"
+        #get all the ingredeints of a given section and strip them one by one
         ingredients = [ingredient.text.strip() for ingredient in section.find_all("li", class_="ingredient xs-mb1 xs-mt0")]
+        #add the section and its ingredinets to the dict
+        ingredsWithSection[sectionName] = ingredients
+        
+    return ingredsWithSection
 
-        print(f"Section Name: {section_name}")
-        for ingredient in ingredients:
-            print(f"- {ingredient}")
-        print("-" * 30)
-
+class Recipe():
+    def __init__(self, sectionsAndIngredients : Dict[str , List[str]],servings:str) ->None:
+        self.sectionsAndIngredients = sectionsAndIngredients
+        self.servings = servings
     
 
     
