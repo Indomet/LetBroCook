@@ -29,7 +29,7 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         except Exception as e:
             print(f"Error: {e}")
 def main():
-    url="https://tasty.co/recipe/grilled-corn-summer-pasta-salad"
+    url="https://tasty.co/recipe/crawfish-onigiri"
         
     #driver = webdriver.Chrome()
     #driver.get(url)
@@ -52,7 +52,11 @@ def main():
         
     #Now we extract the info from each page
     #The info is: Ingredients, prep steps,header image, tags and possibly other info
-    extractIngredients(url)
+    
+    #extractIngredients(url)
+    #extractDescription(url)
+    #extractSteps(url)
+    print(extractTags(url))
     
     
 def extractServings(url:str):
@@ -60,7 +64,7 @@ def extractServings(url:str):
     soup = BeautifulSoup(htmlSource,"html5lib")
     
     servingClass = "servings-display xs-text-2 xs-mb2"
-    servings=soup.find(class_=servingClass).contents
+    return soup.find(class_=servingClass).contents
     
     
 def extractIngredients(url:str):
@@ -91,10 +95,41 @@ def extractIngredients(url:str):
         
     return ingredsWithSection
 
+def extractTags(url:str):
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+    tagsClass = "breadcrumb_item xs-mr1"
+    allTags = soup.find_all("a",class_=tagsClass)
+    return [tag.get_text() for tag in allTags]
+   
+
+    
+def extractSteps(url:str):
+    prepClass = "xs-mb2"
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+    
+    allSteps = soup.find_all("li",class_= prepClass)
+    #exclude steps with links as they contain ads
+    steps = [step.get_text() for step in allSteps if step if not step.find("a")]
+    
+    return steps
+
+def extractDescription(url:str):
+    descClass ="description xs-text-4 md-text-3 lg-text-2 xs-mb2 lg-mb2 lg-pb05"
+    
+    htmlSource = requests.get(url).content
+    soup = BeautifulSoup(htmlSource,"html5lib")
+    return soup.find("p",class_= descClass).text
+    
 class Recipe():
-    def __init__(self, sectionsAndIngredients : Dict[str , List[str]],servings:str) ->None:
-        self.sectionsAndIngredients = sectionsAndIngredients
-        self.servings = servings
+    def __init__(self, sectionsAndIngredients : Dict[str , List[str]],
+                 servings:str,
+                 desc: str,
+                 steps: List[str],
+                 
+                 ) ->None:
+        pass
     
 
     
