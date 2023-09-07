@@ -86,7 +86,7 @@ app.post("/recipe/create", (req, res, next) => {
     });
 });
 
-// update
+// update recipe 
 app.patch("/recipe/:id", function (req, res) {
   var id = req.params.id;
   var recipe = new recipeModel(req.body);
@@ -94,7 +94,7 @@ app.patch("/recipe/:id", function (req, res) {
     .findById(id)
     .then(function (recipe) {
       if (recipe == null) {
-        return res.status(404).json({ message: "recipe is nnull" });
+        return res.status(404).json({ message: "recipe is null" });
       }
       recipe.ingredients = (req.body.ingredients || recipe.ingredients);
       recipe.steps = (req.body.steps || recipe.steps)
@@ -102,13 +102,37 @@ app.patch("/recipe/:id", function (req, res) {
       recipe.description = (req.body.description || recipe.description)
       recipe.tags =(req.body.tags || recipe.tags)
       recipe.nutritionalInfo = (req.body.nutritionalInfo || recipe.nutritionalInfo)
-      recipe.save();
+      recipe.save().then();
       res.json(recipe);
     })
     .catch(function (err) {
       return res.status(500).json({ message: "recipe is not found" });
     });
 });
+
+// update user 
+app.patch("/user/:id", function (req, res) {
+  var id = req.params.id;
+  var user = new userModel(req.body);
+  userModel
+    .findById(id)
+    .then(function (user) {
+      if (user == null) {
+        return res.status(404).json({ message: "user is null" });
+      }
+      user.username = (req.body.username || user.username);
+      user.email = (req.body.email || user.email)
+      user.password = (req.body.password || user.password)
+      user.name = (req.body.name || user.name)
+      user.recipes =(req.body.recipes || user.recipes)
+      user.save();
+      res.json(user);
+    })
+    .catch(function (err) {
+      return res.status(500).json({ message: "user is not found" });
+    });
+});
+
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
   res.status(404).json({ message: "Not Found" });
