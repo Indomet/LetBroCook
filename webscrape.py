@@ -1,11 +1,13 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from bs4 import BeautifulSoup
-from numpy import info
+from numpy import extract, info, rec
 import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
+import tqdm
+import json
 
 def getAllRecipes(soup : BeautifulSoup, url):
     
@@ -30,14 +32,14 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         except Exception as e:
             print(f"Error: {e}")
 def main():
-    url="https://tasty.co/recipe/triple-cheese-potatoes-shreds-croquettes"
+    url="https://tasty.co/latest"
         
-    #driver = webdriver.Chrome()
-    #driver.get(url)
-    #showMore(driver,0)#click show more button a few times to get more links
-    #htmlSource = driver.page_source
+    driver = webdriver.Chrome()
+    driver.get(url)
+    showMore(driver,10)#click show more button a few times to get more links
+    htmlSource = driver.page_source
     
-    htmlSource = requests.get(url).content
+    #htmlSource = requests.get(url).content
     
     #get the inital source
     soup = BeautifulSoup(htmlSource, 'html5lib')  
@@ -46,14 +48,20 @@ def main():
     #create a soup object to be used on all the food items
     soup = BeautifulSoup(x,"html5lib")
     
-    x,y,z = extractFeatures(soup)
-    #print(f"length of titles is {len(x)}, length of links is {len(y)}, length of images is {len(z)}")
-    for title,link,img in zip(x,y,z):
-        break#print(f"title is: {title} with link: {link} with img: {img}")
+    titles,links,images = extractFeatures(soup)
+    #print(f"length of titles is {len(titles)}, length of links is {len(links)}, length of images is {len(images)}")
+    for title,link,img in zip(titles,links,images):
+        pass#print(f"title is: {title} with link: {link}")
         
     #Now we extract the info from each page
-    #The info is: Ingredients, prep steps,header image, tags and possibly other info
-
+    recipes=[]
+    for i in tqdm.trange(len(links)):
+        link=links[i]
+        recipe=createRecipe(link)
+        recipes.append(recipe)
+        print(link)
+        with open("sample.json", "a",encoding="utf-8") as outfile:
+            json.dump(recipe.to_dict(), outfile,indent=4,ensure_ascii=False)
     
     
 def extractServings(url:str):
@@ -61,7 +69,8 @@ def extractServings(url:str):
     soup = BeautifulSoup(htmlSource,"html5lib")
     
     servingClass = "servings-display xs-text-2 xs-mb2"
-    return soup.find(class_=servingClass).contents
+    
+    return soup.find(class_=servingClass).get_text()
     
     
 def extractIngredients(url:str):
@@ -125,21 +134,44 @@ def extractDescription(url:str):
     soup = BeautifulSoup(htmlSource,"html5lib")
     return soup.find("p",class_= descClass).text
     
-class Recipe():
-    def __init__(self, sectionsAndIngredients : Dict[str , List[str]],
-                 servings:str,
-                 desc: str,
-                 steps: List[str],
-                 
-                 ) ->None:
-        pass
-    
 
     
+    
+class Recipe():
+    def __init__(self,
+                 sectionsAndIngredients: Dict[str, List[str]],
+                 servings: str,
+                 desc: str,
+                 steps: List[str],
+                 tags: List[str],
+                 nutritionalInfo: List[str]) -> None:
+        self.sectionsAndIngredients = sectionsAndIngredients
+        self.servings = servings
+        self.desc = desc
+        self.steps = steps
+        self.tags = tags
+        self.nutritionalInfo = nutritionalInfo
+        
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True,)
+    def to_dict(self):
+        return self.__dict__
+    
+def createRecipe(url:str) -> Recipe:
+    sectionsAndIngredients = extractIngredients(url)    
+    servings = extractServings(url)
+    desc = extractDescription(url)
+    steps = extractSteps(url)
+    tags = extractTags(url)
+    nutritionalInfo = extractNutritionalInfo(url)
+    
+    return Recipe(sectionsAndIngredients,servings,desc,
+                  steps,tags,nutritionalInfo)
     
 
 def extractFeatures(soup: BeautifulSoup):
-    allLinks = ["tasty.co"+ item.get("href") for item in soup.find_all("a") if item.get("href")]
+    allLinks = ["https://tasty.co"+ item.get("href") for item in soup.find_all("a") if item.get("href")]
     allTitles = [title.text.strip() for title in soup.find_all("div",attrs={"class","feed-item__title"})]
     allImages = [img["src"] for img in soup.find_all("img") ] 
     
