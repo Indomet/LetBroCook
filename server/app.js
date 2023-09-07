@@ -9,7 +9,7 @@ const userModel = require("./models/userModel.js");
 
 // Variables
 var mongoURI =
-  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/animalDevelopmentDB";
+  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/LetBroCook";
 var port = process.env.PORT || 3000;
 
 // Connect to MongoDB
@@ -21,6 +21,13 @@ mongoose.connect(mongoURI).catch(function (err) {
   }
   console.log(`Connected to MongoDB with URI: ${mongoURI}`);
 });
+
+mongoose.connection.on('error', function(error){
+    console.error(error)
+})
+mongoose.connection.once('open', function(){
+    console.log('Connected to database')
+})
 
 // Create Express app
 var app = express();
@@ -38,6 +45,18 @@ app.get("/api", function (req, res) {
   res.json({ message: "Welcome to your DIT342 backend ExpressJS project!" });
 });
 
+app.get('/users', function (request, response, next) {
+    request.params.id
+    userModel.find({})
+    .then(function (users) {
+        response.json({ 'users': users });
+    })
+    .catch(function (error) {
+        response.status(500).json({ message : error.message})
+        return next(error); // Handle the error using Express's error handling middleware
+    });
+})
+
 
 
 //user login
@@ -45,23 +64,13 @@ app.get("/api", function (req, res) {
 //function to signup user
 app.post("/signup", (req, res, next) => {
   var user = new userModel(req.body);
-
-  if(!validateEmail(user.email)){
-    
-    next(new Error("Invalid email"))
-  }
-  else if(userModel.findById(req.body.id)){
-
-  }
-
-  user
-    .save()
-    .then(function (user) {
-      res.status(201).json(user);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  user.save()
+  .then(function (user){
+    res.status(201).json(user)
+  })
+  .catch(function(error){
+    next(error)
+  })
 });
 
 //add recipe to DB
@@ -116,6 +125,7 @@ app.use(express.static(client));
 // Error handler (i.e., when exception is thrown) must be registered last
 var env = app.get("env");
 // eslint-disable-next-line no-unused-vars
+
 app.use(function (err, req, res, next) {
   console.error(err.stack);
   var err_res = {
@@ -137,11 +147,4 @@ app.listen(port, function (err) {
   console.log(`Frontend (production): http://localhost:${port}/`);
 });
 
-function validateEmail(mail){
-    return String(mail)
-    .toLowerCase()
-    .match(//regex to match email patterns
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    )  
-}
 module.exports = app;
