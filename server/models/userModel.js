@@ -33,6 +33,11 @@ var userSchema= new Schema(
         recipes: {
             type: [Schema.Types.ObjectId],
             ref: 'recipes'
+        },
+
+        favouriteRecipes: {
+            type: [Schema.Types.ObjectId],
+            ref: 'favouriteRecipes'
         }
     }
 )
