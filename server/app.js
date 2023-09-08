@@ -13,15 +13,16 @@ var mongoURI =
 var port = process.env.PORT || 3000;
 
 // Connect to MongoDB
-mongoose.connect(mongoURI).catch(function (err) {
-  if (err) {
+mongoose.connect(mongoURI)
+  .then(() => {
+    console.log(`Connected to MongoDB with URI: ${mongoURI}`);
+  })
+  .catch((err) => {
     console.error(`Failed to connect to MongoDB with URI: ${mongoURI}`);
     console.error(err.stack);
     process.exit(1);
-  }
-  console.log(`Connected to MongoDB with URI: ${mongoURI}`);
-});
-
+  });
+  
 mongoose.connection.on('error', function(error){
     console.error(error)
 })
@@ -89,49 +90,41 @@ app.post("/recipe/create", (req, res, next) => {
 // update recipe 
 app.patch("/recipe/:id", function (req, res) {
   var id = req.params.id;
-  var recipe = new recipeModel(req.body);
   recipeModel
     .findById(id)
     .then(function (recipe) {
       if (recipe == null) {
         return res.status(404).json({ message: "recipe is null" });
       }
-      recipe.ingredients = (req.body.ingredients || recipe.ingredients);
-      recipe.steps = (req.body.steps || recipe.steps)
-      recipe.serving = (req.body.serving || recipe.serving)
-      recipe.description = (req.body.description || recipe.description)
-      recipe.tags =(req.body.tags || recipe.tags)
-      recipe.nutritionalInfo = (req.body.nutritionalInfo || recipe.nutritionalInfo)
-      recipe.save().then();
+      Object.assign(recipe, req.body); // Update user object with values from req.body instead of writing them one by one
+      recipe.save();
       res.json(recipe);
     })
     .catch(function (err) {
-      return res.status(500).json({ message: "recipe is not found" });
+      return res.status(500).json({ message: "500 Internal Server Error" });
     });
 });
 
 // update user 
 app.patch("/user/:id", function (req, res) {
   var id = req.params.id;
-  var user = new userModel(req.body);
   userModel
     .findById(id)
     .then(function (user) {
       if (user == null) {
         return res.status(404).json({ message: "user is null" });
       }
-      user.username = (req.body.username || user.username);
-      user.email = (req.body.email || user.email)
-      user.password = (req.body.password || user.password)
-      user.name = (req.body.name || user.name)
-      user.recipes =(req.body.recipes || user.recipes)
+      
+      Object.assign(user, req.body); 
+      
       user.save();
       res.json(user);
     })
     .catch(function (err) {
-      return res.status(500).json({ message: "user is not found" });
+      return res.status(500).json({ message: "500 Internal Server Error" });
     });
 });
+
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
