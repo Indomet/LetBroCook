@@ -57,7 +57,25 @@ app.get('/users', function (request, response, next) {
     });
 })
 
+app.get("/recipes/:recipeid",(req,res,next) =>{
+  recipeModel.findById(req.params.recipeid).
+  then(recipe => {res.status(200).json({"Recipe":recipe})}).
+  catch(err =>{return next(err)})
 
+
+});
+
+app.get('/recipes', function (request, response, next) {
+  request.params.id
+  recipeModel.find({})
+  .then(function (users) {
+      response.json({ 'recipes': users });
+  })
+  .catch(function (error) {
+      response.status(500).json({ message : error.message})
+      return next(error); // Handle the error using Express's error handling middleware
+  });
+})
 
 //user login
 
@@ -69,22 +87,53 @@ app.post("/signup", (req, res, next) => {
     res.status(201).json(user)
   })
   .catch(function(error){
-    next(error)
+    return next(error)
   })
 });
 
-//add recipe to DB
-app.post("/recipe/create", (req, res, next) => {
+//add a recipe to a users favourited list
+app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
+  const { userId, recipeId } = req.params;
+  try{
+    //attempt to find user
+    const user = await userModel.findById(userId)
+    if(!user){
+      //return resource not found error
+      return res.status(404).json({message: "User does not ecist"})
+    }
+    
+    user.favouriteRecipes.push(recipeId)
+    //request created
+    res.status(201).json({message: "Recipe added to favourite list"})
+
+  }
+
+  catch(error){
+    return next(error)
+  }
+
+});
+
+
+//add recipe to DB and to the users created recioes
+//TODODO DO 
+app.post("/users/:userId/create-recipe/", (req, res, next) => {
   var recipe = new recipeModel(req.body);
   recipe
     .save()
     .then(function (recipe) {
-      res.status(201).json(recipe);
+      userModel.findById(req.params.userId).then(user => {
+        user.recipes.push(recipe.id)
+        user.save().then(function(){res.status(201).json({message:"Recipe created"})}).
+        catch(err =>{return next(err)})
+      })
     })
     .catch((err) => {
-      next(err);
+      return next(err);
     });
 });
+
+app.get("/recipes/:id")
 
 // update
 app.patch("/recipe/:id", function (req, res) {
