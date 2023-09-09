@@ -87,6 +87,53 @@ app.post("/recipe/create", (req, res, next) => {
     });
 });
 
+// override recipe put
+app.put("/recipe/:id", function(req, res){
+  var id = req.params.id;
+  recipeModel
+    .findById(id)         //there is findByIDAndUpdate methodm todo check it out
+    .then(async function(recipe){
+      if (recipe == null) { 
+       return res.status(404).json({ message: "recipe is null" }) 
+      }
+      recipe.ingredients = req.body.ingredients;
+      recipe.steps = req.body.steps 
+      recipe.serving = req.body.serving
+      recipe.description = req.body.description 
+      recipe.tags =req.body.tags 
+      recipe.nutritionalInfo = req.body.nutritionalInfo 
+      await recipe.save();
+      res.json(recipe)
+    })
+    .catch(function (err) {
+      return res.status(500).json({message: err.message });
+    })
+  })
+
+
+// override user  put 
+app.put("/user/:id",  function (req, res){
+  var id = req.params.id;
+  userModel
+    .findById(id)
+    .then(async function (user){
+      if (user == null) {
+        return res.status(404).json({message: "user is null"})
+      }
+      user.username = req.body.username
+      user.email = req.body.email
+      user.password = req.body.password
+      user.name = req.body.name
+      user.recipes = req.body.recipes
+      await user.save(); // await is used to catch the error
+      res.json(user);
+    })
+    .catch(function (err) {
+      return res.status(500).json({message: err.message });
+    })
+    
+})
+
 // update recipe 
 app.patch("/recipe/:id", function (req, res) {
   var id = req.params.id;
@@ -101,8 +148,8 @@ app.patch("/recipe/:id", function (req, res) {
       res.json(recipe);
     })
     .catch(function (err) {
-      return res.status(500).json({ message: "500 Internal Server Error" });
-    });
+      return res.status(500).json({message: err.message });
+    })
 });
 
 // update user 
@@ -121,8 +168,8 @@ app.patch("/user/:id", function (req, res) {
       res.json(user);
     })
     .catch(function (err) {
-      return res.status(500).json({ message: "500 Internal Server Error" });
-    });
+      return res.status(500).json({message: err.message });
+    })
 });
 
 
