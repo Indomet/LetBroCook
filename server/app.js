@@ -61,9 +61,14 @@ app.get("/recipes/:recipeid",(req,res,next) =>{
   recipeModel.findById(req.params.recipeid).
   then(recipe => {res.status(200).json({"Recipe":recipe})}).
   catch(err =>{return next(err)})
-
-
 });
+
+app.get("/users/:userid",(req,res,next) =>{
+  userModel.findById(req.params.userid).
+  then(user => {res.status(200).json({"User":user})}).
+  catch(err =>{return next(err)})
+});
+
 
 app.get('/recipes', function (request, response, next) {
   request.params.id
@@ -90,6 +95,22 @@ app.post("/signup", (req, res, next) => {
     return next(error)
   })
 });
+//add a comment by a user to a certain recipe
+app.post('/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
+  const { userId, recipeId } = req.params;
+   userModel.findById(userId).then(user => {
+    recipeModel.findById(recipeId).then(async recipe=>{
+      const {body} = req.body
+      const newComment = {body: body,
+                          author : user.username}
+      recipe.comments.push(newComment)
+       recipe.save()
+      console.log("pushed")
+      res.status(201).json(newComment)
+    }).catch(err=> {return next(err)})
+  }).catch(err=> {return next(err)})
+
+})
 
 //add a recipe to a users favourited list
 app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
@@ -114,9 +135,6 @@ app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
 
 });
 
-
-//add recipe to DB and to the users created recioes
-//TODODO DO 
 app.post("/users/:userId/create-recipe/", (req, res, next) => {
   var recipe = new recipeModel(req.body);
   recipe
@@ -133,7 +151,6 @@ app.post("/users/:userId/create-recipe/", (req, res, next) => {
     });
 });
 
-app.get("/recipes/:id")
 
 // update
 app.patch("/recipe/:id", function (req, res) {

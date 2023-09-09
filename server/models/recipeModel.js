@@ -27,13 +27,20 @@ var recipeSchema= new Schema(
       required: true,
       default: {
          enum:['tag1', 'tag2', 'tag3', 'tag4']
-      }
+      }  
    },
    nutritionalInfo : {
       type: Array,
       required: true,
-      default: "No nutritional info"
-   }
+      default: "No nutritional info",
+   },
+   comments: [{type: {
+      type: String
+    },
+      body: String,
+      author: String,
+      date: {type: Date, default : Date.now},
+  }]
 }
 )
 
