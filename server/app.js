@@ -4,8 +4,9 @@ var morgan = require("morgan");
 var path = require("path");
 var cors = require("cors");
 var history = require("connect-history-api-fallback");
-const recipeModel = require("./models/recipeModel.js"); //. for windows
+const {recipeModel,Tag} = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
+
 
 // Variables
 var mongoURI =
@@ -81,11 +82,21 @@ app.get('/recipes', function (request, response, next) {
       return next(error); // Handle the error using Express's error handling middleware
   });
 })
-
+app.get('/tags', function (request, response, next) {
+  request.params.id
+  Tag.find({})
+  .then(function (tags) {
+      response.json({ 'tags': tags });
+  })
+  .catch(function (error) {
+      response.status(500).json({ message : error.message})
+      return next(error); // Handle the error using Express's error handling middleware
+  });
+})
 //user login
 
 //function to signup user
-app.post("/signup", (req, res, next) => {
+app.post("/users/signup", (req, res, next) => {
   var user = new userModel(req.body);
   user.save()
   .then(function (user){
@@ -135,14 +146,34 @@ app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
 
 });
 
-app.post("/users/:userId/create-recipe/", (req, res, next) => {
-  var recipe = new recipeModel(req.body);
+
+
+app.post("/users/:userId/create-recipe/",  async (req, res, next) => {
+  const recipeData = req.body;
+  const unformattedTags = req.body.tags
+
+  try {
+    //promises are required as all tags need to be saved
+    const savePromises = unformattedTags.map(async (element) => {
+      const tag = new Tag({ name: element });
+      return tag.save();
+    });
+    //create array to resolve all the promises and save all the tags
+    const savedTags = await Promise.all(savePromises);
+    //map each id to the recipe data ids
+    recipeData.tags = savedTags.map((tag) => tag._id);
+  } catch (err) {
+    return next(err);
+  }
+
+  var recipe = new recipeModel(recipeData);
   recipe
     .save()
     .then(function (recipe) {
       userModel.findById(req.params.userId).then(user => {
         user.recipes.push(recipe.id)
-        user.save().then(function(){res.status(201).json({message:"Recipe created"})}).
+        user.save().then(function(){res.status(201).json({message:"Recipe created",
+                                                          Recipe : recipe})}).
         catch(err =>{return next(err)})
       })
     })
@@ -150,6 +181,9 @@ app.post("/users/:userId/create-recipe/", (req, res, next) => {
       return next(err);
     });
 });
+
+
+
 
 
 // update
@@ -160,7 +194,7 @@ app.patch("/recipe/:id", function (req, res) {
     .findById(id)
     .then(function (recipe) {
       if (recipe == null) {
-        return res.status(404).json({ message: "recipe is nnull" });
+        return res.status(404).json({ message: "recipe is null" });
       }
       recipe.ingredients = (req.body.ingredients || recipe.ingredients);
       recipe.steps = (req.body.steps || recipe.steps)
