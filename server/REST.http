@@ -39,12 +39,12 @@ Content-Type: application/json
 }
 
 ###
-PATCH  http://127.0.0.1:3000/recipe/64fa27aa0f10a759d30bba3d
+PATCH  http://127.0.0.1:3000/recipe/64fa307f2f17d5b12e8b93b4
 Content-Type: application/json
 
 {
    "ingredients": [
-      "Ingraaeddefefient 1",
+      "asim",
       "Ingredientjkbkjhj 2",
       "Ingredient 3"
    ],
@@ -83,12 +83,12 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/signup
+PUT http://127.0.0.1:3000/user/64fae07460d5ee1ec21a21ac
 Content-Type: application/json
 
 {
-    "username": "User2",
-    "email": "validEmail@gmail.com",
+    "username": "asim",
+    "email": "asim@gmail.com",
     "password": "123",
     "name": "Bruh"
 }
