@@ -134,43 +134,122 @@ app.put("/user/:id",  function (req, res){
     
 })
 
-// update recipe 
-app.patch("/recipe/:id", function (req, res) {
-  var id = req.params.id;
-  recipeModel
-    .findById(id)
-    .then(function (recipe) {
-      if (recipe == null) {
-        return res.status(404).json({ message: "recipe is null" });
-      }
-      Object.assign(recipe, req.body); // Update user object with values from req.body instead of writing them one by one
-      recipe.save();
-      res.json(recipe);
-    })
-    .catch(function (err) {
-      return res.status(500).json({message: err.message });
-    })
+//  handle existing tags
+const handleExistingTags = async (tags) => {
+  const formattedTags = [];
+
+  for (const element of tags) {
+    let existingTag = await Tag.findOne({ name: element });
+
+    if (!existingTag) {
+      existingTag = new Tag({ name: element });
+      await existingTag.save();
+    }
+
+    formattedTags.push(existingTag);
+  }
+
+  return formattedTags;
+};
+
+
+// update a recipe
+app.patch("/v1/users/:userId/update-recipe/:recipeId", async (req, res, next) => {
+  const { userId, recipeId } = req.params;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
+
+  try {
+    const formattedTags = await handleExistingTags(unformattedTags);
+    updatedRecipeData.tags = formattedTags;
+    
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+
+    const user = await userModel.findById(userId);
+
+
+    const recipeIndex = user.recipes.indexOf(recipeId);
+    // it is -1 because If it's not found, it returns -1.
+    if (recipeIndex === -1) {
+      return res.status(404).json({ message: "Recipe not found for this user" });
+    }
+
+    const updatedRecipe = await recipeModel.findByIdAndUpdate(recipeId, updatedRecipeData);
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
+    res.status(200).json({ message: "Recipe updated", Recipe: {
+       // ... is a spread syntax and i used it to add edited tags in the middle of the model and not at the end
+        ...updatedRecipe.toObject(),
+        tags: tagDetails, 
+      } });
+  } catch (err) {
+    return next(err);
+  }
 });
 
-// update user 
-app.patch("/user/:id", function (req, res) {
-  var id = req.params.id;
-  userModel
-    .findById(id)
-    .then(function (user) {
-      if (user == null) {
-        return res.status(404).json({ message: "user is null" });
+
+
+app.patch("/v1/users/:userId/update-user", (req, res, next) => {
+  var userId = req.params.userId;
+  userModel.findByIdAndUpdate(userId, req.body)
+    .then(function(user) {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
       }
-      
-      Object.assign(user, req.body); 
-      
-      user.save();
       res.json(user);
     })
-    .catch(function (err) {
-      return res.status(500).json({message: err.message });
-    })
+    .catch(function(error) {
+      return next(error);
+    });
 });
+
+// this one works as well
+//   app.patch("/v1/users/:userId/update-user", function (req, res) {
+//     var userId = req.params.userId;
+//     userModel
+//       .findById(userId)
+//       .then(function (user) {
+//         if (user == null) {
+//           return res.status(404).json({ message: "user is null" });
+//         }
+//         Object.assign(user, req.body); // this is basically 
+//         user.save();
+//         res.json(user);
+//       })
+//       .catch(function (err) {
+//         return res.status(500).json({ message: "user is not found" });
+//       });
+//   });
+
+app.patch('/v1/users/:userId/recipes/:recipeId/update-comment/:commentId', async (req, res, next) => {
+  try {
+    const { userId, recipeId, commentId } = req.params;
+
+    const user = await userModel.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const recipe = await recipeModel.findById(recipeId);
+    if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
+
+    const commentToUpdate = recipe.comments.id(commentId);
+    if (!commentToUpdate) return res.status(404).json({ message: 'Comment not found' });
+
+    const { body } = req.body;
+    commentToUpdate.body = body;
+
+    const updatedRecipe = await recipe.save();
+    res.json(updatedRecipe.comments);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
