@@ -87,52 +87,6 @@ app.post("/recipe/create", (req, res, next) => {
     });
 });
 
-// override recipe put
-app.put("/recipe/:id", function(req, res){
-  var id = req.params.id;
-  recipeModel
-    .findById(id)         //there is findByIDAndUpdate methodm todo check it out
-    .then(async function(recipe){
-      if (recipe == null) { 
-       return res.status(404).json({ message: "recipe is null" }) 
-      }
-      recipe.ingredients = req.body.ingredients;
-      recipe.steps = req.body.steps 
-      recipe.serving = req.body.serving
-      recipe.description = req.body.description 
-      recipe.tags =req.body.tags 
-      recipe.nutritionalInfo = req.body.nutritionalInfo 
-      await recipe.save();
-      res.json(recipe)
-    })
-    .catch(function (err) {
-      return res.status(500).json({message: err.message });
-    })
-  })
-
-
-// override user  put 
-app.put("/user/:id",  function (req, res){
-  var id = req.params.id;
-  userModel
-    .findById(id)
-    .then(async function (user){
-      if (user == null) {
-        return res.status(404).json({message: "user is null"})
-      }
-      user.username = req.body.username
-      user.email = req.body.email
-      user.password = req.body.password
-      user.name = req.body.name
-      user.recipes = req.body.recipes
-      await user.save(); // await is used to catch the error
-      res.json(user);
-    })
-    .catch(function (err) {
-      return res.status(500).json({message: err.message });
-    })
-    
-})
 
 //  handle existing tags
 const handleExistingTags = async (tags) => {
@@ -153,8 +107,8 @@ const handleExistingTags = async (tags) => {
 };
 
 
-// update a recipe
-app.patch("/v1/users/:userId/update-recipe/:recipeId", async (req, res, next) => {
+// edit a recipe
+app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
   const { userId, recipeId } = req.params;
   const updatedRecipeData = req.body;
   const unformattedTags = req.body.tags;
@@ -166,10 +120,7 @@ app.patch("/v1/users/:userId/update-recipe/:recipeId", async (req, res, next) =>
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID format" });
     }
-
     const user = await userModel.findById(userId);
-
-
     const recipeIndex = user.recipes.indexOf(recipeId);
     // it is -1 because If it's not found, it returns -1.
     if (recipeIndex === -1) {
@@ -193,8 +144,8 @@ app.patch("/v1/users/:userId/update-recipe/:recipeId", async (req, res, next) =>
 });
 
 
-
-app.patch("/v1/users/:userId/update-user", (req, res, next) => {
+// edit a user
+app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
   var userId = req.params.userId;
   userModel.findByIdAndUpdate(userId, req.body)
     .then(function(user) {
@@ -209,7 +160,7 @@ app.patch("/v1/users/:userId/update-user", (req, res, next) => {
 });
 
 // this one works as well
-//   app.patch("/v1/users/:userId/update-user", function (req, res) {
+//   app.patch("/v1/users/:userId/edit-user", function (req, res) {
 //     var userId = req.params.userId;
 //     userModel
 //       .findById(userId)
@@ -226,7 +177,8 @@ app.patch("/v1/users/:userId/update-user", (req, res, next) => {
 //       });
 //   });
 
-app.patch('/v1/users/:userId/recipes/:recipeId/update-comment/:commentId', async (req, res, next) => {
+// edit a comment
+app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (req, res, next) => {
   try {
     const { userId, recipeId, commentId } = req.params;
 
@@ -250,6 +202,66 @@ app.patch('/v1/users/:userId/recipes/:recipeId/update-comment/:commentId', async
 });
 
 
+//replace a user
+app.put("/v1/users/:userId/replace-user", function (req, res, next) {
+  var userId = req.params.userId;
+  userModel
+      .findById(userId)
+      .then(function (user) {
+          if (user == null) {
+              return res.status(404).json({ message: "User not found" });
+          }
+          const { username, email, password, name, recipes, favouriteRecipes } = req.body;
+          user.set({ username, email, password, name, recipes, favouriteRecipes });
+          user.save()
+              .then(updatedUser => {
+                  res.json(updatedUser);
+              })
+              .catch(err => {
+                  return next(err);
+              });
+      })
+      .catch((err) => {
+          return next(err);
+      });
+});
+
+
+//replacce a recipe
+app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => {
+  const { userId, recipeId } = req.params;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
+
+  try {
+      const formattedTags = await handleExistingTags(unformattedTags);
+      updatedRecipeData.tags = formattedTags;
+
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ message: "Invalid user ID format" });
+      }
+      const user = await userModel.findById(userId);
+
+      const recipeIndex = user.recipes.indexOf(recipeId);
+      if (recipeIndex === -1) {
+          return res.status(404).json({ message: "Recipe not found for this user" });
+      }
+      const updatedRecipe = await recipeModel.findById(recipeId);
+      if (!updatedRecipe) {
+          return res.status(404).json({ message: "Recipe not found" });
+      }
+      const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+      updatedRecipe.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
+
+      await updatedRecipe.save();
+      const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
+      res.status(200).json({message: "Recipe updated", Recipe: { ...updatedRecipe.toObject(),tags: tagDetails,}
+      });
+    
+  } catch (err) {
+      return next(err);
+  }
+});
 
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
