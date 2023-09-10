@@ -239,6 +239,23 @@ app.patch("/v1/recipe/:id", function (req, res) {
       return res.status(500).json({ message: "recipe is not found" });
     });
 });
+
+//Delete recipe by id
+
+app.delete('/v1/recipe/deleteOne/:id', function(req, res, next){
+    var id = req.params.id
+    recipeModel.findByIdAndDelete(id)
+    .then(function(recipe){
+        if(!recipe){
+            return res.status(404).json({message: "Recipe does not exist"})
+        }
+        return res.status(200).json({message: "Recipe deleted", body: recipe})
+    }).catch(function(error){
+        return next(error)
+    })
+})
+
+
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
   res.status(404).json({ message: "Not Found" });
