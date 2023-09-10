@@ -1,6 +1,5 @@
-from typing import Dict, List
+from typing import Dict, List, Callable, Optional
 from bs4 import BeautifulSoup
-from numpy import extract, info, rec
 import requests
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,37 +8,17 @@ from selenium import webdriver
 import tqdm
 import json
 
-def getAllRecipes(soup : BeautifulSoup, url):
-    
-    allATags = soup.find_all("a")#get list of all elemtns with tag a
-    alllinks = [url + x.get("href") for x in allATags if x.get("href")]#get all links with attr href
-    return {link for link in alllinks if "/recipe/" in link}#get all recipe links
      
-    
-def showMore(driver: webdriver.Chrome,clicksAmount):
-    
-    for i in range(clicksAmount):
-        try:
-            #wait for driver to locate the button
-            showMoreBTN = WebDriverWait(driver, 15).until(
-                #presence of elemnt returns the button object after its located
-                EC.presence_of_element_located((By.CLASS_NAME, "show-more-button"))
-            )
-            
-            #execute JS funciton to click the button
-            driver.execute_script("arguments[0].click();", showMoreBTN)
-        
-        except Exception as e:
-            print(f"Error: {e}")
+
 def main():
     url="https://tasty.co/latest"
         
-    driver = webdriver.Chrome()
+    '''driver = webdriver.Chrome()
     driver.get(url)
     showMore(driver,10)#click show more button a few times to get more links
-    htmlSource = driver.page_source
+    htmlSource = driver.page_source'''
     
-    #htmlSource = requests.get(url).content
+    htmlSource = requests.get(url).content
     
     #get the inital source
     soup = BeautifulSoup(htmlSource, 'html5lib')  
@@ -49,30 +28,60 @@ def main():
     soup = BeautifulSoup(x,"html5lib")
     
     titles,links,images = extractFeatures(soup)
-    #print(f"length of titles is {len(titles)}, length of links is {len(links)}, length of images is {len(images)}")
-    for title,link,img in zip(titles,links,images):
-        pass#print(f"title is: {title} with link: {link}")
         
     #Now we extract the info from each page
-    recipes=[]
-    for i in tqdm.trange(len(links)):
+    recipes= []
+    for i in tqdm.trange(len([22,2])):
         link=links[i]
         recipe=createRecipe(link)
         recipes.append(recipe)
-        print(link)
-        with open("sample.json", "a",encoding="utf-8") as outfile:
-            json.dump(recipe.to_dict(), outfile,indent=4,ensure_ascii=False)
+        
+    with open("RecipeData.json", "w",encoding="utf-8") as outfile:
+        # Create a dictionary with a key for the list of recipes
+        recipeDicts = [recipe.to_dict() for recipe in recipes]
+        #data = {"recipes": recipeDicts}perhaps this is needed to get the val not sure yet 
+        json.dump(recipeDicts, outfile, indent=4, ensure_ascii=False)
+
+def scrapeContent(url: str, htmlClass: str, isSingleElement: bool,
+        conditionFunction: Optional[Callable[[BeautifulSoup], bool]] = lambda _: True,
+        htmlTag=None,):
     
+    html_source = requests.get(url).content
+    soup = BeautifulSoup(html_source, "html5lib")
+    
+    elements = soup.find_all(htmlTag,class_=htmlClass)
+    
+    if isSingleElement:
+        return elements[0].getText() if elements else ""
+    else:
+        return [element.get_text() for element in elements if conditionFunction(element)]
+
     
 def extractServings(url:str):
-    htmlSource = requests.get(url).content
-    soup = BeautifulSoup(htmlSource,"html5lib")
+    htmlClass = "servings-display xs-text-2 xs-mb2"
+    return scrapeContent(url,htmlClass,True)
     
-    servingClass = "servings-display xs-text-2 xs-mb2"
+def extractDescription(url:str):
+    htmlClass="description xs-text-4 md-text-3 lg-text-2 xs-mb2 lg-mb2 lg-pb05"
+    return scrapeContent(url,htmlClass,True)
+
+def extractTags(url:str):
+    tagsClass = "breadcrumb_item xs-mr1"
+    return scrapeContent(url=url,htmlClass=tagsClass,htmlTag="a",isSingleElement=False)
     
-    return soup.find(class_=servingClass).get_text()
-    
-    
+
+def extractNutritionalInfo(url:str):
+    infoClass = "list-unstyled xs-mb1"
+    htmlTag = "li"
+    return scrapeContent(url=url,htmlClass=infoClass,isSingleElement=False,htmlTag=htmlTag)
+
+
+def extractSteps(url:str):
+    prepClass = "xs-mb2"
+    htmlTag= "li"
+    excludeLinks = lambda element: not element.find("a") 
+    return scrapeContent(url,prepClass,False,excludeLinks,htmlTag)
+
 def extractIngredients(url:str):
     """The method takes in a url from the website Tasty.co and returns 
         a dict with the section and its ingredients in a dict with the number of
@@ -100,73 +109,33 @@ def extractIngredients(url:str):
         ingredsWithSection[sectionName] = ingredients
         
     return ingredsWithSection
-
-def extractTags(url:str):
-    htmlSource = requests.get(url).content
-    soup = BeautifulSoup(htmlSource,"html5lib")
-    tagsClass = "breadcrumb_item xs-mr1"
-    allTags = soup.find_all("a",class_=tagsClass)
-    return [tag.get_text() for tag in allTags]
-   
-def extractNutritionalInfo(url:str):
-    infoClass = "list-unstyled xs-mb1"
-    htmlSource = requests.get(url).content
-    soup = BeautifulSoup(htmlSource,"html5lib")
-    #will return an empty array if there is no nutritonal info
-    return [info.get_text() for info in soup.find_all("li",class_=infoClass)]
-    
-    
-def extractSteps(url:str):
-    prepClass = "xs-mb2"
-    htmlSource = requests.get(url).content
-    soup = BeautifulSoup(htmlSource,"html5lib")
-    
-    allSteps = soup.find_all("li",class_= prepClass)
-    #exclude steps with links as they contain ads
-    steps = [step.get_text() for step in allSteps if step if not step.find("a")]
-    
-    return steps
-
-def extractDescription(url:str):
-    descClass ="description xs-text-4 md-text-3 lg-text-2 xs-mb2 lg-mb2 lg-pb05"
-    
-    htmlSource = requests.get(url).content
-    soup = BeautifulSoup(htmlSource,"html5lib")
-    return soup.find("p",class_= descClass).text
-    
-
-    
     
 class Recipe():
     def __init__(self,
                  sectionsAndIngredients: Dict[str, List[str]],
                  servings: str,
-                 desc: str,
+                 description: str,
                  steps: List[str],
                  tags: List[str],
                  nutritionalInfo: List[str]) -> None:
         self.sectionsAndIngredients = sectionsAndIngredients
         self.servings = servings
-        self.desc = desc
+        self.description = description
         self.steps = steps
         self.tags = tags
         self.nutritionalInfo = nutritionalInfo
         
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True,)
     def to_dict(self):
         return self.__dict__
-    
+
 def createRecipe(url:str) -> Recipe:
     sectionsAndIngredients = extractIngredients(url)    
     servings = extractServings(url)
-    desc = extractDescription(url)
+    description = extractDescription(url)
     steps = extractSteps(url)
     tags = extractTags(url)
     nutritionalInfo = extractNutritionalInfo(url)
-    
-    return Recipe(sectionsAndIngredients,servings,desc,
+    return Recipe(sectionsAndIngredients,servings,description,
                   steps,tags,nutritionalInfo)
     
 
@@ -174,6 +143,21 @@ def extractFeatures(soup: BeautifulSoup):
     allLinks = ["https://tasty.co"+ item.get("href") for item in soup.find_all("a") if item.get("href")]
     allTitles = [title.text.strip() for title in soup.find_all("div",attrs={"class","feed-item__title"})]
     allImages = [img["src"] for img in soup.find_all("img") ] 
-    
     return allTitles,allLinks,allImages
+
+def showMore(driver: webdriver.Chrome,clicksAmount):
+    
+    for _ in range(clicksAmount):
+        try:
+            #wait for driver to locate the button
+            showMoreBTN = WebDriverWait(driver, 15).until(
+                #presence of elemnt returns the button object after its located
+                EC.presence_of_element_located((By.CLASS_NAME, "show-more-button")))
+            
+            #execute JS funciton to click the button
+            driver.execute_script("arguments[0].click();", showMoreBTN)
+        
+        except Exception as e:
+            print(f"Error: {e}")
+
 if __name__=="__main__":main()
