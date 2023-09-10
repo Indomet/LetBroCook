@@ -4,8 +4,8 @@ var Schema = mongoose.Schema
 var tagSchema = new Schema({
    name: {
      type: String,
-     unique: true
-   },
+     unique : false,
+   }
 });
 
 var recipeSchema= new Schema(
@@ -29,14 +29,12 @@ var recipeSchema= new Schema(
       required: true,
       default: "Empty description"
    },
-   /*tags: {
-      type: Array,
-      required: true,
-      default: {
-         enum:['tag1', 'tag2', 'tag3', 'tag4']
-      }  
-   },*/
-   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
+  tags: [{
+      type: Schema.Types.ObjectId,
+      ref: "Tag",
+      _id:false
+   }],
+
    nutritionalInfo : {
       type: Array,
       required: true,

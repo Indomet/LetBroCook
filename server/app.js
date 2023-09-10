@@ -46,47 +46,59 @@ app.get("/api", function (req, res) {
   res.json({ message: "Welcome to your DIT342 backend ExpressJS project!" });
 });
 
-app.get('/users', function (request, response, next) {
-    request.params.id
+app.get('/v1/users', function (req, res, next) {
+  //label cache-ability
+    res.set('Cache-control', `no-store`)
+
+    req.params.id
     userModel.find({})
     .then(function (users) {
-        response.json({ 'users': users });
+        res.json({ 'users': users });
     })
     .catch(function (error) {
-        response.status(500).json({ message : error.message})
+        res.status(500).json({ message : error.message})
         return next(error); // Handle the error using Express's error handling middleware
     });
 })
 
-app.get("/recipes/:recipeid",(req,res,next) =>{
+app.get("/v1/recipes/:recipeid",(req,res,next) =>{
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
   recipeModel.findById(req.params.recipeid).
-  then(recipe => {res.status(200).json({"Recipe":recipe})}).
+  then(recipe => {
+    res.status(200).json({"Recipe":recipe})}).
   catch(err =>{return next(err)})
 });
 
-app.get("/users/:userid",(req,res,next) =>{
+app.get("/v1/users/:userid",(req,res,next) =>{
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
   userModel.findById(req.params.userid).
   then(user => {res.status(200).json({"User":user})}).
   catch(err =>{return next(err)})
 });
 
 
-app.get('/recipes', function (request, response, next) {
-  request.params.id
+app.get('/v1/recipes', function (req, res, next) {
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  req.params.id
   recipeModel.find({})
   .then(function (users) {
-      response.json({ 'recipes': users });
+      res.json({ 'recipes': users });
   })
   .catch(function (error) {
-      response.status(500).json({ message : error.message})
+      res.status(500).json({ message : error.message})
       return next(error); // Handle the error using Express's error handling middleware
   });
 })
-app.get('/tags', function (request, response, next) {
-  request.params.id
+app.get('/v1/tags', function (req, res, next) {
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  req.params.id
   Tag.find({})
   .then(function (tags) {
-      response.json({ 'tags': tags });
+      res.json({ 'tags': tags });
   })
   .catch(function (error) {
       response.status(500).json({ message : error.message})
@@ -96,7 +108,7 @@ app.get('/tags', function (request, response, next) {
 //user login
 
 //function to signup user
-app.post("/users/signup", (req, res, next) => {
+app.post("/v1/users/signup", (req, res, next) => {
   var user = new userModel(req.body);
   user.save()
   .then(function (user){
@@ -107,7 +119,7 @@ app.post("/users/signup", (req, res, next) => {
   })
 });
 //add a comment by a user to a certain recipe
-app.post('/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
+app.post('/v1/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
   const { userId, recipeId } = req.params;
    userModel.findById(userId).then(user => {
     recipeModel.findById(recipeId).then(async recipe=>{
@@ -124,7 +136,7 @@ app.post('/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
 })
 
 //add a recipe to a users favourited list
-app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
+app.post('/v1/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
   const { userId, recipeId } = req.params;
   try{
     //attempt to find user
@@ -148,20 +160,24 @@ app.post('/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
 
 
 
-app.post("/users/:userId/create-recipe/",  async (req, res, next) => {
+app.post("/v1/users/:userId/create-recipe/",  async (req, res, next) => {
   const recipeData = req.body;
   const unformattedTags = req.body.tags
 
   try {
-    //promises are required as all tags need to be saved
-    const savePromises = unformattedTags.map(async (element) => {
-      const tag = new Tag({ name: element });
-      return tag.save();
-    });
-    //create array to resolve all the promises and save all the tags
-    const savedTags = await Promise.all(savePromises);
-    //map each id to the recipe data ids
-    recipeData.tags = savedTags.map((tag) => tag._id);
+    var formattedTags = []
+    for(const element of unformattedTags){
+      //make a query to find if a tag already exists
+      let existingTag = await Tag.findOne({name: element})
+      //if the tag doesnt exist create a new one and save it
+      if(!existingTag){
+        existingTag = new Tag({name:element})
+        await existingTag.save()
+        }
+
+        formattedTags.push(existingTag);
+        recipeData.tags = formattedTags;
+    }
   } catch (err) {
     return next(err);
   }
@@ -187,7 +203,7 @@ app.post("/users/:userId/create-recipe/",  async (req, res, next) => {
 
 
 // update
-app.patch("/recipe/:id", function (req, res) {
+app.patch("/v1/recipe/:id", function (req, res) {
   var id = req.params.id;
   var recipe = new recipeModel(req.body);
   recipeModel
