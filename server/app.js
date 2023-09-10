@@ -143,7 +143,6 @@ app.post('/v1/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
                           author : user.username}
       recipe.comments.push(newComment)
        recipe.save()
-      console.log("pushed")
       res.status(201).json(newComment)
     }).catch(err=> {return next(err)})
   }).catch(err=> {return next(err)})

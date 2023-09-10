@@ -10,16 +10,21 @@ var tagSchema = new Schema({
 
 var recipeSchema= new Schema(
 {
-   ingredients : { //for now its just an array but ideally it would be a map/dict
+   /*ingredients : { //for now its just an array but ideally it would be a map/dict
       type: Array,
       required: true,
-   }, 
+   },*/
+   sectionsAndIngredients: {
+      type: Map,
+      of: Array
+    }
+   ,
    steps: {
       type: Array,
       required: true,
       default: "No available steps"
    },
-   serving: {
+   servings: {
       type: String,
       required: true,
       default: "Empty serving info"
