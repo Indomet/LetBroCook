@@ -118,7 +118,7 @@ app.post("/v1/users/signup", (req, res, next) => {
   })
 });
 
-app.get('/v1/users/sign-in', async (req,res,next)=>{
+app.get('/v1/user/sign-in', async (req,res,next)=>{
   const {email,password} = req.body
   if(!email) return res.status(404).json({message:"Email required"})
 
