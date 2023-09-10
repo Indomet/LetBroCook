@@ -4,8 +4,10 @@ var morgan = require("morgan");
 var path = require("path");
 var cors = require("cors");
 var history = require("connect-history-api-fallback");
-const recipeModel = require("./models/recipeModel.js"); //. for windows
+const {recipeModel,Tag} = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
+const serverUtil = require('./serverUtil.js');
+
 
 // Variables
 var mongoURI =
@@ -46,44 +48,168 @@ app.get("/api", function (req, res) {
   res.json({ message: "Welcome to your DIT342 backend ExpressJS project!" });
 });
 
-app.get('/users', function (request, response, next) {
-    request.params.id
+app.get('/v1/users', function (req, res, next) {
+  //label cache-ability
+    res.set('Cache-control', `no-store`)
     userModel.find({})
     .then(function (users) {
-        response.json({ 'users': users });
+        res.json({ 'users': users });
     })
     .catch(function (error) {
-        response.status(500).json({ message : error.message})
+        res.status(500).json({ message : error.message})
         return next(error); // Handle the error using Express's error handling middleware
     });
 })
 
+app.get("/v1/recipes/:recipeid",(req,res,next) =>{
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  recipeModel.findById(req.params.recipeid).
+  then(recipe => {
+    res.status(200).json({"Recipe":recipe})}).
+  catch(err =>{return next(err)})
+});
+
+app.get("/v1/users/:userid",(req,res,next) =>{
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  userModel.findById(req.params.userid).
+  then(user => {res.status(200).json({"User":user})}).
+  catch(err =>{return next(err)})
+});
 
 
-//user login
+app.get('/v1/recipes', function (req, res, next) {
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  recipeModel.find({})
+  .then(function (users) {
+      res.json({ 'recipes': users });
+  })
+  .catch(function (error) {
+      res.status(500).json({ message : error.message})
+      return next(error); // Handle the error using Express's error handling middleware
+  });
+})
+app.get('/v1/tags', function (req, res, next) {
+  //label cache-ability
+  res.set('Cache-control', `no-store`)
+  Tag.find({})
+  .then(function (tags) {
+      res.json({ 'tags': tags });
+  })
+  .catch(function (error) {
+      response.status(500).json({ message : error.message})
+      return next(error); // Handle the error using Express's error handling middleware
+  });
+})
 
 //function to signup user
-app.post("/signup", (req, res, next) => {
+app.post("/v1/users/signup", (req, res, next) => {
   var user = new userModel(req.body);
   user.save()
   .then(function (user){
     res.status(201).json(user)
   })
   .catch(function(error){
-    next(error)
+    return next(error)
   })
 });
 
-//add recipe to DB
-app.post("/recipe/create", (req, res, next) => {
-  var recipe = new recipeModel(req.body);
+app.get('/v1/user/sign-in', async (req,res,next)=>{
+  const {email,password} = req.body
+  if(!userModel) return res.status(404).json({message:"Email required"})
+
+  await userModel.findOne({email:email}).exec().then(user=> {
+    if(!serverUtil.validateEmail(email)){return res.status(404).json({message:"Please input a correct email"})}
+    else if(!user) return res.status(404).json({message:"Account not registered"})
+    
+    user.comparePassword(password,((err,isMatch)=>{
+      if(err) {return next(err)}
+      else if(isMatch){res.json(user)}
+      else{res.status(401).json({message:"Email or password is incorrect"})}
+
+    }))
+  }).catch(err=>{return next(err)})
+
+})
+
+//add a comment by a user to a certain recipe
+app.post('/v1/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
+  const { userId, recipeId } = req.params;
+   userModel.findById(userId).then(user => {
+    recipeModel.findById(recipeId).then(async recipe=>{
+      const {body} = req.body
+      const newComment = {body: body,
+                          author : user.username}
+      recipe.comments.push(newComment)
+       recipe.save()
+      res.status(201).json(newComment)
+    }).catch(err=> {return next(err)})
+  }).catch(err=> {return next(err)})
+
+})
+
+//add a recipe to a users favourited list
+app.post('/v1/users/:userId/favorite-recipes/:recipeId', async (req, res,next) => {
+  const { userId, recipeId } = req.params;
+  try{
+    //attempt to find user
+    const user = await userModel.findById(userId)
+    if(!user){
+      //return resource not found error
+      return res.status(404).json({message: "User does not ecist"})
+    }
+    
+    user.favouriteRecipes.push(recipeId)
+    //request created
+    res.status(201).json({message: "Recipe added to favourite list"})
+
+  }
+
+  catch(error){
+    return next(error)
+  }
+
+});
+
+
+
+app.post("/v1/users/:userId/create-recipe/",  async (req, res, next) => {
+  const recipeData = req.body;
+  const unformattedTags = req.body.tags
+
+  try {
+    var formattedTags = []
+    for(const element of unformattedTags){
+      //make a query to find if a tag already exists
+      let existingTag = await Tag.findOne({name: element})
+      //if the tag doesnt exist create a new one and save it
+      if(!existingTag){
+        existingTag = new Tag({name:element})
+        await existingTag.save()
+        }
+
+        formattedTags.push(existingTag);
+        recipeData.tags = formattedTags;
+    }
+  } catch (err) {
+    return next(err);
+  }
+
+  var recipe = new recipeModel(recipeData);
   recipe
     .save()
     .then(function (recipe) {
-      res.status(201).json(recipe);
+      userModel.findById(req.params.userId).then(user => {
+        user.recipes.push(recipe.id)
+        user.save().then(function(){res.status(201).json({message:"Recipe created",
+                                                          Recipe : recipe})}).
+        catch(err =>{return next(err)})
+      })
     })
     .catch((err) => {
-      next(err);
+      return next(err);
     });
 });
 
@@ -262,6 +388,20 @@ app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => 
       return next(err);
   }
 });
+//Delete recipe by id
+
+app.delete('/v1/recipe/deleteOne/:id', function(req, res, next){
+    var id = req.params.id
+    recipeModel.findByIdAndDelete(id)
+    .then(function(recipe){
+        if(!recipe){
+            return res.status(404).json({message: "Recipe does not exist"})
+        }
+        return res.status(200).json({message: "Recipe deleted", body: recipe})
+    }).catch(function(error){
+        return next(error)
+    })
+})
 
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
