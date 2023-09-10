@@ -118,8 +118,10 @@ app.post("/v1/users/signup", (req, res, next) => {
   })
 });
 
-app.get('/v1/user/login', async (req,res,next)=>{
+app.get('/v1/users/sign-in', async (req,res,next)=>{
   const {email,password} = req.body
+  if(!email) return res.status(404).json({message:"Email required"})
+
   const user = await userModel.findOne({email:email}).exec().then(user=> {
     user.comparePassword(password,((err,isMatch)=>{
       if(err) {return next(err)}
