@@ -1,20 +1,12 @@
 var mongoose = require("mongoose")
 var Schema = mongoose.Schema
 var bcrypt = require("bcrypt")
-
+var validateEmail = require(".././serverUtil.js").validateEmail
 
 
 //salt work factor helps against rainbow table attacks if someone gets access of db
 //so this makes the key setup more expensive to combat server ddos
 const SALT_WORK_FACTOR = 10;
-
-
-
-var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-var validateEmail = function(email) {
-    return regex.test(email)
-};
 
 var userSchema= new Schema(
     {
@@ -80,6 +72,8 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
         cb(null, isMatch);
     });
 };
+userSchema.methods.validateEmail = validateEmail
+
 
 const userModel = mongoose.model('users', userSchema);
 module.exports = userModel

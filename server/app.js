@@ -6,6 +6,7 @@ var cors = require("cors");
 var history = require("connect-history-api-fallback");
 const {recipeModel,Tag} = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
+const serverUtil = require('./serverUtil.js');
 
 
 // Variables
@@ -49,8 +50,6 @@ app.get("/api", function (req, res) {
 app.get('/v1/users', function (req, res, next) {
   //label cache-ability
     res.set('Cache-control', `no-store`)
-
-    req.params.id
     userModel.find({})
     .then(function (users) {
         res.json({ 'users': users });
@@ -82,7 +81,6 @@ app.get("/v1/users/:userid",(req,res,next) =>{
 app.get('/v1/recipes', function (req, res, next) {
   //label cache-ability
   res.set('Cache-control', `no-store`)
-  req.params.id
   recipeModel.find({})
   .then(function (users) {
       res.json({ 'recipes': users });
@@ -95,7 +93,6 @@ app.get('/v1/recipes', function (req, res, next) {
 app.get('/v1/tags', function (req, res, next) {
   //label cache-ability
   res.set('Cache-control', `no-store`)
-  req.params.id
   Tag.find({})
   .then(function (tags) {
       res.json({ 'tags': tags });
@@ -120,9 +117,12 @@ app.post("/v1/users/signup", (req, res, next) => {
 
 app.get('/v1/user/sign-in', async (req,res,next)=>{
   const {email,password} = req.body
-  if(!email) return res.status(404).json({message:"Email required"})
+  if(!userModel) return res.status(404).json({message:"Email required"})
 
-  const user = await userModel.findOne({email:email}).exec().then(user=> {
+  await userModel.findOne({email:email}).exec().then(user=> {
+    if(!serverUtil.validateEmail(email)){return res.status(404).json({message:"Please input a correct email"})}
+    else if(!user) return res.status(404).json({message:"Account not registered"})
+    
     user.comparePassword(password,((err,isMatch)=>{
       if(err) {return next(err)}
       else if(isMatch){res.json(user)}
