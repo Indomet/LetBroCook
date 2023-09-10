@@ -105,7 +105,6 @@ app.get('/v1/tags', function (req, res, next) {
       return next(error); // Handle the error using Express's error handling middleware
   });
 })
-//user login
 
 //function to signup user
 app.post("/v1/users/signup", (req, res, next) => {
@@ -118,6 +117,20 @@ app.post("/v1/users/signup", (req, res, next) => {
     return next(error)
   })
 });
+
+app.get('/v1/user/login', async (req,res,next)=>{
+  const {email,password} = req.body
+  const user = await userModel.findOne({email:email}).exec().then(user=> {
+    user.comparePassword(password,((err,isMatch)=>{
+      if(err) {return next(err)}
+      else if(isMatch){res.json(user)}
+      else{res.status(401).json({message:"Email or password is incorrect"})}
+
+    }))
+  }).catch(err=>{return next(err)})
+
+})
+
 //add a comment by a user to a certain recipe
 app.post('/v1/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
   const { userId, recipeId } = req.params;
