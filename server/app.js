@@ -52,30 +52,81 @@ app.get('/v1/users', function (req, res, next) {
     res.set('Cache-control', `no-store`)
     userModel.find({})
     .then(function (users) {
-        res.json({ 'users': users });
+        res.status(200).json({ 'users': users });
     })
     .catch(function (error) {
         res.status(500).json({ message : error.message})
-        return next(error); // Handle the error using Express's error handling middleware
+        return next(); // Handle the error using Express's error handling middleware
     });
 })
 
-app.get("/v1/recipes/:recipeid",(req,res,next) =>{
-  //label cache-ability
-  res.set('Cache-control', `no-store`)
-  recipeModel.findById(req.params.recipeid).
-  then(recipe => {
-    res.status(200).json({"Recipe":recipe})}).
-  catch(err =>{return next(err)})
+app.get("/v1/recipes/:recipeid", (req, res,next) => {
+  // Label cache-ability
+  res.set('Cache-control', 'no-store');
+
+  recipeModel.findById(req.params.recipeid)
+    .then(recipe => {
+
+        // Recipe found, send it as a response
+        res.status(200).json({ "Recipe": recipe });
+      
+    })
+    .catch(err => {
+      // Handle database errors or other unexpected errors
+      console.error(err); // Log the error for debugging
+      res.status(400).json({ message: "recipe not found" });
+      next()
+    });
+});
+app.post("/v1/users/signup", (req, res, next) => {
+  var user = new userModel(req.body);
+  user.save()
+  .then(function (user){
+    res.status(201).json(user)
+  })
+  .catch(function(error){
+    res.status(400).json({message: error.message})
+    return next()
+  })
 });
 
-app.get("/v1/users/:userid",(req,res,next) =>{
-  //label cache-ability
-  res.set('Cache-control', `no-store`)
-  userModel.findById(req.params.userid).
-  then(user => {res.status(200).json({"User":user})}).
-  catch(err =>{return next(err)})
+app.get('/v1/users/sign-in', async (req,res,next)=>{
+  const {email,password} = req.body
+  if(!email) return res.status(404).json({message:"Email required"})
+
+  await userModel.findOne({email:email}).exec().then(user=> {
+    if(!serverUtil.validateEmail(email)){return res.status(404).json({message:"Please input a correct email"})}
+    else if(!user) return res.status(404).json({message:"Account not registered"})
+    
+    user.comparePassword(password,((err,isMatch)=>{
+      if(isMatch){res.status(200).json(user)}
+      else{res.status(401).json({message:"Email or password is incorrect"})}
+
+    }))
+  }).catch(err=>{return next()})
+
+})
+
+
+app.get("/v1/users/:userid", (req, res, next) => {
+  // Label cache-ability
+  res.set('Cache-control', 'no-store');
+
+  userModel.findById(req.params.userid)
+    .then(user => {
+
+        // User found, send it as a response
+        res.status(200).json({ "User": user });
+      
+    })
+    .catch(err => {
+      // Handle database errors or other unexpected errors
+      console.error(err); // Log the error for debugging
+      res.status(400).json({ message: "user not found" });
+      next()
+    });
 });
+
 
 
 app.get('/v1/recipes', function (req, res, next) {
@@ -91,14 +142,12 @@ app.get('/v1/recipes', function (req, res, next) {
   else if(searchTerm){recipes = recipeModel.find({ $text: { $search: searchTerm } })}
   else{recipes=recipeModel.find({})}
 
-
-
   recipes.then(function (recipes) {
-      res.json({ 'recipes': recipes });
+      res.status(200).json({ 'recipes': recipes });
   })
   .catch(function (error) {
-      res.status(500).json({ message : error.message})
-      return next(error); // Handle the error using Express's error handling middleware
+      res.status(400).json({ message : "invalid filter parameters"})
+      next(); // Handle the error using Express's error handling middleware
   });
 })
 app.get('/v1/tags', function (req, res, next) {
@@ -106,7 +155,7 @@ app.get('/v1/tags', function (req, res, next) {
   res.set('Cache-control', `no-store`)
   Tag.find({})
   .then(function (tags) {
-      res.json({ 'tags': tags });
+      res.status(200).json({ 'tags': tags });
   })
   .catch(function (error) {
       response.status(500).json({ message : error.message})
@@ -115,48 +164,20 @@ app.get('/v1/tags', function (req, res, next) {
 })
 
 //function to signup user
-app.post("/v1/users/signup", (req, res, next) => {
-  var user = new userModel(req.body);
-  user.save()
-  .then(function (user){
-    res.status(201).json(user)
-  })
-  .catch(function(error){
-    return next(error)
-  })
-});
-
-app.get('/v1/users/sign-in', async (req,res,next)=>{
-  const {email,password} = req.body
-  if(!userModel) return res.status(404).json({message:"Email required"})
-
-  await userModel.findOne({email:email}).exec().then(user=> {
-    if(!serverUtil.validateEmail(email)){return res.status(404).json({message:"Please input a correct email"})}
-    else if(!user) return res.status(404).json({message:"Account not registered"})
-    
-    user.comparePassword(password,((err,isMatch)=>{
-      if(err) {return next(err)}
-      else if(isMatch){res.json(user)}
-      else{res.status(401).json({message:"Email or password is incorrect"})}
-
-    }))
-  }).catch(err=>{return next(err)})
-
-})
 
 //add a comment by a user to a certain recipe
 app.post('/v1/users/:userId/recipes/:recipeId/comment',  (req, res,next) => {
   const { userId, recipeId } = req.params;
    userModel.findById(userId).then(user => {
     recipeModel.findById(recipeId).then(async recipe=>{
-      const {body} = req.body
-      const newComment = {body: body,
+      const {comment} = req.body
+      const newComment = {comment: comment,
                           author : user.username}
       recipe.comments.push(newComment)
        recipe.save()
       res.status(201).json(newComment)
-    }).catch(err=> {return next(err)})
-  }).catch(err=> {return next(err)})
+    }).catch(err=> {return next()})
+  }).catch(err=> {return next()})
 
 })
 
@@ -168,7 +189,7 @@ app.post('/v1/users/:userId/favorite-recipes/:recipeId', async (req, res,next) =
     const user = await userModel.findById(userId)
     if(!user){
       //return resource not found error
-      return res.status(404).json({message: "User does not ecist"})
+      return res.status(404).json({message: "User does not exist"})
     }
     
     user.favouriteRecipes.push(recipeId)
@@ -215,11 +236,14 @@ app.post("/v1/users/:userId/create-recipe/",  async (req, res, next) => {
         user.recipes.push(recipe.id)
         user.save().then(function(){res.status(201).json({message:"Recipe created",
                                                           Recipe : recipe})}).
-        catch(err =>{return next(err)})
+        catch(err =>{
+          res.status(404).json({message: "user not found"})
+          return next()})
       })
     })
     .catch((err) => {
-      return next(err);
+      res.status(400).json({message: "Invalid recipe data provided"})
+      return next();
     });
 });
 
