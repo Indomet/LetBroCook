@@ -81,9 +81,20 @@ app.get("/v1/users/:userid",(req,res,next) =>{
 app.get('/v1/recipes', function (req, res, next) {
   //label cache-ability
   res.set('Cache-control', `no-store`)
-  recipeModel.find({})
-  .then(function (users) {
-      res.json({ 'recipes': users });
+
+  tags = req.query.tags
+  searchTerm = req.query.title
+
+  var recipes
+  //users can only filter or search not both
+  if(tags){recipes = recipeModel.find(({ tags: { $in: tags } }))}
+  else if(searchTerm){recipes = recipeModel.find({ $text: { $search: searchTerm } })}
+  else{recipes=recipeModel.find({})}
+
+
+
+  recipes.then(function (recipes) {
+      res.json({ 'recipes': recipes });
   })
   .catch(function (error) {
       res.status(500).json({ message : error.message})
@@ -115,7 +126,7 @@ app.post("/v1/users/signup", (req, res, next) => {
   })
 });
 
-app.get('/v1/user/sign-in', async (req,res,next)=>{
+app.get('/v1/users/sign-in', async (req,res,next)=>{
   const {email,password} = req.body
   if(!userModel) return res.status(404).json({message:"Email required"})
 

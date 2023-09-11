@@ -55,6 +55,9 @@ var recipeSchema= new Schema(
 }
 )
 
+recipeSchema.index({title: 'text'});
+
+
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
 
