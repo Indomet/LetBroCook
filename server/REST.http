@@ -3,6 +3,73 @@ GET http://localhost:3000/api/
 ###
 GET http://localhost:3000/users
 
+
+###
+POST http://127.0.0.1:3000/recipe/create
+Content-Type: application/json
+
+{
+   "ingredients": [
+      "Ingraaedient 1",
+      "Ingredientjkbkjhj 2",
+      "Ingredient 3"
+   ],
+   "steps": [
+      "Step 1: Do something",
+      "Step 2: Do something else"
+   ],
+   "serving": "4 servings",
+   
+   "description": "This is a sample recipe.",
+   
+   "tags": [
+      "tag1",
+      "tag2"
+   ],
+   "nutritionalInfo": [
+      {
+         "name": "Calories",
+         "value": "250"
+      },
+      {
+         "name": "Protein",
+         "value": "15g"
+      }
+   ]
+}
+
+###
+PATCH  http://127.0.0.1:3000/recipe/64fa307f2f17d5b12e8b93b4
+Content-Type: application/json
+
+{
+   "ingredients": [
+      "asim",
+      "Ingredientjkbkjhj 2",
+      "Ingredient 3"
+   ],
+   "steps": [
+      "Step 1: Do something",
+      "Step 2: Do something else"
+   ],
+   "serving": "4 servings",
+   "description": "This is a sample recipe.",
+   "tags": [
+      "tag1",
+      "tag2"
+   ],
+   "nutritionalInfo": [
+      {
+         "name": "Calories",
+         "value": "250"
+      },
+      {
+         "name": "Protein",
+         "value": "15g"
+      }
+   ]
+}
+
 ###
 
 POST http://localhost:3000/signup
@@ -14,13 +81,14 @@ Content-Type: application/json
     "password": "123",
     "name": "Bruh"
 }
+
 ###
-POST http://localhost:3000/signup
+PUT http://127.0.0.1:3000/user/64fae07460d5ee1ec21a21ac
 Content-Type: application/json
 
 {
-    "username": "User2",
-    "email": "validEmail@gmail.com",
+    "username": "asim",
+    "email": "asim@gmail.com",
     "password": "123",
     "name": "Bruh"
 }
