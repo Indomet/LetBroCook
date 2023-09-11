@@ -29,9 +29,7 @@ mongoose.connection.on("error", function (error) {
 });
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
-  //TODO MAKE THING FOR FIRST TIME STARTUP
-  //populate db
-  //const recipes = JSON.parse(fs.readFileSync(".." + '/RecipeData.json', 'utf-8'));
+ 
   const count = recipeModel.countDocuments().exec()
   if(count ==0){
   try {
