@@ -324,7 +324,7 @@ app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
   try {
     const formattedTags = await handleExistingTags(unformattedTags);
     updatedRecipeData.tags = formattedTags;
-
+    
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID format" });
     }
@@ -340,13 +340,13 @@ app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
     if (!updatedRecipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
+
+    // if (req.body.sectionsAndIngredients) {
+    //   updatedRecipeData.sectionsAndIngredients.ingredients = req.body.sectionsAndIngredients.ingredients;
+    // }
     const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
     res.status(200).json({
-      message: "Recipe updated", Recipe: {
-        // ... is a spread syntax and i used it to add edited tags in the middle of the model and not at the end
-        ...updatedRecipe.toObject(),
-        tags: tagDetails,
-      }
+      message: "Recipe updated", Recipe: {updatedRecipe}
     });
   } catch (err) {
     return next(err);

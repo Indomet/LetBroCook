@@ -5,39 +5,65 @@ GET http://localhost:3000/users
 
 
 ###
-POST http://127.0.0.1:3000/recipe/create
+PATCH http://127.0.0.1:3000/v1/users/6500530306ad520f817ef1de/edit-recipe/6500532306ad520f817ef20d
 Content-Type: application/json
 
 {
-   "ingredients": [
-      "Ingraaedient 1",
-      "Ingredientjkbkjhj 2",
-      "Ingredient 3"
-   ],
-   "steps": [
-      "Step 1: Do something",
-      "Step 2: Do something else"
-   ],
-   "serving": "4 servings",
-   
-   "description": "This is a sample recipe.",
-   
-   "tags": [
-      "tag1",
-      "tag2"
-   ],
-   "nutritionalInfo": [
-      {
-         "name": "Calories",
-         "value": "250"
-      },
-      {
-         "name": "Protein",
-         "value": "15g"
-      }
-   ]
-}
-
+        "title": "Chimichurri Wings",
+        "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
+        "sectionsAndIngredients": {
+            "Ingredients": [
+                "asim large shallot, minced",
+                "5 cloves garlic, minced",
+                "1 large jalapeño, minced",
+                "½ cup red wine vinegar",
+                "2 teaspoons kosher salt",
+                "1 teaspoon freshly ground black pepper",
+                "1 teaspoon red pepper flakes",
+                "¼ cup finely chopped fresh parsley",
+                "¼ cup finely chopped fresh cilantro",
+                "½ cup extra-virgin olive oil",
+                "1 lb chicken wings"
+            ]
+        },
+        "servings": "for 4 servings",
+        "description": "Try these herby, garlicky wings for game day or any day!",
+        "steps": [
+            "IALLIIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.",
+            "Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.",
+            "While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.",
+            "Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.",
+            "Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.",
+            "Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).",
+            "Serve the wings immediately with the reserved chimichurri sauce for dipping.",
+            "Enjoy!"
+        ],
+        "tags": [
+            "zepei",
+            "Baking",
+            "Chicken",
+            "High-Protein",
+            "Under 1 Hour",
+            "Weeknight",
+            "Party",
+            "Game Day",
+            "Dinner",
+            "Appetizers",
+            "Easy",
+            "Low-Carb",
+            "Healthy",
+            "Gluten-Free",
+            "Dairy-Free"
+        ],
+        "nutritionalInfo": [
+            "Calories 468",
+            "Fat 43g",
+            "Carbs 1g",
+            "Fiber 25g",
+            "Sugar 0g",
+            "Protein 17g"
+        ]
+    }
 ###
 PATCH  http://127.0.0.1:3000/recipe/64fa307f2f17d5b12e8b93b4
 Content-Type: application/json
@@ -72,7 +98,7 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:3000/signup
+POST http://localhost:3000/v1/users/signup
 Content-Type: application/json
 
 {
