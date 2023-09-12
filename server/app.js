@@ -7,7 +7,7 @@ var history = require("connect-history-api-fallback");
 const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
 const serverUtil = require("./serverUtil.js");
-const fs = require("fs");
+var methodOverride = require('method-override')
 
 // Variables
 var mongoURI =
@@ -68,14 +68,32 @@ app.use(morgan("dev"));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options("*", cors());
 app.use(cors());
+app.use(methodOverride('_method'))
 
 // Import routes
 app.get("/api", function (req, res) {
   res.json({ message: "Welcome to your DIT342 backend ExpressJS project!" });
 });
 
+//http method overriden with post requests
+app.delete('/v1/users/:userID', (req, res) => {
+  const method = req.query._method; // Access the _method query parameter
+  if(method=="DELETE"){
+    userModel.findByIdAndDelete(req.params.userID).then(
+      res.status(200).json({message:"user deleted"})
+    )
+    .catch(err=>{
+      res.status(401).json("user not found")
+      return next(err)
+    })
+  }
+});
+
 app.get("/v1/users", function (req, res, next) {
   //label cache-ability
+  var method = req.params._method
+  console.log(method)
+
   res.set("Cache-control", `no-store`);
   userModel
     .find({})
@@ -474,6 +492,9 @@ app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => 
   }
 });
 
+
+
+
 //Delete recipe by id
 app.delete('/v1/recipe/deleteOne/:id', function (req, res, next) {
   var id = req.params.id
@@ -487,6 +508,8 @@ app.delete('/v1/recipe/deleteOne/:id', function (req, res, next) {
       return next(error)
     })
 })
+
+
 
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
