@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
-import tqdm
+from tqdm.contrib import tzip
 import json
 
      
@@ -31,9 +31,8 @@ def main():
         
     #Now we extract the info from each page
     recipes= []
-    for i in tqdm.trange(len([22,2])):
-        link=links[i]
-        recipe=createRecipe(link)
+    for title,image,link in tzip(titles,images,links):
+        recipe=createRecipe(link,title,image)
         recipes.append(recipe)
         
     with open("RecipeData.json", "w",encoding="utf-8") as outfile:
@@ -112,12 +111,17 @@ def extractIngredients(url:str):
     
 class Recipe():
     def __init__(self,
+                 title:str,
+                 image:str,
                  sectionsAndIngredients: Dict[str, List[str]],
                  servings: str,
                  description: str,
                  steps: List[str],
                  tags: List[str],
-                 nutritionalInfo: List[str]) -> None:
+                 nutritionalInfo: List[str],
+                 ) -> None:
+        self.title=title
+        self.image=image
         self.sectionsAndIngredients = sectionsAndIngredients
         self.servings = servings
         self.description = description
@@ -125,17 +129,19 @@ class Recipe():
         self.tags = tags
         self.nutritionalInfo = nutritionalInfo
         
+        
+        
     def to_dict(self):
         return self.__dict__
 
-def createRecipe(url:str) -> Recipe:
+def createRecipe(url:str,title,image) -> Recipe:
     sectionsAndIngredients = extractIngredients(url)    
     servings = extractServings(url)
     description = extractDescription(url)
     steps = extractSteps(url)
     tags = extractTags(url)
     nutritionalInfo = extractNutritionalInfo(url)
-    return Recipe(sectionsAndIngredients,servings,description,
+    return Recipe(title,image,sectionsAndIngredients,servings,description,
                   steps,tags,nutritionalInfo)
     
 
