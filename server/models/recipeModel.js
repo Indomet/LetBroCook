@@ -14,6 +14,10 @@ var recipeSchema= new Schema(
       type: Array,
       required: true,
    },*/
+   owner: {
+      type: Schema.Types.ObjectId,
+      ref: "Owner"
+   },
    sectionsAndIngredients: {
       type: Map,
       of: Array
