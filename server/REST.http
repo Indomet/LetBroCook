@@ -1,14 +1,15 @@
 GET http://localhost:3000/api/
 
 ###
-GET http://localhost:3000/users
+GET http://127.0.0.1:3000/v1/recipes/65006293f70c14d873a2cc2b
 
 
 ###
-PATCH http://127.0.0.1:3000/v1/users/6500530306ad520f817ef1de/edit-recipe/6500532306ad520f817ef20d
+POST http://127.0.0.1:3000/v1/users/6500530306ad520f817ef1de/create-recipe
 Content-Type: application/json
 
 {
+
         "title": "Chimichurri Wings",
         "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
         "sectionsAndIngredients": {
