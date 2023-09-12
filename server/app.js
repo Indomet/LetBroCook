@@ -8,6 +8,7 @@ const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
 const serverUtil = require("./serverUtil.js");
 const fs = require("fs");
+const userAuth = require("./basicAuth.js")
 
 // Variables
 var mongoURI =
@@ -30,7 +31,7 @@ mongoose.connection.on("error", function (error) {
 });
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
- 
+
   const count = recipeModel.countDocuments().exec()
   if(count ==0){
   try {
@@ -68,6 +69,7 @@ app.use(morgan("dev"));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options("*", cors());
 app.use(cors());
+app.use(setUserData)
 
 // Import routes
 app.get("/api", function (req, res) {
@@ -80,7 +82,7 @@ app.get("/v1/users", function (req, res, next) {
   userModel
     .find({})
     .then(function (users) {
-      res.status(200).json({ users: users });
+      return res.status(200).json({users});
     })
     .catch(function (error) {
       res.status(500).json({ message: error.message });
@@ -105,6 +107,7 @@ app.get("/v1/recipes/:recipeid", (req, res, next) => {
       next(err);
     });
 });
+
 app.post("/v1/users/signup", (req, res, next) => {
   var user = new userModel(req.body);
   user
@@ -146,6 +149,8 @@ app.get("/v1/users/sign-in", async (req, res, next) => {
     });
 });
 
+//Get user by id
+//TODO: Admin permissions
 app.get("/v1/users/:userid", (req, res, next) => {
   // Label cache-ability
   res.set("Cache-control", "no-store");
@@ -163,6 +168,7 @@ app.get("/v1/users/:userid", (req, res, next) => {
     });
 });
 
+//Get all recipes
 app.get("/v1/recipes", function (req, res, next) {
   //label cache-ability
   res.set("Cache-control", `no-store`);
@@ -189,6 +195,36 @@ app.get("/v1/recipes", function (req, res, next) {
       return next(err); // Handle the error using Express's error handling middleware
     });
 });
+
+//Get all recipes of user
+app.get("/v1/users/recipes/all", userAuth.authUser, function (req, res, next) {
+    //label cache-ability
+    res.set("Cache-control", `no-store`);
+
+    tags = req.query.tags;
+    searchTerm = req.query.title;
+
+    var recipes;
+    //users can only filter or search not both
+    if (tags) {
+      recipes = recipeModel.find({ tags: { $in: tags } });
+    } else if (searchTerm) {
+      recipes = recipeModel.find({ $text: { $search: searchTerm } });
+    } else {
+      recipes = recipeModel.find({});
+    }
+
+    recipes
+      .then(function (recipes) {
+        res.status(200).json({ recipes: recipes });
+      })
+      .catch(function (error) {
+        res.status(400).json({ message: "invalid filter parameters" });
+        return next(err); // Handle the error using Express's error handling middleware
+      });
+  });
+
+
 app.get("/v1/tags", function (req, res, next) {
   //label cache-ability
   res.set("Cache-control", `no-store`);
@@ -273,6 +309,7 @@ app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
   }
 
   var recipe = new recipeModel(recipeData);
+  recipe.owner = req.params.userId
   recipe
     .save()
     .then(function (recipe) {
@@ -324,7 +361,7 @@ app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
   try {
     const formattedTags = await handleExistingTags(unformattedTags);
     updatedRecipeData.tags = formattedTags;
-    
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID format" });
     }
@@ -378,7 +415,7 @@ app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
 //         if (user == null) {
 //           return res.status(404).json({ message: "user is null" });
 //         }
-//         Object.assign(user, req.body); // this is basically 
+//         Object.assign(user, req.body); // this is basically
 //         user.save();
 //         res.json(user);
 //       })
@@ -475,9 +512,9 @@ app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => 
 });
 
 //Delete recipe by id
-app.delete('/v1/recipe/deleteOne/:id', function (req, res, next) {
-  var id = req.params.id
-  recipeModel.findByIdAndDelete(id)
+app.delete('/v1/recipes/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
+  var recipeId = req.recipe.id
+  recipeModel.findByIdAndRemove(recipeId)
     .then(function (recipe) {
       if (!recipe) {
         return res.status(404).json({ message: "Recipe does not exist" })
@@ -487,6 +524,53 @@ app.delete('/v1/recipe/deleteOne/:id', function (req, res, next) {
       return next(error)
     })
 })
+
+//Delete all recipes from specific userId
+app.delete('/v1/recipes/deleteAllFromUser', userAuth.authUser, function(req, res, next){
+    recipeModel.find({owner : req.user.id}).then(function(recipes){
+        if(recipes.length === 0){
+            return res.status(404).json({ message: "No recipes to delete" })
+        }
+        recipeModel.deleteMany({id: recipes.id})
+        .then(function(recipes){
+            return res.status(200).json({ message: "Recipe deleted", body: recipes })
+
+        })
+        .catch(function(error){
+            return next(error)
+        })
+    })
+    .catch(function(error){
+        return next(error)
+    })
+
+})
+
+//Set the req.user to a valid user in the database with matching id.
+async function setUserData(req, res, next) {
+    const userid = req.body.userId
+    const recipeId = req.body.recipeId
+    console.log("request has id " + userid)
+    //Check that the id is not null
+    if (userid) {
+        //Check that the ObjectId is in valid format
+        await userModel.findById(userid).then(function(user){
+            req.user = user
+        })
+        .catch(function(err){
+            next(err)
+        })
+
+        await recipeModel.findById(recipeId).then(function(recipe){
+            req.recipe = recipe
+        })
+        .catch(function(err){
+            next(err)
+        })
+    }
+    next()
+}
+
 
 
 // Catch all non-error handler for api (i.e., 404 Not Found)

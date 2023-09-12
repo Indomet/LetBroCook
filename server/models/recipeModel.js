@@ -51,7 +51,11 @@ var recipeSchema= new Schema(
       body: String,
       author: String,
       date: {type: Date, default : Date.now},
-  }]
+  }],
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserModel'
+}
 }
 )
 
