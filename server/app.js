@@ -83,7 +83,7 @@ app.get("/v1/users", function (req, res, next) {
     })
     .catch(function (error) {
       res.status(500).json({ message: error.message });
-      return next(); // Handle the error using Express's error handling middleware
+      return next(error); // Handle the error using Express's error handling middleware
     });
 });
 
@@ -101,7 +101,7 @@ app.get("/v1/recipes/:recipeid", (req, res, next) => {
       // Handle database errors or other unexpected errors
       console.error(err); // Log the error for debugging
       res.status(400).json({ message: "recipe not found" });
-      next();
+      next(err);
     });
 });
 app.post("/v1/users/signup", (req, res, next) => {
@@ -113,7 +113,7 @@ app.post("/v1/users/signup", (req, res, next) => {
     })
     .catch(function (error) {
       res.status(400).json({ message: error.message });
-      return next();
+      return next(error);
     });
 });
 
@@ -141,7 +141,7 @@ app.get("/v1/users/sign-in", async (req, res, next) => {
       });
     })
     .catch((err) => {
-      return next();
+      return next(err);
     });
 });
 
@@ -157,9 +157,8 @@ app.get("/v1/users/:userid", (req, res, next) => {
     })
     .catch((err) => {
       // Handle database errors or other unexpected errors
-      console.error(err); // Log the error for debugging
       res.status(400).json({ message: "user not found" });
-      next();
+      next(err);
     });
 });
 
@@ -186,7 +185,7 @@ app.get("/v1/recipes", function (req, res, next) {
     })
     .catch(function (error) {
       res.status(400).json({ message: "invalid filter parameters" });
-      next(); // Handle the error using Express's error handling middleware
+      return next(err); // Handle the error using Express's error handling middleware
     });
 });
 app.get("/v1/tags", function (req, res, next) {
@@ -220,11 +219,11 @@ app.post("/v1/users/:userId/recipes/:recipeId/comment", (req, res, next) => {
           res.status(201).json(newComment);
         })
         .catch((err) => {
-          return next();
+          return next(err);
         });
     })
     .catch((err) => {
-      return next();
+      return next(err);
     });
 });
 
@@ -285,13 +284,13 @@ app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
           })
           .catch((err) => {
             res.status(404).json({ message: "user not found" });
-            return next();
+            return next(err);
           });
       });
     })
     .catch((err) => {
       res.status(400).json({ message: "Invalid recipe data provided" });
-      return next();
+      return next(err);
     });
 });
 
@@ -316,7 +315,9 @@ app.patch("/v1/recipe/:id", function (req, res) {
       res.json(recipe);
     })
     .catch(function (err) {
-      return res.status(500).json({ message: "recipe is not found" });
+      res.status(500).json({ message: "recipe is not found" });
+      return next(err)
+
     });
 });
 // Catch all non-error handler for api (i.e., 404 Not Found)
