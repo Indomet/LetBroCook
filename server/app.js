@@ -15,14 +15,15 @@ var mongoURI =
 var port = process.env.PORT || 3000;
 
 // Connect to MongoDB
-mongoose.connect(mongoURI).catch(function (err) {
-  if (err) {
+mongoose.connect(mongoURI)
+  .then(() => {
+    console.log(`Connected to MongoDB with URI: ${mongoURI}`);
+  })
+  .catch((err) => {
     console.error(`Failed to connect to MongoDB with URI: ${mongoURI}`);
     console.error(err.stack);
     process.exit(1);
-  }
-  console.log(`Connected to MongoDB with URI: ${mongoURI}`);
-});
+  });
 
 mongoose.connection.on("error", function (error) {
   console.error(error);
@@ -294,32 +295,200 @@ app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
     });
 });
 
-// update
-app.patch("/v1/recipe/:id", function (req, res) {
-  var id = req.params.id;
-  var recipe = new recipeModel(req.body);
-  recipeModel
-    .findById(id)
-    .then(function (recipe) {
-      if (recipe == null) {
-        return res.status(404).json({ message: "recipe is null" });
-      }
-      recipe.ingredients = req.body.ingredients || recipe.ingredients;
-      recipe.steps = req.body.steps || recipe.steps;
-      recipe.serving = req.body.serving || recipe.serving;
-      recipe.description = req.body.description || recipe.description;
-      recipe.tags = req.body.tags || recipe.tags;
-      recipe.nutritionalInfo =
-        req.body.nutritionalInfo || recipe.nutritionalInfo;
-      recipe.save();
-      res.json(recipe);
-    })
-    .catch(function (err) {
-      res.status(500).json({ message: "recipe is not found" });
-      return next(err)
 
+//  handle existing tags
+const handleExistingTags = async (tags) => {
+  const formattedTags = [];
+
+  for (const element of tags) {
+    let existingTag = await Tag.findOne({ name: element });
+
+    if (!existingTag) {
+      existingTag = new Tag({ name: element });
+      await existingTag.save();
+    }
+
+    formattedTags.push(existingTag);
+  }
+
+  return formattedTags;
+};
+
+
+// edit a recipe
+app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
+  const { userId, recipeId } = req.params;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
+
+  try {
+    const formattedTags = await handleExistingTags(unformattedTags);
+    updatedRecipeData.tags = formattedTags;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+    const user = await userModel.findById(userId);
+    const recipeIndex = user.recipes.indexOf(recipeId);
+    // it is -1 because If it's not found, it returns -1.
+    if (recipeIndex === -1) {
+      return res.status(404).json({ message: "Recipe not found for this user" });
+    }
+
+    const updatedRecipe = await recipeModel.findByIdAndUpdate(recipeId, updatedRecipeData);
+
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
+    res.status(200).json({
+      message: "Recipe updated", Recipe: {
+        // ... is a spread syntax and i used it to add edited tags in the middle of the model and not at the end
+        ...updatedRecipe.toObject(),
+        tags: tagDetails,
+      }
+    });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+// edit a user
+app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
+  var userId = req.params.userId;
+  userModel.findByIdAndUpdate(userId, req.body)
+    .then(function (user) {
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    })
+    .catch(function (error) {
+      return next(error);
     });
 });
+
+// this one works as well
+//   app.patch("/v1/users/:userId/edit-user", function (req, res) {
+//     var userId = req.params.userId;
+//     userModel
+//       .findById(userId)
+//       .then(function (user) {
+//         if (user == null) {
+//           return res.status(404).json({ message: "user is null" });
+//         }
+//         Object.assign(user, req.body); // this is basically 
+//         user.save();
+//         res.json(user);
+//       })
+//       .catch(function (err) {
+//         return res.status(500).json({ message: "user is not found" });
+//       });
+//   });
+
+// edit a comment
+app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (req, res, next) => {
+  try {
+    const { userId, recipeId, commentId } = req.params;
+
+    const user = await userModel.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const recipe = await recipeModel.findById(recipeId);
+    if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
+
+    const commentToUpdate = recipe.comments.id(commentId);
+    if (!commentToUpdate) return res.status(404).json({ message: 'Comment not found' });
+
+    const { body } = req.body;
+    commentToUpdate.body = body;
+
+    const updatedRecipe = await recipe.save();
+    res.json(updatedRecipe.comments);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+//replace a user
+app.put("/v1/users/:userId/replace-user", function (req, res, next) {
+  var userId = req.params.userId;
+  userModel
+    .findById(userId)
+    .then(function (user) {
+      if (user == null) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { username, email, password, name, recipes, favouriteRecipes } = req.body;
+      user.set({ username, email, password, name, recipes, favouriteRecipes });
+      user.save()
+        .then(updatedUser => {
+          res.json(updatedUser);
+        })
+        .catch(err => {
+          return next(err);
+        });
+    })
+    .catch((err) => {
+      return next(err);
+    });
+});
+
+
+//replacce a recipe
+app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => {
+  const { userId, recipeId } = req.params;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
+
+  try {
+    const formattedTags = await handleExistingTags(unformattedTags);
+    updatedRecipeData.tags = formattedTags;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+    const user = await userModel.findById(userId);
+
+    const recipeIndex = user.recipes.indexOf(recipeId);
+    if (recipeIndex === -1) {
+      return res.status(404).json({ message: "Recipe not found for this user" });
+    }
+    const updatedRecipe = await recipeModel.findById(recipeId);
+    if (!updatedRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+    updatedRecipe.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
+
+    await updatedRecipe.save();
+    const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
+    res.status(200).json({
+      message: "Recipe updated", Recipe: { ...updatedRecipe.toObject(), tags: tagDetails, }
+    });
+
+  } catch (err) {
+    return next(err);
+  }
+});
+
+//Delete recipe by id
+app.delete('/v1/recipe/deleteOne/:id', function (req, res, next) {
+  var id = req.params.id
+  recipeModel.findByIdAndDelete(id)
+    .then(function (recipe) {
+      if (!recipe) {
+        return res.status(404).json({ message: "Recipe does not exist" })
+      }
+      return res.status(200).json({ message: "Recipe deleted", body: recipe })
+    }).catch(function (error) {
+      return next(error)
+    })
+})
+
+
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
   res.status(404).json({ message: "Not Found" });
