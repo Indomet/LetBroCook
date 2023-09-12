@@ -1,19 +1,64 @@
 {
 	"info": {
-		"_postman_id": "f7ee95b5-9cb9-442f-a6a9-42de46138872",
+		"_postman_id": "f68fec31-7f81-42e3-966b-06a6a3c499ca",
 		"name": "server",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29456576"
 	},
 	"item": [
 		{
-			"name": "GET /api",
+			"name": "users",
 			"event": [
 				{
-					"listen": "prerequest",
+					"listen": "test",
 					"script": {
-						"id": "b58d92ec-5214-450c-adb0-28e068aa71b9",
 						"exec": [
-							""
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"haha\",\r\n    \"email\":\"ligmabaugill@gmail.com\",\r\n    \"name\":\"aki\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -21,55 +66,234 @@
 			],
 			"request": {
 				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
+				"header": [],
 				"url": {
-					"raw": "{{host}}/api",
+					"raw": "http://localhost:3000/v1/recipes/hjbdcj",
+					"protocol": "http",
 					"host": [
-						"{{host}}"
+						"localhost"
 					],
+					"port": "3000",
 					"path": [
-						"api"
+						"v1",
+						"recipes",
+						"hjbdcj"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/v1/users/903878",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"903878"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllRecipes",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "getAlltags",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "createUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"ali\",\r\n    \"email\": \"IAHFVHEAGKB@gmail.com\",\r\n    \"password\":\"12345\",\r\n    \"username\":\"chef_senpai36+\"\r\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"lmfao@gmail.com\",\r\n    \"password\": \"12345\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/sign-in",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"sign-in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n        \"title\": \"Chimichurri Wings\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"1 large shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large jalapeño, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"In a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"Appliance\",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/64ff49c0b91dc4ca7593d370/create-recipe/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"64ff49c0b91dc4ca7593d370",
+						"create-recipe",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addComment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"comment\": \"test commetn\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/64ff49c0b91dc4ca7593d370/recipes/64ff4ca8463074c812643150/comment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"64ff49c0b91dc4ca7593d370",
+						"recipes",
+						"64ff4ca8463074c812643150",
+						"comment"
 					]
 				}
 			},
 			"response": []
 		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"id": "05864cff-5cba-4070-bac3-a59328954ebf",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"id": "e9c319be-3306-4fc5-ba34-fcf64391213a",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"id": "cd185905-a834-4211-8030-583d17702534",
-			"key": "host",
-			"value": "http://localhost:3000",
-			"type": "string"
-		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
