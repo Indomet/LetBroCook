@@ -2,13 +2,14 @@ GET http://localhost:3000/api/
 
 ###
 GET http://localhost:3000/v1/users
+
 ###
 
 GET http://localhost:3000/v1/users/selectOne
 Content-Type: application/json
 
 {
-    "userId": "6501d3bddaaa1baae9a3b383"
+    "userId": "4eb6e7e7e9b7f4194e000001"
 }
 
 ###
@@ -28,7 +29,7 @@ GET http://localhost:3000/v1/users/recipes/all
 Content-Type: application/json
 
 {
-    "userId": "6501e0a5e6ab49f7ec469953"
+    "userId": "4eb6e7e7e9b7f4194e000001"
 }
 
 ###
@@ -137,4 +138,12 @@ Content-Type: application/json
     "userId": "6501d3bddaaa1baae9a3b383",
     "recipeId": "6501d80714eaa6d12f0c0df6"
 
+}
+
+GET  http://127.0.0.1:3000/v1/users/sign-in
+Content-Type: application/json
+
+{
+    "email":"gusalmual@student.gu.se",
+    "password": "Admin123"
 }
