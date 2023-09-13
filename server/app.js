@@ -31,30 +31,33 @@ mongoose.connection.on("error", function (error) {
 });
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
-
-  const count = recipeModel.countDocuments().exec()
-  if(count ==0){
+  const count = await recipeModel.countDocuments().exec();
+  var originalOGuser = new userModel(
+    {
+      email:"gusalmual@student.gu.se",
+      password:"Admin123",
+      username:"Chef Chef",
+      name:"Ali"
+    }
+  )
+  //specify a consisteant and findable id
+  originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
+    await originalOGuser.save()
+  if(0 == count){
   try {
     recipeData = require("../RecipeData.json");
-    console.log("lenghtn is " + recipeData.length);
 
     for (let i = 0; i < recipeData.length; i++) {
-      let formattedTags = [];
-      for (const element of recipeData[i].tags) {
-        let existingTag = await Tag.findOne({ name: element });
-        // If the tag doesn't exist, create a new one and save it
-        if (!existingTag) {
-          existingTag = new Tag({ name: element });
-          await existingTag.save();
-        }
+        recipeData[i].tags = await handleExistingTags(recipeData[i].tags) // Assign the array of ObjectIds to the recipeData
+        
+        var recipe = new recipeModel(recipeData[i])
+        recipe.owner= originalOGuser._id
+        await recipe.save()
 
-        formattedTags.push(existingTag._id); // Push the ObjectId of the tag
       }
-      recipeData[i].tags = formattedTags; // Assign the array of ObjectIds to the recipeData
-      await new recipeModel(recipeData[i]).save();
+      console.log("Database populated")
     }
-    console.log("done");
-  } catch (err) {
+   catch (err) {
     console.log(err);
   }}
 });
