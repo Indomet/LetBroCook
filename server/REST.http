@@ -11,7 +11,7 @@ GET http://localhost:3000/v1/users/recipes/all
 Content-Type: application/json
 
 {
-    "userId": "6500b52e0c7d8e5c4c39c8a3"
+    "userId": "6501b5d9fb9b4037e83bf95a"
 }
 
 ###
@@ -19,22 +19,23 @@ DELETE http://localhost:3000/v1/recipes/deleteOne
 Content-Type: application/json
 
 {
-    "userId": "6500b52e0c7d8e5c4c39c8a3",
-    "recipeId": "6500b86ab5ad75969d3c3194"
+    "userId": "6501b5d9fb9b4037e83bf95a",
+    "recipeId": "6501b7304ac1406f819b125a"
 }
 ###
 DELETE http://localhost:3000/v1/recipes/deleteAllFromUser
 Content-Type: application/json
 
 {
-    "userId": "6500b52e0c7d8e5c4c39c8a3"
+    "userId": "6501b5d9fb9b4037e83bf95a"
 }
 
 ###
-POST http://127.0.0.1:3000/v1/users/6500b52e0c7d8e5c4c39c8a3/create-recipe
+POST http://127.0.0.1:3000/v1/users/create-recipe
 Content-Type: application/json
 
 {
+        "userId": "6501bd917f18daad355b838c",
         "title": "Chimichurri Wings",
         "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
         "sectionsAndIngredients": {
@@ -55,7 +56,7 @@ Content-Type: application/json
         ]
     }
 ###
-PATCH  http://127.0.0.1:3000/recipe/64fa307f2f17d5b12e8b93b4
+PATCH  http://127.0.0.1:3000/recipe/6501bd917f18daad355b838c
 Content-Type: application/json
 
 {

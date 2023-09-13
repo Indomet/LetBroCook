@@ -241,8 +241,11 @@ app.get("/v1/tags", function (req, res, next) {
 //function to signup user
 
 //add a comment by a user to a certain recipe
-app.post("/v1/users/:userId/recipes/:recipeId/comment", (req, res, next) => {
-  const { userId, recipeId } = req.params;
+app.post("/v1/users/recipes/comment", userAuth.authUser, (req, res, next) => {
+  //const { userId, recipeId } = req.params;
+    const userId = req.user.id
+    const recipeId = req.recipe.id
+
   userModel
     .findById(userId)
     .then((user) => {
@@ -286,9 +289,10 @@ app.post(
   }
 );
 
-app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
+app.post("/v1/users/create-recipe/", userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
+    const userId = req.user.id
 
     try {
     var formattedTags = [];
@@ -310,11 +314,11 @@ app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
 
     var recipe = new recipeModel(recipeData);
 
-    var user = await userModel.findById(req.params.userId)
+    var user = await userModel.findById(userId)
     if(!user ){
         return res.status(404).send("no user found")
     }
-    recipe.owner = req.params.userId
+    recipe.owner = userId
 
     recipe.save()
     .then(function (recipe) {
