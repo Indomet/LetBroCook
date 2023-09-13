@@ -1,4 +1,5 @@
-var mongoose = require("mongoose")
+var mongoose = require("mongoose");
+const userModel = require("./userModel");
 var Schema = mongoose.Schema
 
 var tagSchema = new Schema({
@@ -55,15 +56,20 @@ var recipeSchema= new Schema(
       body: String,
       author: String,
       date: {type: Date, default : Date.now},
-  }]
+  }],
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserModel'
+}
 }
 )
 
 recipeSchema.index({title: 'text'});
 
-
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
+
+
 
 module.exports = {
    recipeModel: recipeModel,
