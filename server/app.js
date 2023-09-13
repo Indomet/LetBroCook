@@ -516,8 +516,12 @@ app.delete('/v1/recipes/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe,
   var recipeId = req.recipe.id
   var userId = req.user.id
 
+  try{
+  updateOneUserRecipe(userId, recipeId)}//Deletes the reference to the recipe
+    catch(err){
+      return next(err)
+    }
 
-  updateOneUserRecipe(userId, recipeId)//Deletes the reference to the recipe
   recipeModel.findByIdAndRemove(recipeId)//Deletes the actual recipe
     .then(function (recipe) {
       if (!recipe) {
@@ -555,7 +559,11 @@ async function deleteManyUserRecipe(req, userId){
 //Delete all recipes from specific userId
 app.delete('/v1/recipes/deleteAllFromUser', userAuth.authUser, function(req, res, next){
     const userId = req.user.id
-    deleteManyUserRecipe(req, userId)
+    try{
+    deleteManyUserRecipe(req, userId)}
+    catch(err){
+      return next(err)
+    }
 
     recipeModel.find({owner : userId}).then(function(recipes){
         if(recipes.length === 0){
