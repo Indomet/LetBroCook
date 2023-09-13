@@ -94,10 +94,10 @@ app.get("/v1/users", function (req, res, next) {
 });
 
 // hateoas
-app.get("/v1/recipes/:recipeId", async (req, res, next) => {
-  const { recipeId } = req.params;
+app.get("/v1/recipes/selectOne", async (req, res, next) => {
 
   try {
+    const recipeId = req.recipe.id
     const recipe = await recipeModel.findById(recipeId);
 
     if (!recipe) {
@@ -132,7 +132,11 @@ app.post("/v1/users/signup", (req, res, next) => {
 });
 
 app.get("/v1/users/sign-in", async (req, res, next) => {
-  const { email, password } = req.body;
+    if(!req.body){
+        return res.status(404).json({ message: "Missing body" })
+    }
+    const { email, password } = req.body;
+
   if (!email) return res.status(404).json({ message: "Email required" });
 
   await userModel
@@ -161,19 +165,24 @@ app.get("/v1/users/sign-in", async (req, res, next) => {
 
 //Get user by id
 //TODO: Admin permissions
-app.get("/v1/users/:userid", (req, res, next) => {
+app.get("/v1/users/selectOne", (req, res, next) => {
   // Label cache-ability
   res.set("Cache-control", "no-store");
 
+    if(!req.user.id){
+        return res.status(400).json({ message: "Invalid user" })
+    }
+    const userId = req.user.id
+
   userModel
-    .findById(req.params.userid)
+    .findById(userId)
     .then((user) => {
       // User found, send it as a response
       res.status(200).json({ User: user });
     })
     .catch((err) => {
       // Handle database errors or other unexpected errors
-      res.status(400).json({ message: "user not found" });
+      res.status(404).json({ message: "user not found" });
       next(err);
     });
 });
@@ -208,31 +217,21 @@ app.get("/v1/recipes", function (req, res, next) {
 
 //Get all recipes of user
 app.get("/v1/users/recipes/all", userAuth.authUser, function (req, res, next) {
-    //label cache-ability
-    res.set("Cache-control", `no-store`);
-
-    tags = req.query.tags;
-    searchTerm = req.query.title;
-
-    var recipes;
-    //users can only filter or search not both
-    if (tags) {
-      recipes = recipeModel.find({ tags: { $in: tags } });
-    } else if (searchTerm) {
-      recipes = recipeModel.find({ $text: { $search: searchTerm } });
-    } else {
-      recipes = recipeModel.find({});
+    if(!req.user.id){
+        return res.status(400).json({ message: "Invalid user" })
     }
-
-    recipes
-      .then(function (recipes) {
+    const userId = req.user.id
+    recipeModel.find({owner: userId})
+    .then(function(recipes){
         res.status(200).json({ recipes: recipes });
-      })
-      .catch(function (error) {
-        res.status(400).json({ message: "invalid filter parameters" });
+    })
+    .catch(function (error) {
+        res.status(500).json({ message: "Internal Error" });
         return next(err); // Handle the error using Express's error handling middleware
       });
-  });
+
+
+  })
 
 
 app.get("/v1/tags", function (req, res, next) {
@@ -252,7 +251,10 @@ app.get("/v1/tags", function (req, res, next) {
 
 //add a comment by a user to a certain recipe
 app.post("/v1/users/recipes/comment", userAuth.authUser, (req, res, next) => {
-  //const { userId, recipeId } = req.params;
+    if(!req.user.id || !req.recipe.id){
+        return res.status(400).json({ message: "Invalid user/recipe" })
+    }
+
     const userId = req.user.id
     const recipeId = req.recipe.id
 
@@ -277,11 +279,16 @@ app.post("/v1/users/recipes/comment", userAuth.authUser, (req, res, next) => {
     });
 });
 
+//TODO: adding to favorite recipe not actually adding to user.favorites
 //add a recipe to a users favourited list
-app.post(
-  "/v1/users/:userId/favorite-recipes/:recipeId",
-  async (req, res, next) => {
-    const { userId, recipeId } = req.params;
+app.post("/v1/users/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
+
+    if(!req.user.id || !req.recipe.id){
+        return res.status(400).json({ message: "Invalid user/recipe" })
+    }
+    const userId = req.user.id
+    const recipeId = req.recipe.id
+
     try {
       //attempt to find user
       const user = await userModel.findById(userId);
@@ -302,8 +309,11 @@ app.post(
 app.post("/v1/users/create-recipe/", userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
-    const userId = req.user.id
 
+    if(!req.user.id){
+        return res.status(400).json({ message: "Invalid user" })
+    }
+    const userId = req.user.id
     try {
     var formattedTags = [];
     for (const element of unformattedTags) {
@@ -351,10 +361,6 @@ app.post("/v1/users/create-recipe/", userAuth.authUser, async (req, res, next) =
 })
 
 
-
-
-
-
 //  handle existing tags
 const handleExistingTags = async (tags) => {
   const formattedTags = [];
@@ -375,10 +381,16 @@ const handleExistingTags = async (tags) => {
 
 
 // edit a recipe
-app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
-  const { userId, recipeId } = req.params;
-  const updatedRecipeData = req.body;
-  const unformattedTags = req.body.tags;
+app.patch("/v1/users/edit-recipe/", async (req, res, next) => {
+
+    const updatedRecipeData = req.body;
+    const unformattedTags = req.body.tags;
+
+    if(!req.user.id || !req.recipe.id){
+        return res.status(400).json({ message: "Invalid user/recipe" })
+        }
+    const userId = req.user.id
+    const recipeId = req.recipe.id
 
   try {
     const formattedTags = await handleExistingTags(unformattedTags);
@@ -414,8 +426,11 @@ app.patch("/v1/users/:userId/edit-recipe/:recipeId", async (req, res, next) => {
 
 
 // edit a user
-app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
-  var userId = req.params.userId;
+app.patch("/v1/users/edit-user", (req, res, next) => {
+    if(!req.user.id){
+        return res.status(400).json({ message: "Invalid user"})
+    }
+    const userId = req.user.id
   userModel.findByIdAndUpdate(userId, req.body)
     .then(function (user) {
       if (!user) {
@@ -427,6 +442,9 @@ app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
       return next(error);
     });
 });
+
+//TODO: Make comment into separate model and create authorization
+//check for only being able to edit/delete one's own comment
 
 // edit a comment
 app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (req, res, next) => {
@@ -455,9 +473,11 @@ app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (
 
 //replace a user
 app.put("/v1/users/replace-user", userAuth.authUser, function (req, res, next) {
-  var userId = req.user.id
-  userModel
-    .findById(userId)
+    if(!req.user.id){
+        return res.status(400).json({ message: "Invalid user"})
+    }
+    const userId = req.user.id
+    userModel.findById(userId)
     .then(function (user) {
 
       const { username, email, password, name, recipes, favouriteRecipes } = req.body;
@@ -592,7 +612,8 @@ app.delete('/v1/recipes/deleteAllFromUser', userAuth.authUser, function(req, res
 async function setUserData(req, res, next) {
     const userid = req.body.userId
     const recipeId = req.body.recipeId
-    console.log("request has id " + userid)
+    console.log("request has userId " + userid)
+    console.log("request has recipeId " + recipeId)
     //Check that the id is not null
     if (userid) {
         //Check that the ObjectId is in valid format
@@ -603,6 +624,8 @@ async function setUserData(req, res, next) {
             next(err)
         })
 
+    }
+    if(recipeId){
         await recipeModel.findById(recipeId).then(function(recipe){
             req.recipe = recipe
         })
