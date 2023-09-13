@@ -88,23 +88,31 @@ app.get("/v1/users", function (req, res, next) {
     });
 });
 
-app.get("/v1/recipes/:recipeid", (req, res, next) => {
-  // Label cache-ability
-  res.set("Cache-control", "no-store");
+// hateoas
+app.get("/v1/recipes/:recipeId", async (req, res, next) => {
+  const { recipeId } = req.params;
 
-  recipeModel
-    .findById(req.params.recipeid)
-    .then((recipe) => {
-      // Recipe found, send it as a response
-      res.status(200).json({ Recipe: recipe });
-    })
-    .catch((err) => {
-      // Handle database errors or other unexpected errors
-      console.error(err); // Log the error for debugging
-      res.status(400).json({ message: "recipe not found" });
-      next(err);
+  try {
+    const recipe = await recipeModel.findById(recipeId);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "recipe not found" });
+    }
+
+    // HATEOAS links
+    const links = [
+      { rel: "itself", href: `/v1/recipes/${recipe._id}` },
+      { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
+      { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
+    ];
+
+    res.status(200).json({recipe: recipe,links: links,
     });
+  } catch (err) {
+    return next(err);
+  }
 });
+
 app.post("/v1/users/signup", (req, res, next) => {
   var user = new userModel(req.body);
   user
@@ -267,6 +275,7 @@ app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
 
       formattedTags.push(existingTag);
       recipeData.tags = formattedTags;
+      recipeData.owner = req.params.userId;
     }
   } catch (err) {
     return next(err);
