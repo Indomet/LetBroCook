@@ -541,24 +541,21 @@ function updateOneUserRecipe(userId, recipeId){
         })
 }
 
-async function updateManyUserRecipe(req, userId){
+async function deleteManyUserRecipe(req, userId){
     var recipesToRemove = []
     recipesToRemove = req.user.recipes
 
-    await userModel.findOneAndUpdate(
-        { _id: userId },
-        { $pullAll: recipesToRemove},
-        { new: true }).then(function(updatedUser){
+    await userModel.findOneAndUpdate({_id:userId}, { $set: { recipes: [] }}).then(function(updatedUser){
                 console.log("User recipes updated successfully:", updatedUser);
         }).catch(function(err){
                 console.error("Error updating user:", err);
         })
-}``
+}
 
 //Delete all recipes from specific userId
 app.delete('/v1/recipes/deleteAllFromUser', userAuth.authUser, function(req, res, next){
     const userId = req.user.id
-    updateManyUserRecipe(req, userId)
+    deleteManyUserRecipe(req, userId)
 
     recipeModel.find({owner : userId}).then(function(recipes){
         if(recipes.length === 0){
