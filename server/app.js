@@ -287,50 +287,57 @@ app.post(
 );
 
 app.post("/v1/users/:userId/create-recipe/", async (req, res, next) => {
-  const recipeData = req.body;
-  const unformattedTags = req.body.tags;
+    const recipeData = req.body;
+    const unformattedTags = req.body.tags;
 
-  try {
+    try {
     var formattedTags = [];
     for (const element of unformattedTags) {
-      //make a query to find if a tag already exists
-      let existingTag = await Tag.findOne({ name: element });
-      //if the tag doesnt exist create a new one and save it
-      if (!existingTag) {
+        //make a query to find if a tag already exists
+        let existingTag = await Tag.findOne({ name: element });
+        //if the tag doesnt exist create a new one and save it
+        if (!existingTag) {
         existingTag = new Tag({ name: element });
         await existingTag.save();
-      }
+        }
 
-      formattedTags.push(existingTag);
-      recipeData.tags = formattedTags;
+        formattedTags.push(existingTag);
+        recipeData.tags = formattedTags;
     }
-  } catch (err) {
+    } catch (err) {
     return next(err);
-  }
+    }
 
-  var recipe = new recipeModel(recipeData);
-  recipe.owner = req.params.userId
-  recipe
-    .save()
+    var recipe = new recipeModel(recipeData);
+
+    var user = await userModel.findById(req.params.userId)
+    if(!user ){
+        return res.status(404).send("no user found")
+    }
+    recipe.owner = req.params.userId
+
+    recipe.save()
     .then(function (recipe) {
-      userModel.findById(req.params.userId).then((user) => {
-        user.recipes.push(recipe.id);
-        user
-          .save()
-          .then(function () {
-            res.status(201).json({ message: "Recipe created", Recipe: recipe });
-          })
-          .catch((err) => {
-            res.status(404).json({ message: "user not found" });
-            return next(err);
-          });
-      });
-    })
-    .catch((err) => {
-      res.status(400).json({ message: "Invalid recipe data provided" });
-      return next(err);
-    });
-});
+        try{
+            user.recipes.push(recipe.id);
+        }catch(error){
+            console.log("Invalid user")
+            return next(error)
+        }
+        user.save()
+            .then(function () {
+                res.status(201).json({ message: "Recipe created", Recipe: recipe });
+            })
+            .catch((err) => {
+                res.status(404).json({ message: "user not found" });
+                return next(err);
+            });
+        })
+})
+
+
+
+
 
 
 //  handle existing tags
@@ -514,7 +521,11 @@ app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => 
 //Delete recipe by id
 app.delete('/v1/recipes/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
   var recipeId = req.recipe.id
-  recipeModel.findByIdAndRemove(recipeId)
+  var userId = req.user.id
+
+
+  updateOneUserRecipe(userId, recipeId)//Deletes the reference to the recipe
+  recipeModel.findByIdAndRemove(recipeId)//Deletes the actual recipe
     .then(function (recipe) {
       if (!recipe) {
         return res.status(404).json({ message: "Recipe does not exist" })
@@ -523,14 +534,44 @@ app.delete('/v1/recipes/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe,
     }).catch(function (error) {
       return next(error)
     })
+
 })
+
+function updateOneUserRecipe(userId, recipeId){
+    userModel.findOneAndUpdate(
+        { _id: userId },
+        { $pull: { recipes: recipeId } },
+        { new: true }).then(function(updatedUser){
+                console.log("User recipes updated successfully:", updatedUser);
+        }).catch(function(err){
+                console.error("Error updating user:", err);
+        })
+}
+
+async function updateManyUserRecipe(req, userId){
+    var recipesToRemove = []
+    recipesToRemove = req.user.recipes
+
+    await userModel.findOneAndUpdate(
+        { _id: userId },
+        { $pullAll: recipesToRemove},
+        { new: true }).then(function(updatedUser){
+                console.log("User recipes updated successfully:", updatedUser);
+        }).catch(function(err){
+                console.error("Error updating user:", err);
+        })
+}``
 
 //Delete all recipes from specific userId
 app.delete('/v1/recipes/deleteAllFromUser', userAuth.authUser, function(req, res, next){
-    recipeModel.find({owner : req.user.id}).then(function(recipes){
+    const userId = req.user.id
+    updateManyUserRecipe(req, userId)
+
+    recipeModel.find({owner : userId}).then(function(recipes){
         if(recipes.length === 0){
             return res.status(404).json({ message: "No recipes to delete" })
         }
+
         recipeModel.deleteMany({id: recipes.id})
         .then(function(recipes){
             return res.status(200).json({ message: "Recipe deleted", body: recipes })
@@ -610,5 +651,6 @@ app.listen(port, function (err) {
   console.log(`Backend: http://localhost:${port}/api/`);
   console.log(`Frontend (production): http://localhost:${port}/`);
 });
+
 
 module.exports = app;
