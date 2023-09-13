@@ -12,7 +12,8 @@ var userSchema= new Schema(
     {
         username:  {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         email: {
             type: String,
@@ -29,7 +30,8 @@ var userSchema= new Schema(
         },
         name: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         recipes: {
             type: [Schema.Types.ObjectId],
@@ -40,7 +42,7 @@ var userSchema= new Schema(
             type: [Schema.Types.ObjectId],
             ref: 'favouriteRecipes'
         },
-        
+
     }
 )
 
