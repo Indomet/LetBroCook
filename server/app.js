@@ -417,24 +417,6 @@ app.patch("/v1/users/:userId/edit-user", (req, res, next) => {
     });
 });
 
-// this one works as well
-//   app.patch("/v1/users/:userId/edit-user", function (req, res) {
-//     var userId = req.params.userId;
-//     userModel
-//       .findById(userId)
-//       .then(function (user) {
-//         if (user == null) {
-//           return res.status(404).json({ message: "user is null" });
-//         }
-//         Object.assign(user, req.body); // this is basically
-//         user.save();
-//         res.json(user);
-//       })
-//       .catch(function (err) {
-//         return res.status(500).json({ message: "user is not found" });
-//       });
-//   });
-
 // edit a comment
 app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (req, res, next) => {
   try {
@@ -461,14 +443,12 @@ app.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (
 
 
 //replace a user
-app.put("/v1/users/:userId/replace-user", function (req, res, next) {
-  var userId = req.params.userId;
+app.put("/v1/users/replace-user", userAuth.authUser, function (req, res, next) {
+  var userId = req.user.id
   userModel
     .findById(userId)
     .then(function (user) {
-      if (user == null) {
-        return res.status(404).json({ message: "User not found" });
-      }
+
       const { username, email, password, name, recipes, favouriteRecipes } = req.body;
       user.set({ username, email, password, name, recipes, favouriteRecipes });
       user.save()
@@ -486,8 +466,9 @@ app.put("/v1/users/:userId/replace-user", function (req, res, next) {
 
 
 //replacce a recipe
-app.put("/v1/users/:userId/replace-recipe/:recipeId", async (req, res, next) => {
-  const { userId, recipeId } = req.params;
+app.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+  const userId = req.user.id
+  const recipeId = req.recipe.id
   const updatedRecipeData = req.body;
   const unformattedTags = req.body.tags;
 
