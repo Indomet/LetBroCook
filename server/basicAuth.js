@@ -16,11 +16,11 @@ function authUser(req, res, next){
 
 function isOwnerOfRecipe(req, res, next){
     console.log('Authenticating Recipe...')
-    if(recipe == null){
+    if(req.recipe == null){
         res.status(404)
         return res.send('Recipe not found')
     }else{
-        if(recipe.owner.toString() != req.user.id){
+        if(req.recipe.owner.toString() != req.user.id){
             res.status(403)
             return res.send('You do not have permission')
         }
