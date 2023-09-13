@@ -1,15 +1,58 @@
 GET http://localhost:3000/api/
 
 ###
-GET http://127.0.0.1:3000/v1/recipes/65006293f70c14d873a2cc2b
-
-
+GET http://localhost:3000/v1/users
 ###
-POST http://127.0.0.1:3000/v1/users/6500530306ad520f817ef1de/create-recipe
+
+GET http://localhost:3000/v1/users/selectOne
 Content-Type: application/json
 
 {
-        "userId": "6501bd917f18daad355b838c",
+    "userId": "6501d3bddaaa1baae9a3b383"
+}
+
+###
+GET http://localhost:3000/v1/recipes
+###
+
+GET http://localhost:3000/v1/recipes/selectOne
+Content-Type: application/json
+
+{
+    "recipeId": "6501d421daaa1baae9a3b388"
+}
+
+###
+
+GET http://localhost:3000/v1/users/recipes/all
+Content-Type: application/json
+
+{
+    "userId": "6501e0a5e6ab49f7ec469953"
+}
+
+###
+DELETE http://localhost:3000/v1/recipes/deleteOne
+Content-Type: application/json
+
+{
+    "userId": "6501b5d9fb9b4037e83bf95a",
+    "recipeId": "6501b7304ac1406f819b125a"
+}
+###
+DELETE http://localhost:3000/v1/recipes/deleteAllFromUser
+Content-Type: application/json
+
+{
+    "userId": "6501e0a5e6ab49f7ec469953"
+}
+
+###
+POST http://127.0.0.1:3000/v1/users/create-recipe
+Content-Type: application/json
+
+{
+        "userId": "6501e0a5e6ab49f7ec469953",
         "title": "Chimichurri Wings",
         "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
         "sectionsAndIngredients": {
@@ -30,10 +73,12 @@ Content-Type: application/json
         ]
     }
 ###
-PATCH  http://127.0.0.1:3000/recipe/6501bd917f18daad355b838c
+PATCH  http://127.0.0.1:3000/v1/users/edit-recipe/
 Content-Type: application/json
 
 {
+    "recipeId": "6501e0b3e6ab49f7ec469957",
+    "userId": "6501e0a5e6ab49f7ec469953",
    "ingredients": [
       "asim",
       "Ingredientjkbkjhj 2",
@@ -74,12 +119,22 @@ Content-Type: application/json
 }
 
 ###
-PUT http://127.0.0.1:3000/user/64fae07460d5ee1ec21a21ac
+PATCH  http://127.0.0.1:3000/v1/users/edit-user/
 Content-Type: application/json
 
 {
-    "username": "asim",
+    "userId": "6501e0a5e6ab49f7ec469953",
+    "username": "Ali",
     "email": "asim@gmail.com",
     "password": "123",
     "name": "Bruh"
+}
+###
+POST http://127.0.0.1:3000/v1/users/favorite-recipes/
+Content-Type: application/json
+
+{
+    "userId": "6501d3bddaaa1baae9a3b383",
+    "recipeId": "6501d80714eaa6d12f0c0df6"
+
 }

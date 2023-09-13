@@ -65,17 +65,6 @@ var recipeSchema= new Schema(
 )
 
 recipeSchema.index({title: 'text'});
-/*
-recipeSchema.pre('findByIdAndRemove', function(next) {
-    console.log("recipeSchema pre: deleteOne")
-    userModel.updateOne(
-        { recipes : this._id},
-        { $pull: { recipes: this._id } },
-        { multi: true })  //if reference exists in multiple documents
-    .exec();
-    next();
-});*/
-
 
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
