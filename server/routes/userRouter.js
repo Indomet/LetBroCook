@@ -125,6 +125,7 @@ router.post("/comments", userAuth.authUser, (req, res, next) => {
 
 
           const newComment = {
+            _id: new mongoose.Types.ObjectId(),
           ownerId: userId,
           recipeId: recipeId,
           comment: req.body.comment,
