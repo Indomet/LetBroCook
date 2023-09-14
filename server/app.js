@@ -98,30 +98,47 @@ app.get("/api", function (req, res) {
 
 //Set the req.user to a valid user in the database with matching id.
 async function setUserData(req, res, next) {
-    const userid = req.body.userId
-    const recipeId = req.body.recipeId
-    console.log("request has userId " + userid)
-    console.log("request has recipeId " + recipeId)
-    //Check that the id is not null
-    if (userid) {
-        //Check that the ObjectId is in valid format
-        await userModel.findById(userid).then(function(user){
-            req.user = user
-        })
-        .catch(function(err){
-            next(err)
-        })
+  const userId = req.body.userId
+  const recipeId = req.body.recipeId
+  console.log("request has userId " + userId)
+  console.log("request has recipeId " + recipeId)
+  //Check that the id is not null
+  if (userId) {
+      //Check that the ObjectId is in valid format
 
-    }
-    if(recipeId){
-        await recipeModel.findById(recipeId).then(function(recipe){
-            req.recipe = recipe
-        })
-        .catch(function(err){
-            next(err)
-        })
-    }
-    next()
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ message: "Invalid user ID format" });
+      }
+
+      await userModel.findById(userId)
+      .then(function(user){
+          if (!user) {
+              return res.status(404).json({ message: "User not found" });
+          }
+          req.user = user
+      })
+      .catch(function(err){
+          next(err)
+      })
+  }
+  if(recipeId){
+
+      if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+          return res.status(400).json({ message: "Invalid recipe ID format" });
+      }
+
+      await recipeModel.findById(recipeId)
+      .then(function(recipe){
+          if (!recipe) {
+              return res.status(404).json({ message: "recipe not found" });
+          }
+          req.recipe = recipe
+      })
+      .catch(function(err){
+          next(err)
+      })
+  }
+  next()
 }
 
 
