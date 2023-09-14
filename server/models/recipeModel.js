@@ -56,10 +56,16 @@ var recipeSchema= new Schema(
       required: true,
       default: "No nutritional info",
    },
-   comments: [{type: {
-      type: String
+   comments: [{
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your owner has an ID
+      required: true,
     },
-      body: String,
+    recipeId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your recipe has an ID
+      required: true,
+    },
+      comment: String,
       author: String,
       date: {type: Date, default : Date.now},
   }],
