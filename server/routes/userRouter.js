@@ -179,30 +179,31 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
 
 });
 
-//replacce a recipe
+//replace a recipe
 router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-    const updatedRecipeData = req.body;
-    const unformattedTags = req.body.tags;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
 
-    try {
-      const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-      updatedRecipeData.tags = formattedTags;
+  try {
+    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
+    updatedRecipeData.tags = formattedTags;
 
-      const recipeToUpdate = req.recipe
+    const recipeToUpdate = req.recipe
 
-      const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
-      recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
+    const { title, image, sectionsAndIngredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+    recipeToUpdate.set({ title, image, sectionsAndIngredients, steps, serving, description, tags, nutritionalInfo, comments });
 
-      await recipeToUpdate.save();
-      const tagDetails = await Tag.find({ _id: { $in: recipeToUpdate.tags } });
-      res.status(200).json({
-        message: "Recipe updated", Recipe: { ...recipeToUpdate.toObject(), tags: tagDetails, }
-      });
 
-    } catch (err) {
-      err.status=400//bad update requets
-      return next(err);
-    }
+    await recipeToUpdate.save();
+   
+    res.status(200).json({
+      message: "Recipe updated", Recipe: { recipeToUpdate}
+    });
+
+  } catch (err) {
+    err.status=400//bad update requets
+    return next(err);
+  }
 });
 
 //PATCH----------------------------------
