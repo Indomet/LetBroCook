@@ -249,22 +249,26 @@ router.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfReci
 //PATCH----------------------------------
 
 // edit a user
+// edit a user
 router.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user"})
+  if(!req.user.id){
+      return res.status(400).json({ message: "Invalid user"})
+  }
+  const userId = req.user.id
+userModel.findById(userId)
+  .then(function (user) {
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    const userId = req.user.id
-  userModel.findByIdAndUpdate(userId, req.body)
-    .then(function (user) {
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      res.json(user);
-    })
-    .catch(function (error) {
-      error.status=400
-      return next(error);
-    });
+    Object.assign(user,req.body);
+    user.save();
+    res.json(user);
+  })
+  .catch(function (error) {
+    error.status=400
+    return next(error);
+  });
 });
 
 
