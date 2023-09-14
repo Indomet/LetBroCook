@@ -9,7 +9,7 @@ GET http://localhost:3000/v1/users/selectOne
 Content-Type: application/json
 
 {
-    "userId": "4eb6e7e7e9b7f4194e000001"
+    "userId": "6502f6abb594c59b5e72305c"
 }
 
 ###
@@ -29,7 +29,7 @@ GET http://localhost:3000/v1/users/recipes/all
 Content-Type: application/json
 
 {
-    "userId": "4eb6e7e7e9b7f4194e000001"
+    "userId": "6502f864b4b79b57207b6af1"
 }
 
 ###
@@ -53,7 +53,7 @@ POST http://127.0.0.1:3000/v1/users/create-recipe
 Content-Type: application/json
 
 {
-        "userId": "4eb6e7e7e9b7f4194e000001",
+        "userId": "6502f864b4b79b57207b6af1",
         "title": "Chimichurri Wings",
         "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
         "sectionsAndIngredients": {
@@ -78,8 +78,8 @@ PATCH  http://127.0.0.1:3000/v1/users/edit-recipe/
 Content-Type: application/json
 
 {
-    "recipeId": "6501e0b3e6ab49f7ec469957",
-    "userId": "4eb6e7e7e9b7f4194e000001",
+    "recipeId": "6502f97ab4b79b57207b6b61",
+    "userId": "6502f864b4b79b57207b6af1",
    "ingredients": [
       "asim",
       "Ingredientjkbkjhj 2",
