@@ -40,9 +40,7 @@ mongoose.connection.once("open", async function () {
   )
   //specify a consisteant and findable id
   originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
-    await originalOGuser.save().catch(function(err){
-        return console.error(err)
-    })
+
   if(count == 0){
   try {
     recipeData = require("../RecipeData.json");
@@ -56,9 +54,12 @@ mongoose.connection.once("open", async function () {
 
       }
       console.log("Database populated")
+      await originalOGuser.save().catch(function(err){
+        return console.error(err)
+    })
     }
    catch (err) {
-    console.log(err);
+    console.log(err); 
   }}
 });
 
