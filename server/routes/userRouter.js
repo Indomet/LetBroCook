@@ -91,12 +91,12 @@ router.get("/sign-in", async (req, res, next) => {
 //POST----------------------------------
 
 
-router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
+router.post("/favorite-recipes",userAuth.authUser, async (req, res, next) => {
 
     try {
 
       const user = req.user
-      user.favouriteRecipes.push(recipeId);
+      user.favouriteRecipes.push(req.body.recipeId);
       user.save()
       //request created
       res.status(201).json({ message: "Recipe added to favourite list" });
@@ -179,30 +179,31 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
 
 });
 
-//replacce a recipe
+//replace a recipe
 router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-    const updatedRecipeData = req.body;
-    const unformattedTags = req.body.tags;
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
 
-    try {
-      const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-      updatedRecipeData.tags = formattedTags;
+  try {
+    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
+    updatedRecipeData.tags = formattedTags;
 
-      const recipeToUpdate = req.recipe
+    const recipeToUpdate = req.recipe
 
-      const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
-      recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
+    const { title, image, sectionsAndIngredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+    recipeToUpdate.set({ title, image, sectionsAndIngredients, steps, serving, description, tags, nutritionalInfo, comments });
 
-      await recipeToUpdate.save();
-      const tagDetails = await Tag.find({ _id: { $in: recipeToUpdate.tags } });
-      res.status(200).json({
-        message: "Recipe updated", Recipe: { ...recipeToUpdate.toObject(), tags: tagDetails, }
-      });
 
-    } catch (err) {
-      err.status=400//bad update requets
-      return next(err);
-    }
+    await recipeToUpdate.save();
+   
+    res.status(200).json({
+      message: "Recipe updated", Recipe: { recipeToUpdate}
+    });
+
+  } catch (err) {
+    err.status=400//bad update requets
+    return next(err);
+  }
 });
 
 //PATCH----------------------------------
@@ -303,4 +304,36 @@ router.patch('/editComment', userAuth.authUser, async (req, res, next) => {
     return next(err)})
   })
 
-//DELETE----------------------------------
+//DELETE----------------------------------comment
+
+router.delete('/deleteComment', userAuth.authUser, async (req, res, next) => {
+  const { commentId, recipeId } = req.body;
+
+  try {
+    
+    await recipeModel.findByIdAndUpdate(recipeId,{ $pull: { comments: { _id: commentId } } });
+     res.status(200).json({ message: "comment deleted " });
+
+  } catch (err) {
+      err.status = 500;
+      return next(err);
+  }
+});
+
+
+//DELETE----------------------------------favourite recipe
+router.delete("/favorite-recipes/delete",userAuth.authUser, async (req, res, next) => {
+  const {userId, recipeId}= req.body
+
+  userModel.findById(userId).then((user)=>{
+    index = user.favouriteRecipes.indexOf(recipeId)
+    user.favouriteRecipes.splice(recipeId,1)
+    user.save()
+    res.status(200).json({message: "Fav recipe removed"})
+  }
+  ).catch((err)=>{
+    err.message = "recipe doesnt exist"
+    err.status=404
+    return next(err)
+  })
+}) 
