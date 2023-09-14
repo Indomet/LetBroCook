@@ -182,7 +182,7 @@ router.post("/signup", (req, res, next) => {
 //PUT----------------------------------
 
 //replace a user
-router.put("/v1/users/replace-user", userAuth.authUser, function (req, res, next) {
+router.put("/replace-user", userAuth.authUser, function (req, res, next) {
     if(!req.user.id){
         return res.status(400).json({ message: "Invalid user"})
     }
@@ -207,14 +207,14 @@ router.put("/v1/users/replace-user", userAuth.authUser, function (req, res, next
 });
 
 //replacce a recipe
-router.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.put("/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
     const userId = req.user.id
     const recipeId = req.recipe.id
     const updatedRecipeData = req.body;
     const unformattedTags = req.body.tags;
 
     try {
-      const formattedTags = await serverUtil.handleExistingTags(unformattedTags);
+      const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
       updatedRecipeData.tags = formattedTags;
 
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -250,7 +250,7 @@ router.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfReci
 
 // edit a user
 // edit a user
-router.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
+router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
   if(!req.user.id){
       return res.status(400).json({ message: "Invalid user"})
   }
@@ -273,7 +273,7 @@ userModel.findById(userId)
 
 
 // edit a recipe
-router.patch("/v1/users/edit-recipe/", async (req, res, next) => {
+router.patch("/edit-recipe/", async (req, res, next) => {
 
     const updatedRecipeData = req.body;
     const unformattedTags = req.body.tags;
@@ -285,7 +285,7 @@ router.patch("/v1/users/edit-recipe/", async (req, res, next) => {
     const recipeId = req.recipe.id
 
   try {
-    const formattedTags = await serverUtil.handleExistingTags(unformattedTags);
+    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
     updatedRecipeData.tags = formattedTags;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
