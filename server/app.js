@@ -7,7 +7,6 @@ var history = require("connect-history-api-fallback");
 const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
 const serverUtil = require("./serverUtil.js");
-const fs = require("fs");
 const userAuth = require("./basicAuth.js")
 
 // Variables
@@ -29,6 +28,9 @@ mongoose.connect(mongoURI)
 mongoose.connection.on("error", function (error) {
   console.error(error);
 });
+
+
+
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
   const count = await recipeModel.countDocuments().exec();
@@ -41,26 +43,30 @@ mongoose.connection.once("open", async function () {
     }
   )
   //specify a consisteant and findable id
-  originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
-    //await originalOGuser.save()
-  if(false){
+  
+  if(count==0){
   try {
+    originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
     recipeData = require("../RecipeData.json");
 
     for (let i = 0; i < recipeData.length; i++) {
-        recipeData[i].tags = await handleExistingTags(recipeData[i].tags) // Assign the array of ObjectIds to the recipeData
+        recipeData[i].tags = await serverUtil.handleExistingTags(recipeData[i].tags,Tag) // Assign the array of ObjectIds to the recipeData
 
         var recipe = new recipeModel(recipeData[i])
         recipe.owner= originalOGuser._id
+        originalOGuser.recipes.push(recipe)
         await recipe.save()
 
       }
+      await originalOGuser.save()
       console.log("Database populated")
     }
    catch (err) {
     console.log(err);
   }}
 });
+
+
 
 
 
