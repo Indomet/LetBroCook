@@ -29,7 +29,7 @@ var recipeSchema= new Schema(
       type: Map,
       of: Array
     }
-   ,
+   , 
    steps: {
       type: Array,
       required: true,

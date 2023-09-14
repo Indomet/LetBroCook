@@ -209,48 +209,44 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
 });
 
 //replacce a recipe
-router.put("/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-    const userId = req.user.id
-    const recipeId = req.recipe.id
-    const updatedRecipeData = req.body;
-    const unformattedTags = req.body.tags;
+//replacce a recipe
+router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+  const updatedRecipeData = req.body;
+  const unformattedTags = req.body.tags;
 
-    try {
-      const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-      updatedRecipeData.tags = formattedTags;
+  try {
+    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
+    updatedRecipeData.tags = formattedTags;
+/*
+    const user = await userModel.findById(userId);
 
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).json({ message: "Invalid user ID format" });
-      }
-      const user = await userModel.findById(userId);
-
-      const recipeIndex = user.recipes.indexOf(recipeId);
-      if (recipeIndex === -1) {
-        return res.status(404).json({ message: "Recipe not found for this user" });
-      }
-      const updatedRecipe = await recipeModel.findById(recipeId);
-      if (!updatedRecipe) {
-        return res.status(404).json({ message: "Recipe not found" });
-      }
-      const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
-      updatedRecipe.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
-
-      await updatedRecipe.save();
-      const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
-      res.status(200).json({
-        message: "Recipe updated", Recipe: { ...updatedRecipe.toObject(), tags: tagDetails, }
-      });
-
-    } catch (err) {
-      err.status=400//bad update requets
-      return next(err);
+    const recipeIndex = req.user.recipes.indexOf(recipeId);
+    if (recipeIndex === -1) {
+      return res.status(404).json({ message: "Recipe not found for this user" });
     }
-  });
+    */
+    const recipeToUpdate = req.recipe
+    /*
+    if (!recipeToUpdate) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }*/
+    const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+    recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
 
+    await recipeToUpdate.save();
+    const tagDetails = await Tag.find({ _id: { $in: recipeToUpdate.tags } });
+    res.status(200).json({
+      message: "Recipe updated", Recipe: { ...recipeToUpdate.toObject(), tags: tagDetails, }
+    });
+
+  } catch (err) {
+    err.status=400//bad update requets
+    return next(err);
+  }
+});
 
 //PATCH----------------------------------
 
-// edit a user
 // edit a user
 router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
   if(!req.user.id){
