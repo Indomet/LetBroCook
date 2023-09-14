@@ -190,7 +190,6 @@ router.post("/signup", (req, res, next) => {
   });
 
 //PUT----------------------------------
-
 //replace a user
 router.put("/replace-user", userAuth.authUser, function (req, res, next) {
     if(!req.user.id){
@@ -373,29 +372,20 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
 //TODO: Make comment into separate model and create authorization
 //check for only being able to edit/delete one's own comment
 
-// edit a comment
-router.patch('/v1/users/:userId/recipes/:recipeId/edit-comment/:commentId', async (req, res, next) => {
-    try {
-      const { userId, recipeId, commentId } = req.params;
+// edit a comment 
+//body has a comment recipe and the comment id
+router.patch('/editComment', async (req, res, next) => {
+      const { commentId, recipeId,comment } = req.body;
+      recipeModel.findById(recipeId).then((recipe)=>{
+        if(!recipe){return res.json("no recipe")}
 
-      const user = await userModel.findById(userId);
-      if (!user) return res.status(404).json({ message: 'User not found' });
-
-      const recipe = await recipeModel.findById(recipeId);
-      if (!recipe) return res.status(404).json({ message: 'Recipe not found' });
-
-      const commentToUpdate = recipe.comments.id(commentId);
-      if (!commentToUpdate) return res.status(404).json({ message: 'Comment not found' });
-
-      const { body } = req.body;
-      commentToUpdate.body = body;
-
-      const updatedRecipe = await recipe.save();
-      res.json(updatedRecipe.comments);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-
+        let obj = recipe.comments.find(comment => comment._id ==commentId);
+        obj.comment=comment
+        //recipe.comments[commentIndex].comment=comment
+        res.status(200).json({message:"comment changed"})
+      }).catch((err)=>{
+      err.status= 404
+      err.message="comment doesnt exist"
+      return next(err)})
+    })
 //DELETE----------------------------------
