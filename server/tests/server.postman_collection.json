@@ -1,18 +1,171 @@
 {
 	"info": {
-		"_postman_id": "f7ee95b5-9cb9-442f-a6a9-42de46138872",
-		"name": "server",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "464ffc79-70ea-4d6b-8002-dea6d1f105b1",
+		"name": "serverworking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29691657"
 	},
 	"item": [
 		{
-			"name": "GET /api",
+			"name": "createUser",
 			"event": [
 				{
-					"listen": "prerequest",
+					"listen": "test",
 					"script": {
-						"id": "b58d92ec-5214-450c-adb0-28e068aa71b9",
 						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var jsonData = JSON.parse(responseBody);\r",
+							"var user_id = jsonData._id;\r",
+							"pm.globals.set(\"user_id\", jsonData._id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"indomet\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"asim\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/v1/users/signup",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser(signin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"asim@gmail.com\",\r\n    \"password\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/sign-in",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"sign-in"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "editUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\",\r\n    \"username\":\"changeusername\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"aki\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/v1/users/edit-user/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"edit-user",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// var jsonData =pm.response.json();\r",
+							"// console.log(jsonData); \r",
+							"// pm.globals.set(\"recipe_id\", jsonData._id);\r",
+							"var jsonData = JSON.parse(responseBody);\r",
+							"var recipe_id = jsonData.Recipe._id;\r",
+							"pm.globals.set(\"recipe_id\", recipe_id);\r",
 							""
 						],
 						"type": "text/javascript"
@@ -20,56 +173,657 @@
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n        \"userId\": \"{{user_id}}\",\r\n        \"title\": \"Chimichurri Wings\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"1 large shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large jalapeño, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"In a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"Appliance\",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
 					}
-				],
+				},
 				"url": {
-					"raw": "{{host}}/api",
+					"raw": "http://localhost:3000/v1/users/create-recipe/",
+					"protocol": "http",
 					"host": [
-						"{{host}}"
+						"localhost"
 					],
+					"port": "3000",
 					"path": [
-						"api"
+						"v1",
+						"users",
+						"create-recipe",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getSingleRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"recipeId\": \"{{recipe_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/selectOne",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						"selectOne"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "editRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n        \"userId\": \"{{user_id}}\",\r\n        \"recipeId\": \"{{recipe_id}}\",\r\n        \"title\": \"Chimichurri Wings-changetitle\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"1 large shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large jalapeño, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"In a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"Appliance\",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/edit-recipe/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"edit-recipe",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "replaceUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\",\r\n    \"username\":\"recplaceuser\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"aki\",\r\n    \"password\":\"1234\",\r\n    \"recipes\": [],\r\n    \"favouriteRecipes\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/replace-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"replace-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "replaceRecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n        \"userId\": \"{{user_id}}\",\r\n        \"recipeId\": \"{{recipe_id}}\",\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/replace-recipe/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"replace-recipe",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllUsers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"6502e3e7e062c66a344645485\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/selectOne",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"selectOne"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllRecipes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllRecipesFromAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"userId\": \"{{user_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/recipes/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"recipes",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createComment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var jsonData = JSON.parse(responseBody);\r",
+							"var comment_id = jsonData._id;\r",
+							"pm.globals.set(\"comment_id\", jsonData._id);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\",\r\n    \"recipeId\":\"{{recipe_id}}\",\r\n    \"comment\":\"testskjheaffnewjslkbn\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "editComment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\",\r\n    \"recipeId\":\"{{recipe_id}}\",\r\n    \"commentId\": \"{{comment_id}}\",\r\n    \"comment\":\"edit test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/editComment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"editComment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllTags",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/tags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllRecipesOfAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/recipes/all",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"recipes",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteRecipeFromAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\",\r\n    \"recipeId\": \"{{recipe_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/deleteOne",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						"deleteOne"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteAllRecipesFromAUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"4eb6e7e7e9b7f4194e000001\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/deleteAllFromUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						"deleteAllFromUser"
 					]
 				}
 			},
 			"response": []
 		}
 	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"id": "05864cff-5cba-4070-bac3-a59328954ebf",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"id": "e9c319be-3306-4fc5-ba34-fcf64391213a",
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
 	"variable": [
 		{
-			"id": "cd185905-a834-4211-8030-583d17702534",
 			"key": "host",
-			"value": "http://localhost:3000",
-			"type": "string"
+			"value": "http://localhost:3000"
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
