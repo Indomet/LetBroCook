@@ -91,12 +91,12 @@ router.get("/sign-in", async (req, res, next) => {
 //POST----------------------------------
 
 
-router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
+router.post("/favorite-recipes",userAuth.authUser, async (req, res, next) => {
 
     try {
 
       const user = req.user
-      user.favouriteRecipes.push(recipeId);
+      user.favouriteRecipes.push(req.body.recipeId);
       user.save()
       //request created
       res.status(201).json({ message: "Recipe added to favourite list" });
