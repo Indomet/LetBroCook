@@ -250,7 +250,7 @@ router.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfReci
 
 // edit a user
 // edit a user
-app.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
+router.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
   if(!req.user.id){
       return res.status(400).json({ message: "Invalid user"})
   }
