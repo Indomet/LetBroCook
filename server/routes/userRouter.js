@@ -5,7 +5,7 @@ const router = express.Router();
 
 const { recipeModel, Tag } = require("../models/recipeModel.js"); //. for windows
 const userModel = require("../models/userModel.js");
-const serverUtil = require("../serverUtil.js");
+const serverUtil = require("../serverUtil.js")
 const userAuth = require("../basicAuth.js")
 
 module.exports = router
@@ -30,11 +30,8 @@ router.get("/", function (req, res, next) {
 
 //Get all recipes of user
 router.get("/recipes/all", userAuth.authUser, function (req, res, next) {
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user" })
-    }
-    const userId = req.user.id
-    recipeModel.find({owner: userId})
+
+    recipeModel.find({owner: req.user.id})
     .then(function(recipes){
         res.status(200).json({ recipes: recipes });
     })
@@ -52,25 +49,10 @@ router.get("/selectOne", (req, res, next) => {
     // Label cache-ability
     res.set("Cache-control", "no-store");
 
-      if(!req.user.id){
-          return res.status(400).json({ message: "Invalid user" })
-      }
-      const userId = req.user.id
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(404).json({ message: "Invalid user ID format" });
-      }
-    userModel
-      .findById(userId)
-      .then((user) => {
-        // User found, send it as a response
+        const user = req.user
         res.status(200).json({ User: user });
-      })
-      .catch((err) => {
-        // Handle database errors or other unexpected errors
-        err.staus=404
-        next(err);
-      });
-  });
+});
+
 
 //User sign in
 router.get("/sign-in", async (req, res, next) => {
@@ -111,20 +93,9 @@ router.get("/sign-in", async (req, res, next) => {
 
 router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
 
-    if(!req.user.id || !req.recipe.id){
-        return res.status(400).json({ message: "Invalid user/recipe" })
-    }
-    const userId = req.user.id
-    const recipeId = req.recipe.id
-
     try {
-      //attempt to find user
-      const user = await userModel.findById(userId);
-      if (!user) {
-        //return resource not found error
-        return res.status(404).json({ message: "User does not exist" });
-      }
 
+      const user = req.user
       user.favouriteRecipes.push(recipeId);
       user.save()
       //request created
@@ -192,14 +163,9 @@ router.post("/signup", (req, res, next) => {
 //PUT----------------------------------
 //replace a user
 router.put("/replace-user", userAuth.authUser, function (req, res, next) {
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user"})
-    }
-    const userId = req.user.id
-    userModel.findById(userId)
-    .then(function (user) {
 
-      const { username, email, password, name, recipes, favouriteRecipes } = req.body;
+    const user = req.user
+    const { username, email, password, name, recipes, favouriteRecipes } = req.body;
       user.set({ username, email, password, name, recipes, favouriteRecipes,  });
       user.save()
         .then(updatedUser => {
@@ -209,27 +175,32 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
           err.status= 400//bad req for updating a user
           return next(err);
         });
-    })
-    .catch((err) => {
-      return next(err);
-    });
+
 });
 
 //replacce a recipe
-//replacce a recipe
 router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-  const updatedRecipeData = req.body;
-  const unformattedTags = req.body.tags;
+    const updatedRecipeData = req.body;
+    const unformattedTags = req.body.tags;
 
-  try {
-    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-    updatedRecipeData.tags = formattedTags;
-/*
-    const user = await userModel.findById(userId);
+    try {
+      const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
+      updatedRecipeData.tags = formattedTags;
 
-    const recipeIndex = req.user.recipes.indexOf(recipeId);
-    if (recipeIndex === -1) {
-      return res.status(404).json({ message: "Recipe not found for this user" });
+      const recipeToUpdate = req.recipe
+
+      const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
+      recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
+
+      await recipeToUpdate.save();
+      const tagDetails = await Tag.find({ _id: { $in: recipeToUpdate.tags } });
+      res.status(200).json({
+        message: "Recipe updated", Recipe: { ...recipeToUpdate.toObject(), tags: tagDetails, }
+      });
+
+    } catch (err) {
+      err.status=400//bad update requets
+      return next(err);
     }
     */
     const recipeToUpdate = req.recipe
@@ -256,65 +227,33 @@ router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async 
 
 // edit a user
 router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
-  if(!req.user.id){
-      return res.status(400).json({ message: "Invalid user"})
-  }
-  const userId = req.user.id
-userModel.findById(userId)
-  .then(function (user) {
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    Object.assign(user,req.body);
+    const user = req.user
+    Object.assign(user, req.body);
     user.save();
     res.json(user);
-  })
-  .catch(function (error) {
-    error.status=400
-    return next(error);
-  });
-});
-
+})
 
 // edit a recipe
-router.patch("/edit-recipe/", async (req, res, next) => {
+router.patch("/edit-recipe", async (req, res, next) => {
 
     const updatedRecipeData = req.body;
     const unformattedTags = req.body.tags;
-
-    if(!req.user.id || !req.recipe.id){
-        return res.status(400).json({ message: "Invalid user/recipe" })
-        }
-    const userId = req.user.id
-    const recipeId = req.recipe.id
 
   try {
     const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
     updatedRecipeData.tags = formattedTags;
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid user ID format" });
-    }
-    const user = await userModel.findById(userId);
-    const recipeIndex = user.recipes.indexOf(recipeId);
-    // it is -1 because If it's not found, it returns -1.
-    if (recipeIndex === -1) {
-      return res.status(404).json({ message: "Recipe not found for this user" });
-    }
-
-    const updatedRecipe = await recipeModel.findByIdAndUpdate(recipeId, updatedRecipeData);
+    const updatedRecipe = await recipeModel.findByIdAndUpdate(req.recipe.id, updatedRecipeData);
 
     if (!updatedRecipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
 
-    // if (req.body.sectionsAndIngredients) {
-    //   updatedRecipeData.sectionsAndIngredients.ingredients = req.body.sectionsAndIngredients.ingredients;
-    // }
     const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
     res.status(200).json({
-      message: "Recipe updated", Recipe: {updatedRecipe}
+      message: "Recipe updated",
+      Recipe: {updatedRecipe},
+      tags: tagDetails
     });
   } catch (err) {
     err.status=400
@@ -327,12 +266,8 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
 
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user" })
-    }
-    const userId = req.user.id
     try {
-    var formattedTags = await serverUtil.handleExistingTags(unformattedTags,Tag)
+    var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag)
       recipeData.tags = formattedTags;
       recipeData.owner = req.params.userId;
     }
@@ -342,12 +277,8 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
     }
 
     var recipe = new recipeModel(recipeData);
-
-    var user = await userModel.findById(userId)
-    if(!user ){
-        return res.status(404).send("no user found")
-    }
-    recipe.owner = userId
+    const user = req.user
+    recipe.owner = user.id
 
     recipe.save()
     .then(function (recipe) {

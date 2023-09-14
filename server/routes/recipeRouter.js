@@ -57,28 +57,17 @@ router.get("/tags", function (req, res, next) {
 // hateoas
 router.get("/selectOne", async (req, res, next) => {
 
-try {
-    const recipeId = req.recipe.id
-    await recipeModel.findById(recipeId)
-    .then(function(recipe){
-        if (!recipe) {
-            return res.status(404).json({ message: "recipe not found" });
-        }
-        // HATEOAS links
+    const recipe = req.recipe
+    // HATEOAS links
     const links = [
         { rel: "itself", href: `/v1/recipes/${recipe._id}` },
         { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
         { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
     ];
 
-        res.status(200).json({recipe: recipe,links: links,
-        });
-    })
+    res.status(200).json({recipe: recipe,links: links,
+    });
 
-} catch (err) {
-    err.status=400
-    return next(err)
-}
 });
 
 
@@ -118,38 +107,49 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
 
   })
 
-
 //Delete all recipes from specific userId
 router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next) {
-  const userId = req.user.id;
+    const userId = req.user.id;
+    deleteManyUserRecipe(req, userId)
 
-  recipeModel.find({ owner: userId }).then(function(recipes) {
-      if (recipes.length === 0) {
-          return res.status(404).json({ message: "No recipes to delete" });
-      }
+    recipeModel.find({ owner: userId }).then(function(recipes) {
+        if (recipes.length === 0) {
+            return res.status(404).json({ message: "No recipes to delete" });
+        }
 
-      const recipeIds = recipes.map(recipe => recipe.id);
+        const recipeIds = recipes.map(recipe => recipe.id);
 
-      recipeModel.deleteMany({ _id: { $in: recipeIds } })
-          .then(function(result) {
-              return res.status(200).json({ message: "Recipes deleted", body: result });
-          })
-          .catch(function(error) {
-              return next(error);
-          });
-  }).catch(function(error) {
-      return next(error);
+        recipeModel.deleteMany({ _id: { $in: recipeIds } })
+            .then(function(result) {
+                return res.status(200).json({ message: "Recipes deleted", body: result });
+            })
+            .catch(function(error) {
+                return next(error);
+            });
+    }).catch(function(error) {
+        return next(error);
+    });
   });
-});
 
 
-
-
+//Deletes the reference of one recipeId
 function updateOneUserRecipe(userId, recipeId){
     userModel.findOneAndUpdate(
         { _id: userId },
         { $pull: { recipes: recipeId } },
         { new: true }).then(function(updatedUser){
+                console.log("User recipes updated successfully:", updatedUser);
+        }).catch(function(err){
+                console.error("Error updating user:", err);
+        })
+}
+
+//Deletes the reference of many recipeId
+async function deleteManyUserRecipe(req, userId){
+    var recipesToRemove = []
+    recipesToRemove = req.user.recipes
+
+    await userModel.findOneAndUpdate({_id:userId}, { $set: { recipes: [] }}).then(function(updatedUser){
                 console.log("User recipes updated successfully:", updatedUser);
         }).catch(function(err){
                 console.error("Error updating user:", err);
