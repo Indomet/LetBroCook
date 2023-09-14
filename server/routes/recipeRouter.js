@@ -122,12 +122,12 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
 //Delete all recipes from specific userId
 router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
     const userId = req.user.id
-    try{
-    deleteManyUserRecipe(req, userId)}
-    catch(err){
-      err.status = 404 // user doesnt exist
-      return next(err)
-    }
+    // try{
+    // deleteManyUserRecipe(req, userId)}
+    // catch(err){
+    //   err.status = 404 // user doesnt exist
+    //   return next(err)
+    // }
 
     recipeModel.find({owner : userId}).then(function(recipes){
         if(recipes.length === 0){
