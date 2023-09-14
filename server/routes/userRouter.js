@@ -122,15 +122,15 @@ router.post("/comments", userAuth.authUser, (req, res, next) => {
         .findById(recipeId)
         .then(async (recipe) => {
 
-          
-          
+
+
           const newComment = {
           ownerId: userId,
-          recipeId: recipeId, 
-          comment: req.body.comment, 
-          author: user.username, 
+          recipeId: recipeId,
+          comment: req.body.comment,
+          author: user.username,
           };
-          
+
 
           recipe.comments.push(newComment);
           recipe.save();
@@ -202,25 +202,6 @@ router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async 
       err.status=400//bad update requets
       return next(err);
     }
-    */
-    const recipeToUpdate = req.recipe
-    /*
-    if (!recipeToUpdate) {
-      return res.status(404).json({ message: "Recipe not found" });
-    }*/
-    const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
-    recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
-
-    await recipeToUpdate.save();
-    const tagDetails = await Tag.find({ _id: { $in: recipeToUpdate.tags } });
-    res.status(200).json({
-      message: "Recipe updated", Recipe: { ...recipeToUpdate.toObject(), tags: tagDetails, }
-    });
-
-  } catch (err) {
-    err.status=400//bad update requets
-    return next(err);
-  }
 });
 
 //PATCH----------------------------------
@@ -303,7 +284,7 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
 //TODO: Make comment into separate model and create authorization
 //check for only being able to edit/delete one's own comment
 
-// edit a comment 
+// edit a comment
 //body has a comment recipe and the comment id
 router.patch('/editComment', async (req, res, next) => {
       const { commentId, recipeId,comment } = req.body;
