@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "464ffc79-70ea-4d6b-8002-dea6d1f105b1",
+		"_postman_id": "971de17c-1544-4f08-8824-a4dcb3d04e4c",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29691657"
+		"_exporter_id": "29736996"
 	},
 	"item": [
 		{
@@ -566,9 +566,7 @@
 							"\r",
 							"var jsonData = JSON.parse(responseBody);\r",
 							"var comment_id = jsonData._id;\r",
-							"pm.globals.set(\"comment_id\", jsonData._id);\r",
-							"\r",
-							""
+							"pm.globals.set(\"comment_id\", jsonData._id);"
 						],
 						"type": "text/javascript"
 					}
