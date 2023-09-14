@@ -304,4 +304,36 @@ router.patch('/editComment', userAuth.authUser, async (req, res, next) => {
     return next(err)})
   })
 
-//DELETE----------------------------------
+//DELETE----------------------------------comment
+
+router.delete('/deleteComment', userAuth.authUser, async (req, res, next) => {
+  const { commentId, recipeId } = req.body;
+
+  try {
+    
+    await recipeModel.findByIdAndUpdate(recipeId,{ $pull: { comments: { _id: commentId } } });
+     res.status(200).json({ message: "comment deleted " });
+
+  } catch (err) {
+      err.status = 500;
+      return next(err);
+  }
+});
+
+
+//DELETE----------------------------------favourite recipe
+router.delete("/favorite-recipes/delete",userAuth.authUser, async (req, res, next) => {
+  const {userId, recipeId}= req.body
+
+  userModel.findById(userId).then((user)=>{
+    index = user.favouriteRecipes.indexOf(recipeId)
+    user.favouriteRecipes.splice(recipeId,1)
+    user.save()
+    res.status(200).json({message: "Fav recipe removed"})
+  }
+  ).catch((err)=>{
+    err.message = "recipe doesnt exist"
+    err.status=404
+    return next(err)
+  })
+}) 

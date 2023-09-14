@@ -54,9 +54,9 @@ mongoose.connection.once("open", async function () {
 
       }
       console.log("Database populated")
-      await originalOGuser.save().catch(function(err){
+      originalOGuser.save().catch(function(err){
         return console.error(err)
-    })
+    }) 
     }
    catch (err) {
     console.log(err); 
