@@ -130,7 +130,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/v1/users/edit-user/",
+					"raw": "http://127.0.0.1:3000/v1/users/edit",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -142,8 +142,7 @@
 					"path": [
 						"v1",
 						"users",
-						"edit-user",
-						""
+						"edit"
 					]
 				}
 			},
@@ -185,7 +184,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/create-recipe/",
+					"raw": "http://localhost:3000/v1/users/recipes/create",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -194,54 +193,8 @@
 					"path": [
 						"v1",
 						"users",
-						"create-recipe",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getSingleRecipe",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"recipeId\": \"{{recipe_id}}\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/v1/recipes/selectOne",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"v1",
 						"recipes",
-						"selectOne"
+						"create"
 					]
 				}
 			},
@@ -311,7 +264,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " {\r\n        \"userId\": \"{{user_id}}\",\r\n        \"recipeId\": \"{{recipe_id}}\",\r\n        \"title\": \"Chimichurri Wings-changetitle\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"1 large shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large jalapeño, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"In a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"Appliance\",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"raw": " {\r\n        \"userId\": \"{{user_id}}\",\r\n        \"recipeId\": \"{{recipe_id}}\",\r\n        \"title\": \"Chimichurri Wings-changetitle\",\r\n        \"image\": \"https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"change1 large shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large jalapeño, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"changeIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"Appliance\",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -319,7 +272,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/edit-recipe/",
+					"raw": "http://localhost:3000/v1/users/recipes/edit",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -328,8 +281,8 @@
 					"path": [
 						"v1",
 						"users",
-						"edit-recipe",
-						""
+						"recipes",
+						"edit"
 					]
 				}
 			},
@@ -363,7 +316,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/replace-user",
+					"raw": "http://localhost:3000/v1/users/replacement",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -372,7 +325,7 @@
 					"path": [
 						"v1",
 						"users",
-						"replace-user"
+						"replacement"
 					]
 				}
 			},
@@ -407,7 +360,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/replace-recipe/",
+					"raw": "http://localhost:3000/v1/users/recipes/replacement",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -416,8 +369,8 @@
 					"path": [
 						"v1",
 						"users",
-						"replace-recipe",
-						""
+						"recipes",
+						"replacement"
 					]
 				}
 			},
@@ -494,7 +447,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/selectOne",
+					"raw": "http://localhost:3000/v1/users/selection",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -503,7 +456,53 @@
 					"path": [
 						"v1",
 						"users",
-						"selectOne"
+						"selection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getARecipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"recipeId\": \"{{recipe_id}}\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/recipes/selection",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"recipes",
+						"selection"
 					]
 				}
 			},
@@ -672,7 +671,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/editComment",
+					"raw": "http://localhost:3000/v1/users/comments/edit",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -681,7 +680,8 @@
 					"path": [
 						"v1",
 						"users",
-						"editComment"
+						"comments",
+						"edit"
 					]
 				}
 			},
@@ -804,7 +804,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/deleteComment",
+					"raw": "http://localhost:3000/v1/users/comments/delete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -813,7 +813,8 @@
 					"path": [
 						"v1",
 						"users",
-						"deleteComment"
+						"comments",
+						"delete"
 					]
 				}
 			},
@@ -893,7 +894,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/deleteOne",
+					"raw": "http://localhost:3000/v1/recipes/delete",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -902,7 +903,7 @@
 					"path": [
 						"v1",
 						"recipes",
-						"deleteOne"
+						"delete"
 					]
 				}
 			},
