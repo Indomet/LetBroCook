@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "971de17c-1544-4f08-8824-a4dcb3d04e4c",
+		"_postman_id": "f4958ab4-c807-4d52-a4bf-c579d68ad534",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29736996"
+		"_exporter_id": "29691657"
 	},
 	"item": [
 		{
@@ -426,8 +426,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {\r",
-							"    pm.response.to.have.status(400);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
 							"});"
 						],
 						"type": "text/javascript"
@@ -442,7 +442,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": \"6502e3e7e062c66a344645485\"\r\n}",
+					"raw": "{\r\n    \"userId\": \"{{user_id}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
