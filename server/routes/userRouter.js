@@ -286,18 +286,20 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
 
 // edit a comment
 //body has a comment recipe and the comment id
-router.patch('/editComment', async (req, res, next) => {
-      const { commentId, recipeId,comment } = req.body;
-      recipeModel.findById(recipeId).then((recipe)=>{
-        if(!recipe){return res.json("no recipe")}
+router.patch('/editComment', userAuth.authUser, async (req, res, next) => {
+    const { commentId, recipeId, comment } = req.body;
+    recipeModel.findById(recipeId).then((recipe)=>{
+      if(!recipe){return res.json("no recipe")}
 
-        let obj = recipe.comments.find(comment => comment._id ==commentId);
-        obj.comment=comment
-        //recipe.comments[commentIndex].comment=comment
-        res.status(200).json({message:"comment changed"})
-      }).catch((err)=>{
-      err.status= 404
-      err.message="comment doesnt exist"
-      return next(err)})
-    })
+      let obj = recipe.comments.find(comment => comment._id ==commentId);
+      obj.comment=comment
+      recipe.save()
+      //recipe.comments[commentIndex].comment=comment
+      res.status(200).json({comment:obj})
+    }).catch((err)=>{
+    err.status= 404
+    err.message="comment doesnt exist"
+    return next(err)})
+  })
+
 //DELETE----------------------------------
