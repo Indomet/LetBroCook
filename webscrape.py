@@ -1,3 +1,4 @@
+from pydoc import describe
 from typing import Dict, List, Callable, Optional
 from bs4 import BeautifulSoup
 import requests
@@ -13,13 +14,11 @@ import json
 def main():
     url="https://tasty.co/latest"
         
-    '''driver = webdriver.Chrome()
+    driver = webdriver.Chrome()
     driver.get(url)
-    showMore(driver,10)#click show more button a few times to get more links
-    htmlSource = driver.page_source'''
-    
-    htmlSource = requests.get(url).content
-    
+    showMore(driver,50)#click show more button a few times to get more links
+    htmlSource = driver.page_source
+        
     #get the inital source
     soup = BeautifulSoup(htmlSource, 'html5lib')  
     #get all the food items as an html string
@@ -33,7 +32,11 @@ def main():
     recipes= []
     for title,image,link in tzip(titles,images,links):
         recipe=createRecipe(link,title,image)
-        recipes.append(recipe)
+        #ADD IF STATMEENT TO CHECK FOR STEPS SECTIONS AND INGREDIENTS AND TAGS
+        if not recipe.tags or not recipe.steps or not recipe.sectionsAndIngredients or not recipe.description:
+            print("invalid recipe")
+        else:
+            recipes.append(recipe)
         
     with open("RecipeData.json", "w",encoding="utf-8") as outfile:
         # Create a dictionary with a key for the list of recipes
