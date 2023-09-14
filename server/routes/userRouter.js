@@ -137,22 +137,30 @@ router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
 );
 
 //add a comment by a user to a certain recipe
-router.post("/v1/users/recipes/comment", userAuth.authUser, (req, res, next) => {
+router.post("/comments", userAuth.authUser, (req, res, next) => {
     if(!req.user.id || !req.recipe.id){
         return res.status(400).json({ message: "Invalid user/recipe" })
     }
 
     const userId = req.user.id
     const recipeId = req.recipe.id
-
   userModel
     .findById(userId)
     .then((user) => {
       recipeModel
         .findById(recipeId)
         .then(async (recipe) => {
-          const { comment } = req.body;
-          const newComment = { comment: comment, author: user.username };
+
+          
+          
+          const newComment = {
+          ownerId: userId,
+          recipeId: recipeId, 
+          comment: req.body.comment, 
+          author: user.username, 
+          };
+          
+
           recipe.comments.push(newComment);
           recipe.save();
           res.status(201).json(newComment);
