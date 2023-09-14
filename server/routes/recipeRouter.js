@@ -57,6 +57,17 @@ router.get("/tags", function (req, res, next) {
 // hateoas
 router.get("/selectOne/", async (req, res, next) => {
 
+    const recipe = req.recipe
+    // HATEOAS links
+    const links = [
+        { rel: "itself", href: `/v1/recipes/${recipe._id}` },
+        { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
+        { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
+    ];
+
+    res.status(200).json({recipe: recipe,links: links,
+    });
+/*
 try {
     const recipeId = req.recipe.id
     await recipeModel.findById(recipeId)
@@ -64,21 +75,14 @@ try {
         if (!recipe) {
             return res.status(404).json({ message: "recipe not found" });
         }
-        // HATEOAS links
-    const links = [
-        { rel: "itself", href: `/v1/recipes/${recipe._id}` },
-        { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
-        { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
-    ];
 
-        res.status(200).json({recipe: recipe,links: links,
-        });
     })
 
 } catch (err) {
     err.status=400
     return next(err)
 }
+*/
 });
 
 
@@ -145,7 +149,7 @@ router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
         })
     })
     .catch(function(error){
-      err.status = 404//no recipes owner was found 
+      err.status = 404//no recipes owner was found
 
         return next(error)
     })
@@ -153,7 +157,7 @@ router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
 })
 
 
-
+//Deletes the reference of one recipeId
 function updateOneUserRecipe(userId, recipeId){
     userModel.findOneAndUpdate(
         { _id: userId },
@@ -165,6 +169,7 @@ function updateOneUserRecipe(userId, recipeId){
         })
 }
 
+//Deletes the reference of many recipeId
 async function deleteManyUserRecipe(req, userId){
     var recipesToRemove = []
     recipesToRemove = req.user.recipes

@@ -20,7 +20,7 @@ GET http://localhost:3000/v1/recipes/selectOne
 Content-Type: application/json
 
 {
-    "recipeId": "6501d421daaa1baae9a3b388"
+    "recipeId": "6502db2ea2dda82921aafc7c"
 }
 
 ###
@@ -37,15 +37,15 @@ DELETE http://localhost:3000/v1/recipes/deleteOne
 Content-Type: application/json
 
 {
-    "userId": "6501b5d9fb9b4037e83bf95a",
-    "recipeId": "6501b7304ac1406f819b125a"
+    "userId": "4eb6e7e7e9b7f4194e000001",
+    "recipeId": "65021cabdad7075d911e9166"
 }
 ###
 DELETE http://localhost:3000/v1/recipes/deleteAllFromUser
 Content-Type: application/json
 
 {
-    "userId": "6501e0a5e6ab49f7ec469953"
+    "userId": "4eb6e7e7e9b7f4194e000001"
 }
 
 ###
@@ -53,7 +53,7 @@ POST http://127.0.0.1:3000/v1/users/create-recipe
 Content-Type: application/json
 
 {
-        "userId": "6501e0a5e6ab49f7ec469953",
+        "userId": "4eb6e7e7e9b7f4194e000001",
         "title": "Chimichurri Wings",
         "image": "https://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto",
         "sectionsAndIngredients": {
@@ -79,7 +79,7 @@ Content-Type: application/json
 
 {
     "recipeId": "6501e0b3e6ab49f7ec469957",
-    "userId": "6501e0a5e6ab49f7ec469953",
+    "userId": "4eb6e7e7e9b7f4194e000001",
    "ingredients": [
       "asim",
       "Ingredientjkbkjhj 2",
@@ -106,7 +106,39 @@ Content-Type: application/json
       }
    ]
 }
+###
+PUT http://localhost:3000/v1/users/replace-recipe
+Content-Type: application/json
 
+{
+    "recipeId": "6502db2ea2dda82921aafc7c",
+    "userId": "4eb6e7e7e9b7f4194e000001",
+   "ingredients": [
+      "asim",
+      "Ingredientjkbkjhj 2",
+      "Ingredient 3"
+   ],
+   "steps": [
+      "Step 1: Do something",
+      "Step 2: Do something else"
+   ],
+   "serving": "4 servings",
+   "description": "This is a sample recipe.",
+   "tags": [
+      "tag1",
+      "tag2"
+   ],
+   "nutritionalInfo": [
+      {
+         "name": "Calories",
+         "value": "250"
+      },
+      {
+         "name": "Protein",
+         "value": "15g"
+      }
+   ]
+}
 ###
 
 POST http://localhost:3000/v1/users/signup
@@ -139,6 +171,7 @@ Content-Type: application/json
     "recipeId": "6501d80714eaa6d12f0c0df6"
 
 }
+###
 
 GET  http://127.0.0.1:3000/v1/users/sign-in
 Content-Type: application/json
@@ -146,4 +179,17 @@ Content-Type: application/json
 {
     "email":"gusalmual@student.gu.se",
     "password": "Admin123"
+}
+
+###
+GET http://127.0.0.1:3000/v1/recipes/tags
+
+###
+POST http://127.0.0.1:3000/v1/users/recipes/comment
+Content-Type: application/json
+
+{
+    "userId": "4eb6e7e7e9b7f4194e000001" ,
+    "recipeId": "6502db2ea2dda82921aafc7c",
+    "comment": "I dont know what to comment, kool recipe"
 }
