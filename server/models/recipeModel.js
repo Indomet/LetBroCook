@@ -15,6 +15,12 @@ var recipeSchema= new Schema(
       type: Array,
       required: true,
    },*/
+   title: {
+      type: String
+   },
+   image: {
+      type: String
+   },
    owner: {
       type: Schema.Types.ObjectId,
       ref: "Owner"
