@@ -30,12 +30,6 @@ router.get("/", function (req, res, next) {
 
 //Get all recipes of user
 router.get("/recipes/all", userAuth.authUser, function (req, res, next) {
-    /*
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user" })
-    }
-    const userId = req.user.id
-    */
 
     recipeModel.find({owner: req.user.id})
     .then(function(recipes){
@@ -57,26 +51,8 @@ router.get("/selectOne", (req, res, next) => {
 
         const user = req.user
         res.status(200).json({ User: user });
+});
 
-      /*
-      if(!req.user.id){
-          return res.status(400).json({ message: "Invalid user" })
-      }
-
-
-    userModel
-      .findById(userId)
-      .then((user) => {
-        // User found, send it as a response
-        res.status(200).json({ User: user });
-      })
-      .catch((err) => {
-        // Handle database errors or other unexpected errors
-        err.staus=404
-        next(err);
-      });
-      */
-  });
 
 //User sign in
 router.get("/sign-in", async (req, res, next) => {
@@ -117,24 +93,9 @@ router.get("/sign-in", async (req, res, next) => {
 
 router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
 
-    /*
-    if(!req.user.id || !req.recipe.id){
-        return res.status(400).json({ message: "Invalid user/recipe" })
-    }
-    const userId = req.user.id
-    const recipeId = req.recipe.id
-*/
-
     try {
-      //attempt to find user
-      const user = req.user
-      /*const user = await userModel.findById(userId);
-      if (!user) {
-        //return resource not found error
-        return res.status(404).json({ message: "User does not exist" });
-      }
-      */
 
+      const user = req.user
       user.favouriteRecipes.push(recipeId);
       user.save()
       //request created
@@ -148,11 +109,6 @@ router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
 
 //add a comment by a user to a certain recipe
 router.post("/recipes/comment", userAuth.authUser, (req, res, next) => {
-    /*
-    if(!req.user || !req.recipe){
-        return res.status(400).json({ message: "Invalid user/recipe" })
-    }
-    */
 
     const user = req.user
     const recipe = req.recipe
@@ -164,30 +120,6 @@ router.post("/recipes/comment", userAuth.authUser, (req, res, next) => {
     recipe.save();
     res.status(201).json(newComment);
 
-/*
-userModel
-    .findById(userId)
-    .then((user) => {
-    recipeModel
-        .findById(recipeId)
-        .then(async (recipe) => {
-        const newComment = {
-            comment: req.body.comment,
-            author: user.username
-        };
-        recipe.comments.push(newComment);
-        recipe.save();
-        res.status(201).json(newComment);
-        })
-        .catch((err) => {
-        err.status=400
-        return next(err);
-        });
-    })
-    .catch((err) => {
-    return next(err);
-    });
-    */
 });
 
 //Create user account
@@ -208,11 +140,7 @@ router.post("/signup", (req, res, next) => {
 
 //replace a user
 router.put("/replace-user", userAuth.authUser, function (req, res, next) {
-    /*
-    if(!req.user.id){
-        return res.status(400).json({ message: "Invalid user"})
-    }
-    */
+
     const user = req.user
     const { username, email, password, name, recipes, favouriteRecipes } = req.body;
       user.set({ username, email, password, name, recipes, favouriteRecipes,  });
@@ -224,25 +152,7 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
           err.status= 400//bad req for updating a user
           return next(err);
         });
-    /*
-    userModel.findById(userId)
-    .then(function (user) {
 
-      const { username, email, password, name, recipes, favouriteRecipes } = req.body;
-      user.set({ username, email, password, name, recipes, favouriteRecipes,  });
-      user.save()
-        .then(updatedUser => {
-          res.json(updatedUser);
-        })
-        .catch(err => {
-          err.status= 400//bad req for updating a user
-          return next(err);
-        });
-    })
-    .catch((err) => {
-      return next(err);
-    });
-    */
 });
 
 //replacce a recipe
@@ -253,24 +163,9 @@ router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async 
     try {
       const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
       updatedRecipeData.tags = formattedTags;
-/*
-      if (req.body.ingredients) {
-        updatedRecipeData.sectionsAndIngredients.ingredients = req.body.ingredients
-     }
 
-      const user = await userModel.findById(userId);
-
-      const recipeIndex = req.user.recipes.indexOf(recipeId);
-      if (recipeIndex === -1) {
-        return res.status(404).json({ message: "Recipe not found for this user" });
-      }
-      */
       const recipeToUpdate = req.recipe
 
-      /*
-      if (!recipeToUpdate) {
-        return res.status(404).json({ message: "Recipe not found" });
-      }*/
       const { ingredients, steps, serving, description, tags, nutritionalInfo, comments } = req.body;
       recipeToUpdate.set({ ingredients, steps, serving, description, tags, nutritionalInfo, comments });
 
@@ -290,31 +185,15 @@ router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async 
 //PATCH----------------------------------
 
 // edit a user
-router.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
+router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
     const user = req.user
     Object.assign(user, req.body);
     user.save();
     res.json(user);
 })
-    /*
-  const userId = req.user.id
-    userModel.findById(userId)
-  .then(function (user) {
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-  })
-  .catch(function (error) {
-    error.status=400
-    return next(error);
-  });
-});*/
-
 
 // edit a recipe
-router.patch("/v1/users/edit-recipe/", async (req, res, next) => {
+router.patch("/edit-recipe", async (req, res, next) => {
 
     const updatedRecipeData = req.body;
     const unformattedTags = req.body.tags;
@@ -323,27 +202,17 @@ router.patch("/v1/users/edit-recipe/", async (req, res, next) => {
     const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
     updatedRecipeData.tags = formattedTags;
 
-    const user = req.user
-    /*
-    const recipeIndex = user.recipes.indexOf(recipeId);
-    // it is -1 because If it's not found, it returns -1.
-    if (recipeIndex === -1) {
-      return res.status(404).json({ message: "Recipe not found for this user" });
-    }*/
-
-    const updatedRecipe = await recipeModel.findByIdAndUpdate(recipeId, updatedRecipeData);
+    const updatedRecipe = await recipeModel.findByIdAndUpdate(req.recipe.id, updatedRecipeData);
 
     if (!updatedRecipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
-/*
-    if (req.body.sectionsAndIngredients) {
-       updatedRecipeData.sectionsAndIngredients.ingredients = req.body.sectionsAndIngredients.ingredients;
-    }*/
 
     const tagDetails = await Tag.find({ _id: { $in: updatedRecipe.tags } });
     res.status(200).json({
-      message: "Recipe updated", Recipe: {updatedRecipe}
+      message: "Recipe updated",
+      Recipe: {updatedRecipe},
+      tags: tagDetails
     });
   } catch (err) {
     err.status=400
@@ -367,8 +236,8 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
     }
 
     var recipe = new recipeModel(recipeData);
-
-    recipe.owner = req.user.id
+    const user = req.user
+    recipe.owner = user.id
 
     recipe.save()
     .then(function (recipe) {

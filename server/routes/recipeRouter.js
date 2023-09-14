@@ -67,22 +67,7 @@ router.get("/selectOne/", async (req, res, next) => {
 
     res.status(200).json({recipe: recipe,links: links,
     });
-/*
-try {
-    const recipeId = req.recipe.id
-    await recipeModel.findById(recipeId)
-    .then(function(recipe){
-        if (!recipe) {
-            return res.status(404).json({ message: "recipe not found" });
-        }
 
-    })
-
-} catch (err) {
-    err.status=400
-    return next(err)
-}
-*/
 });
 
 
@@ -122,39 +107,29 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
 
   })
 
-
 //Delete all recipes from specific userId
-router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
-    const userId = req.user.id
-    try{
-    deleteManyUserRecipe(req, userId)}
-    catch(err){
-      err.status = 404 // user doesnt exist
-      return next(err)
-    }
+router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next) {
+    const userId = req.user.id;
+    deleteManyUserRecipe(req, userId)
 
-    recipeModel.find({owner : userId}).then(function(recipes){
-        if(recipes.length === 0){
-            return res.status(404).json({ message: "No recipes to delete" })
+    recipeModel.find({ owner: userId }).then(function(recipes) {
+        if (recipes.length === 0) {
+            return res.status(404).json({ message: "No recipes to delete" });
         }
 
-        recipeModel.deleteMany({id: recipes.id})
-        .then(function(recipes){
-            return res.status(200).json({ message: "Recipe deleted", body: recipes })
+        const recipeIds = recipes.map(recipe => recipe.id);
 
-        })
-        .catch(function(error){
-          err.status = 404//no recipes to delete
-            return next(error)
-        })
-    })
-    .catch(function(error){
-      err.status = 404//no recipes owner was found
-
-        return next(error)
-    })
-
-})
+        recipeModel.deleteMany({ _id: { $in: recipeIds } })
+            .then(function(result) {
+                return res.status(200).json({ message: "Recipes deleted", body: result });
+            })
+            .catch(function(error) {
+                return next(error);
+            });
+    }).catch(function(error) {
+        return next(error);
+    });
+  });
 
 
 //Deletes the reference of one recipeId
