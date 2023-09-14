@@ -20,7 +20,7 @@ GET http://localhost:3000/v1/recipes/selectOne
 Content-Type: application/json
 
 {
-    "recipeId": "6502db2ea2dda82921aafc7c"
+    "recipeId": "650304e62bf4f7c72945d630"
 }
 
 ###
@@ -192,4 +192,15 @@ Content-Type: application/json
     "userId": "4eb6e7e7e9b7f4194e000001" ,
     "recipeId": "6502db2ea2dda82921aafc7c",
     "comment": "I dont know what to comment, kool recipe"
+}
+###
+
+PATCH http://localhost:3000/v1/users/editComment
+Content-Type: application/json
+
+{
+    "userId": "4eb6e7e7e9b7f4194e000001",
+    "commentId": "650305f02bf4f7c72945d662",
+    "recipeId":"650304e62bf4f7c72945d630",
+    "comment":"PLES BE EDITED"
 }
