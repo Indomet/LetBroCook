@@ -11,7 +11,7 @@ module.exports = router
 
 //GET----------------------------------
 
-//Get all recipes
+//Get all recipes 
 router.get("/", function (req, res, next) {
     //label cache-ability
     res.set("Cache-control", `no-store`);
@@ -55,18 +55,22 @@ router.get("/tags", function (req, res, next) {
 
 
 // hateoas
-router.get("/selectOne", async (req, res, next) => {
+router.get("/selection", async (req, res, next) => {
 
-    const recipe = req.recipe
-    // HATEOAS links
+  const recipeId = req.body.recipeId
+  recipeModel.findById(recipeId).then(recipe => {
     const links = [
-        { rel: "itself", href: `/v1/recipes/${recipe._id}` },
-        { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
-        { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
+        // HATEOAS links
+      { rel: "itself", href: `/v1/recipes/${recipe._id}` },
+      { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
+      { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
     ];
-
-    res.status(200).json({recipe: recipe,links: links,
-    });
+    res.status(200).json({ recipe: recipe, links: links});
+  })
+  .catch(function(error){
+    error.status= 404
+    return next(error)
+  });
 
 });
 
@@ -82,8 +86,8 @@ router.get("/selectOne", async (req, res, next) => {
 //DELETE--------------------------------
 
 
-//Delete recipe by id
-router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
+//Delete recipe by id 
+router.delete('/delete', userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
     var recipeId = req.recipe.id
     var userId = req.user.id
 
@@ -129,10 +133,10 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
 //     }).catch(function(error) {
 //         return next(error);
 //     });
-//   });
+//   }); 
 
 
-//Deletes the reference of one recipeId
+//Deletes the reference of one recipeId 
 function updateOneUserRecipe(userId, recipeId){
     userModel.findOneAndUpdate(
         { _id: userId },
