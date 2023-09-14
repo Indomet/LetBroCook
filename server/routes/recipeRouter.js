@@ -34,8 +34,8 @@ router.get("/", function (req, res, next) {
         res.status(200).json({ recipes: recipes });
       })
       .catch(function (error) {
-        res.status(400).json({ message: "invalid filter parameters" });
-        return next(err); // Handle the error using Express's error handling middleware
+        error.status=400
+        return next(error); // Handle the error using Express's error handling middleware
       });
   });
 
@@ -48,7 +48,7 @@ router.get("/tags", function (req, res, next) {
         res.status(200).json({ tags: tags });
       })
       .catch(function (error) {
-        response.status(500).json({ message: error.message });
+        error.status=400
         return next(error); // Handle the error using Express's error handling middleware
     });
 });
@@ -76,7 +76,8 @@ try {
     })
 
 } catch (err) {
-    return res.status(404).send({message: "Invalid ID"})
+    err.status=400
+    return next(err)
 }
 });
 
@@ -100,6 +101,7 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
     try{
         updateOneUserRecipe(userId, recipeId)
     }catch(err){
+      err.status=400 //bad request to update the user
         return next(err)
     }
 
@@ -109,8 +111,9 @@ router.delete('/deleteOne', userAuth.authUser, userAuth.isOwnerOfRecipe, functio
           return res.status(404).json({ message: "Recipe does not exist" })
         }
         return res.status(200).json({ message: "Recipe deleted", body: recipe })
-      }).catch(function (error) {
-        return next(error)
+      }).catch(function (err) {
+        err.status=400 //bad request to delete recipe
+        return next(err)
       })
 
   })
@@ -122,6 +125,7 @@ router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
     try{
     deleteManyUserRecipe(req, userId)}
     catch(err){
+      err.status = 404 // user doesnt exist
       return next(err)
     }
 
@@ -136,10 +140,13 @@ router.delete('/deleteAllFromUser', userAuth.authUser, function(req, res, next){
 
         })
         .catch(function(error){
+          err.status = 404//no recipes to delete
             return next(error)
         })
     })
     .catch(function(error){
+      err.status = 404//no recipes owner was found 
+
         return next(error)
     })
 

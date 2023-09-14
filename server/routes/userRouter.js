@@ -22,7 +22,7 @@ router.get("/", function (req, res, next) {
         return res.status(200).json({users});
       })
       .catch(function (error) {
-        res.status(500).json({ message: error.message });
+        error.status=400//bad req
         return next(error); // Handle the error using Express's error handling middleware
       });
   });
@@ -39,8 +39,8 @@ router.get("/recipes/all", userAuth.authUser, function (req, res, next) {
         res.status(200).json({ recipes: recipes });
     })
     .catch(function (error) {
-        res.status(500).json({ message: "Internal Error" });
-        return next(err); // Handle the error using Express's error handling middleware
+        error.status= 400
+        return next(error); // Handle the error using Express's error handling middleware
       });
 
 
@@ -65,7 +65,7 @@ router.get("/selectOne", (req, res, next) => {
       })
       .catch((err) => {
         // Handle database errors or other unexpected errors
-        res.status(404).json({ message: "user not found" });
+        err.staus=404
         next(err);
       });
   });
@@ -99,6 +99,7 @@ router.get("/sign-in", async (req, res, next) => {
       });
     })
     .catch((err) => {
+      err.status=404
       return next(err);
     });
 });
@@ -127,6 +128,7 @@ router.post("/favorite-recipes/",userAuth.authUser, async (req, res, next) => {
       //request created
       res.status(201).json({ message: "Recipe added to favourite list" });
     } catch (error) {
+      error.status=400
       return next(error);
     }
   }
@@ -154,6 +156,7 @@ router.post("/v1/users/recipes/comment", userAuth.authUser, (req, res, next) => 
           res.status(201).json(newComment);
         })
         .catch((err) => {
+          err.status=400
           return next(err);
         });
     })
@@ -171,7 +174,7 @@ router.post("/signup", (req, res, next) => {
         res.status(201).json(user);
       })
       .catch(function (error) {
-        res.status(400).json({ message: error.message });
+        error.status=400
         return next(error);
       });
   });
@@ -194,6 +197,7 @@ router.put("/v1/users/replace-user", userAuth.authUser, function (req, res, next
           res.json(updatedUser);
         })
         .catch(err => {
+          err.status= 400//bad req for updating a user
           return next(err);
         });
     })
@@ -236,6 +240,7 @@ router.put("/v1/users/replace-recipe/",userAuth.authUser, userAuth.isOwnerOfReci
       });
 
     } catch (err) {
+      err.status=400//bad update requets
       return next(err);
     }
   });
@@ -257,6 +262,7 @@ router.patch("/v1/users/edit-user", userAuth.authUser, (req, res, next) => {
       res.json(user);
     })
     .catch(function (error) {
+      error.status=400
       return next(error);
     });
 });
@@ -302,6 +308,7 @@ router.patch("/v1/users/edit-recipe/", async (req, res, next) => {
       message: "Recipe updated", Recipe: {updatedRecipe}
     });
   } catch (err) {
+    err.status=400
     return next(err);
   }
 });
@@ -316,21 +323,12 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
     }
     const userId = req.user.id
     try {
-    var formattedTags = [];
-    for (const element of unformattedTags) {
-        //make a query to find if a tag already exists
-        let existingTag = await Tag.findOne({ name: element });
-        //if the tag doesnt exist create a new one and save it
-        if (!existingTag) {
-        existingTag = new Tag({ name: element });
-        await existingTag.save();
-        }
-
-      formattedTags.push(existingTag);
+    var formattedTags = await serverUtil.handleExistingTags(unformattedTags,Tag)
       recipeData.tags = formattedTags;
       recipeData.owner = req.params.userId;
     }
-    } catch (err) {
+    catch (err) {
+      err.status=400//bad tags request
     return next(err);
     }
 
