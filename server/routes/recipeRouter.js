@@ -55,7 +55,7 @@ router.get("/tags", function (req, res, next) {
 
 
 // hateoas
-router.get("/selectOne/", async (req, res, next) => {
+router.get("/selectOne", async (req, res, next) => {
 
     const recipe = req.recipe
     // HATEOAS links
