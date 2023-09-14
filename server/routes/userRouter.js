@@ -56,7 +56,9 @@ router.get("/selectOne", (req, res, next) => {
           return res.status(400).json({ message: "Invalid user" })
       }
       const userId = req.user.id
-
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(404).json({ message: "Invalid user ID format" });
+      }
     userModel
       .findById(userId)
       .then((user) => {
