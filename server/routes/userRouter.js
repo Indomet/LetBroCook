@@ -45,7 +45,7 @@ router.get("/recipes/all", userAuth.authUser, function (req, res, next) {
 
   //Get user by id
 //TODO: Admin permissions
-router.get("/selectOne", (req, res, next) => {
+router.get("/selection", (req, res, next) => {
     // Label cache-ability
     res.set("Cache-control", "no-store");
 
@@ -163,7 +163,7 @@ router.post("/signup", (req, res, next) => {
 
 //PUT----------------------------------
 //replace a user
-router.put("/replace-user", userAuth.authUser, function (req, res, next) {
+router.put("/replacement", userAuth.authUser, function (req, res, next) {
 
     const user = req.user
     const { username, email, password, name, recipes, favouriteRecipes } = req.body;
@@ -180,7 +180,7 @@ router.put("/replace-user", userAuth.authUser, function (req, res, next) {
 });
 
 //replace a recipe
-router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.put("/recipes/replacement",userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
   const updatedRecipeData = req.body;
   const unformattedTags = req.body.tags;
 
@@ -209,7 +209,7 @@ router.put("/replace-recipe",userAuth.authUser, userAuth.isOwnerOfRecipe, async 
 //PATCH----------------------------------
 
 // edit a user
-router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
+router.patch("/edit", userAuth.authUser, (req, res, next) => {
     const user = req.user
     Object.assign(user, req.body);
     user.save();
@@ -217,7 +217,7 @@ router.patch("/edit-user", userAuth.authUser, (req, res, next) => {
 })
 
 // edit a recipe
-router.patch("/edit-recipe", async (req, res, next) => {
+router.patch("/recipes/edit", async (req, res, next) => {
 
     const updatedRecipeData = req.body;
     const unformattedTags = req.body.tags;
@@ -245,7 +245,7 @@ router.patch("/edit-recipe", async (req, res, next) => {
 });
 
 
-router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
+router.post("/recipes/create", userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
 
@@ -288,7 +288,7 @@ router.post("/create-recipe", userAuth.authUser, async (req, res, next) => {
 
 // edit a comment
 //body has a comment recipe and the comment id
-router.patch('/editComment', userAuth.authUser, async (req, res, next) => {
+router.patch('/comments/edit', userAuth.authUser, async (req, res, next) => {
     const { commentId, recipeId, comment } = req.body;
     recipeModel.findById(recipeId).then((recipe)=>{
       if(!recipe){return res.json("no recipe")}
@@ -306,7 +306,7 @@ router.patch('/editComment', userAuth.authUser, async (req, res, next) => {
 
 //DELETE----------------------------------comment
 
-router.delete('/deleteComment', userAuth.authUser, async (req, res, next) => {
+router.delete('/comments/delete', userAuth.authUser, async (req, res, next) => {
   const { commentId, recipeId } = req.body;
 
   try {
