@@ -15,6 +15,12 @@ var recipeSchema= new Schema(
       type: Array,
       required: true,
    },*/
+   title: {
+      type: String
+   },
+   image: {
+      type: String
+   },
    owner: {
       type: Schema.Types.ObjectId,
       ref: "Owner"
@@ -23,7 +29,7 @@ var recipeSchema= new Schema(
       type: Map,
       of: Array
     }
-   ,
+   , 
    steps: {
       type: Array,
       required: true,
@@ -50,13 +56,20 @@ var recipeSchema= new Schema(
       required: true,
       default: "No nutritional info",
    },
-   comments: [{type: {
-      type: String
+   comments: [{
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your owner has an ID
+      required: true,
     },
-      body: String,
+    recipeId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your recipe has an ID
+      required: true,
+    },
+      comment: String,
       author: String,
       date: {type: Date, default : Date.now},
   }],
+
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'UserModel'

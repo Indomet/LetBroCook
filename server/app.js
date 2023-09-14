@@ -6,8 +6,7 @@ var cors = require("cors");
 var history = require("connect-history-api-fallback");
 const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
-const serverUtil = require("./serverUtil.js");
-const userAuth = require("./basicAuth.js")
+const serverUtil = require('./serverUtil.js')
 
 // Variables
 var mongoURI =
@@ -28,9 +27,6 @@ mongoose.connect(mongoURI)
 mongoose.connection.on("error", function (error) {
   console.error(error);
 });
-
-
-
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
   const count = await recipeModel.countDocuments().exec();
@@ -43,30 +39,28 @@ mongoose.connection.once("open", async function () {
     }
   )
   //specify a consisteant and findable id
-  
-  if(count==0){
+  originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
+    await originalOGuser.save().catch(function(err){
+        return console.error(err)
+    })
+  if(count == 0){
   try {
-    originalOGuser._id=mongoose.mongo.BSON.ObjectId.createFromHexString("4eb6e7e7e9b7f4194e000001")
     recipeData = require("../RecipeData.json");
 
     for (let i = 0; i < recipeData.length; i++) {
-        recipeData[i].tags = await serverUtil.handleExistingTags(recipeData[i].tags,Tag) // Assign the array of ObjectIds to the recipeData
+        recipeData[i].tags = await serverUtil.handleExistingTags(recipeData[i].tags, Tag) // Assign the array of ObjectIds to the recipeData
 
         var recipe = new recipeModel(recipeData[i])
         recipe.owner= originalOGuser._id
-        originalOGuser.recipes.push(recipe)
         await recipe.save()
 
       }
-      await originalOGuser.save()
       console.log("Database populated")
     }
    catch (err) {
     console.log(err);
   }}
 });
-
-
 
 
 
@@ -98,14 +92,23 @@ app.get("/api", function (req, res) {
 
 //Set the req.user to a valid user in the database with matching id.
 async function setUserData(req, res, next) {
-    const userid = req.body.userId
+    const userId = req.body.userId
     const recipeId = req.body.recipeId
-    console.log("request has userId " + userid)
+    console.log("request has userId " + userId)
     console.log("request has recipeId " + recipeId)
     //Check that the id is not null
-    if (userid) {
+    if (userId) {
         //Check that the ObjectId is in valid format
-        await userModel.findById(userid).then(function(user){
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "Invalid user ID format" });
+        }
+
+        await userModel.findById(userId)
+        .then(function(user){
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
             req.user = user
         })
         .catch(function(err){
@@ -114,7 +117,16 @@ async function setUserData(req, res, next) {
 
     }
     if(recipeId){
-        await recipeModel.findById(recipeId).then(function(recipe){
+
+        if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+            return res.status(400).json({ message: "Invalid recipe ID format" });
+        }
+
+        await recipeModel.findById(recipeId)
+        .then(function(recipe){
+            if (!recipe) {
+                return res.status(404).json({ message: "recipe not found" });
+            }
             req.recipe = recipe
         })
         .catch(function(err){
@@ -123,8 +135,6 @@ async function setUserData(req, res, next) {
     }
     next()
 }
-
-
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
