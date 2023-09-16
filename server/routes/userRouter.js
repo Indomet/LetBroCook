@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 const router = express.Router();
 
 
-const { recipeModel, Tag } = require("../models/recipeModel.js"); //. for windows
+const { recipeModel, Tag ,Comment} = require("../models/recipeModel.js"); //. for windows
 const userModel = require("../models/userModel.js");
 const serverUtil = require("../serverUtil.js")
 const userAuth = require("../basicAuth.js")
@@ -138,17 +138,19 @@ router.post("/:userId/recipes/:recipeId/comments", (req, res, next) => {
         .findById(recipeId)
         .then(async (recipe) => {
 
-          const newComment = {
-            _id: new mongoose.Types.ObjectId(),
-          ownerId: userId,
-          recipeId: recipeId,
-          comment: req.body.comment,
-          author: user.username,
-          };
+          const newComment = new Comment({
+            ownerId: userId,
+            recipeId: recipeId,
+            comment: req.body.comment,
+            author: user.username,
+            // The 'date' field will automatically use the current date and time due to the default value.
+          });
+
 
 
           recipe.comments.push(newComment);
           recipe.save();
+          newComment.save()
           res.status(201).json(newComment);
         })
         .catch((err) => {
@@ -300,36 +302,29 @@ router.post("/recipes/create", userAuth.authUser, async (req, res, next) => {
 
 
 //TODO: Make comment into separate model and create authorization
-//TODO ADD BACK AUTH
-
-router.patch('/recipes/:recipeId/comments/:commentId/',  async (req, res, next) => {
-    //const { commentId, recipeId, comment } = req.body;
-    const recipeId = req.params.recipeId
-    const commentId = req.params.commentId
-    const comment = req.body.comment
-    recipeModel.findById(recipeId).then((recipe)=>{
-
-      let obj = recipe.comments.find(comment => comment._id ==commentId);
-      obj.comment=comment
-      recipe.save()
-      //recipe.comments[commentIndex].comment=comment
-      res.status(200).json({comment:obj})
-    }).catch((err)=>{
-    err.status= 404
-    err.message="comment doesnt exist" 
-    return next(err)})
+//TODO ADD BACK AUTH not sure if :userid is needed
+router.patch('/comments/:commentId/',  async (req, res, next) => {
+    const newComment = req.body.comment
+    const id = req.params.commentId
+    await Comment.findByIdAndUpdate(id,{comment:newComment}).then((result)=>{
+      return res.status(200).json({message: "Comment updated"})
+    }).catch(err=>{
+      err.status=400
+      return next(err)
+    })
   })
 
 //DELETE----------------------------------comment
 //TODO ADD BACK USER AUTH THIS HAD ONE
-router.delete('/recipes/:recipeId/comments/:commentid', async (req, res, next) => {
+router.delete('/comments/:commentid', async (req, res, next) => {
   const commentId = req.params.commentid
   const recipeId = req.params.recipeId
 
   try {
     
     await recipeModel.findByIdAndUpdate(recipeId,{ $pull: { comments: { _id: commentId } } });
-     res.status(200).json({ message: "comment deleted " });
+    await Comment.findByIdAndDelete(commentId)
+    res.status(200).json({ message: "comment deleted " });
 
   } catch (err) {
       err.status = 500;
