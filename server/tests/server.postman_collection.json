@@ -669,7 +669,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"comment\":\"edit test\"\r\n}",
+					"raw": "{\r\n    \"comment\":\"edit test2x\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -677,7 +677,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/recipes/{{recipe_id}}/comments/{{comment_id}}/",
+					"raw": "http://localhost:3000/v1/users/comments/{{comment_id}}/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -686,8 +686,6 @@
 					"path": [
 						"v1",
 						"users",
-						"recipes",
-						"{{recipe_id}}",
 						"comments",
 						"{{comment_id}}",
 						""
@@ -766,7 +764,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/recipes/{{recipe_id}}/comments/{{comment_id}}",
+					"raw": "http://localhost:3000/v1/users/comments/{{comment_id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -775,8 +773,6 @@
 					"path": [
 						"v1",
 						"users",
-						"recipes",
-						"{{recipe_id}}",
 						"comments",
 						"{{comment_id}}"
 					]
