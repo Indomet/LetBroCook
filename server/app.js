@@ -95,6 +95,7 @@ app.get("/api", function (req, res) {
 async function setUserData(req, res, next) {
     const userId = req.body.userId
     const recipeId = req.body.recipeId
+    
     console.log("request has userId " + userId)
     console.log("request has recipeId " + recipeId)
     //Check that the id is not null

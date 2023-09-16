@@ -55,9 +55,9 @@ router.get("/tags", function (req, res, next) {
 
 
 // hateoas
-router.get("/selection", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
 
-  const recipeId = req.body.recipeId
+  const recipeId = req.params.id
   recipeModel.findById(recipeId).then(recipe => {
     const links = [
         // HATEOAS links
@@ -87,9 +87,9 @@ router.get("/selection", async (req, res, next) => {
 
 
 //Delete recipe by id 
-router.delete('/delete', userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
-    var recipeId = req.recipe.id
-    var userId = req.user.id
+router.delete('/:recipeId/users/:userId/delete', function (req, res, next) {
+    var recipeId = req.params.recipeId
+    var userId = req.params.userId
 
     try{
         updateOneUserRecipe(userId, recipeId)
