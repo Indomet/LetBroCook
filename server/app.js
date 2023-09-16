@@ -51,6 +51,7 @@ mongoose.connection.once("open", async function () {
         var recipe = new recipeModel(recipeData[i])
         recipe.owner= originalOGuser._id
         await recipe.save()
+        originalOGuser.recipes.push(recipe._id)
 
       }
       console.log("Database populated")

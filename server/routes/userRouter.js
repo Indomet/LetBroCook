@@ -146,8 +146,6 @@ router.post("/:userId/recipes/:recipeId/comments", (req, res, next) => {
             // The 'date' field will automatically use the current date and time due to the default value.
           });
 
-
-
           recipe.comments.push(newComment);
           recipe.save();
           newComment.save()
@@ -204,31 +202,6 @@ router.post("/signup", (req, res, next) => {
 
 });
 
-//replace a recipe
-//TODO ADD BACK USER AUUTH
-//THIS HAD BOTH
-router.put("/recipes/:recipeId", async (req, res, next) => {
-  const id = req.params.recipeId
-
-  const updatedRecipeData = req.body;
-  const unformattedTags = req.body.tags;
-
-  const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-  updatedRecipeData.tags = formattedTags;
-
-
-  await recipeModel.findByIdAndUpdate(id,
-    {$set:updatedRecipeData, 
-      tags:formattedTags})
-    
-    .then(()=>{
-    return res.status(200).json({message:"Recipe replaced"})})
-    .catch(err=>{
-      err.status=404
-      return next(err)
-    })
-
-});
 
 //PATCH----------------------------------
 
@@ -247,6 +220,7 @@ router.patch("/:userId",  async (req, res, next) => {
 
 // edit a recipe
 //ADD USER AUTH HAD BOTH
+//Also maybe move this to recipeRouter??
 router.patch("/recipes/:id", async (req, res, next) => {
 
     const updatedRecipeData = req.body;
@@ -263,41 +237,26 @@ router.patch("/recipes/:id", async (req, res, next) => {
 });
 
 
-router.post("/recipes/create", userAuth.authUser, async (req, res, next) => {
+//TODO ADD AUTH BACK
+router.post("/:userId/recipes/", async (req, res, next) => {
+
     const recipeData = req.body;
-    const unformattedTags = req.body.tags;
 
-    try {
-    var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag)
-      recipeData.tags = formattedTags;
-      recipeData.owner = req.params.userId;
-    }
-    catch (err) {
-      err.status=400//bad tags request
-    return next(err);
-    }
+    var formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag)
+    recipeData.tags = formattedTags;
 
-    var recipe = new recipeModel(recipeData);
-    const user = req.user
-    recipe.owner = user.id
+    recipeData.owner = req.params.userId;
 
-    recipe.save()
-    .then(function (recipe) {
-        try{
-            user.recipes.push(recipe.id);
-        }catch(error){
-            console.log("Invalid user")
-            return next(error)
-        }
-        user.save()
-            .then(function () {
-                res.status(201).json({ message: "Recipe created", Recipe: recipe });
-            })
-            .catch((err) => {
-                res.status(404).json({ message: "user not found" });
-                return next(err);
-            });
-        })
+    await userModel.findById(req.params.userId).then(async user=>{
+      const newRecipe = new recipeModel(recipeData);
+      await newRecipe.save()
+      return res.status(201).json({Recipe: newRecipe})
+    }).catch(err=>{
+      err.status=404
+      err.message="User not found"
+      return next(err)
+    })
+    
 })
 
 
@@ -331,6 +290,40 @@ router.delete('/comments/:commentid', async (req, res, next) => {
       return next(err);
   }
 });
+
+router.delete("/:userId",async (req,res,next)=>{
+  const id = req.params.userId
+  await userModel.findByIdAndDelete(id).then(async ()=>{
+    //now i need to delete all the recipes associated with the user
+    await recipeModel.deleteMany({owner:id})
+
+    return res.status(200).json({message:"User deleted"})
+  }).catch(err=>{
+    err.status=404
+    err.message="User not found" 
+    return next(err) 
+  }) 
+})
+
+//method to delete everything
+router.delete('/', async (req, res,next) => {
+  try {
+    // First, delete all recipes associated with users
+    await recipeModel.deleteMany({});
+    
+    // Then, delete all users
+    await userModel.deleteMany({});
+
+    await Comment.deleteMany({})
+    
+    res.status(200).json({ message: 'All users and their associated recipes have been deleted.' });
+  } catch (err) {
+
+    return next(err)
+  }
+});
+
+
 
 
 //DELETE----------------------------------favourite recipe
