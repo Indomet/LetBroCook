@@ -9,6 +9,20 @@ var tagSchema = new Schema({
    }
 });
 
+var commentSchema = new Schema({
+   ownerId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your owner has an ID
+      required: true,
+    },
+    recipeId: {
+      type: mongoose.Schema.Types.ObjectId, // Assuming your recipe has an ID
+      required: true,
+    },
+      comment: String,
+      author: String,
+      date: {type: Date, default : Date.now},
+});
+
 var recipeSchema= new Schema(
 {
    /*ingredients : { //for now its just an array but ideally it would be a map/dict
@@ -57,17 +71,9 @@ var recipeSchema= new Schema(
       default: "No nutritional info",
    },
    comments: [{
-    ownerId: {
-      type: mongoose.Schema.Types.ObjectId, // Assuming your owner has an ID
-      required: true,
-    },
-    recipeId: {
-      type: mongoose.Schema.Types.ObjectId, // Assuming your recipe has an ID
-      required: true,
-    },
-      comment: String,
-      author: String,
-      date: {type: Date, default : Date.now},
+      type: Schema.Types.ObjectId,
+      ref: "Comment",
+      _id:false
   }],
 
   owner: {
@@ -81,10 +87,12 @@ recipeSchema.index({title: 'text'});
 
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
+var Comment = mongoose.model("Comment", commentSchema); // Define the Tag model
 
 
 
 module.exports = {
    recipeModel: recipeModel,
-   Tag:Tag
+   Tag:Tag,
+   Comment:Comment
 }
