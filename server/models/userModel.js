@@ -46,6 +46,8 @@ var userSchema= new Schema(
     }
 )
 
+
+
 //middleware function to has password when a suer document is saved
 //the hook event aka when the function is called is when saving to the db
 userSchema.pre('save', function(next) {
