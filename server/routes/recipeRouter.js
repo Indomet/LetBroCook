@@ -123,8 +123,7 @@ router.put("/:recipeId", async (req, res, next) => {
     const updatedRecipe = await recipeModel.findById(recipeId);
 
     Object.assign(updatedRecipe, {
-      title, image, sectionsAndIngredients, steps, servings, description, tags: formattedTags, nutritionalInfo
-    });
+      title, image, sectionsAndIngredients, steps, servings, description, tags: formattedTags, nutritionalInfo });
 
     await updatedRecipe.save();
 
