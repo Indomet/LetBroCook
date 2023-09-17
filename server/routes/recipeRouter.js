@@ -114,27 +114,28 @@ router.post("/tags",async function(req,res,next){
 
 //THIS USED TO BE IN USER ROUTER PUT BACK IF BREAKS
 router.put("/:recipeId", async (req, res, next) => {
-  const id = req.params.recipeId
+  const { recipeId } = req.params;
+  const { title, image, sectionsAndIngredients, steps, servings, description,  nutritionalInfo } = req.body;
 
-  const updatedRecipeData = req.body;
-  const unformattedTags = req.body.tags;
+  try {
+    const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag);
 
-  const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag);
-  updatedRecipeData.tags = formattedTags;
+    const updatedRecipe = await recipeModel.findById(recipeId);
 
+    Object.assign(updatedRecipe, {
+      title, image, sectionsAndIngredients, steps, servings, description, tags: formattedTags, nutritionalInfo });
 
-  await recipeModel.findByIdAndUpdate(id,
-    {$set:updatedRecipeData, 
-      tags:formattedTags})
-    
-    .then(()=>{
-    return res.status(200).json({message:"Recipe replaced"})})
-    .catch(err=>{
-      err.status=404
-      return next(err)
-    })
+    await updatedRecipe.save();
 
+    res.status(200).json({
+      message: "Recipe updated",
+      Recipe: updatedRecipe
+    });
+  } catch (err) {
+    return next(err);
+  }
 });
+
 
 
 

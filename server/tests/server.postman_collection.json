@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "25d9455b-427f-4218-aa46-957d0768204c",
+		"_postman_id": "d4a623f9-89b5-4062-a3bb-8ce4d0d3ca48",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29456576"
+		"_exporter_id": "29691657"
 	},
 	"item": [
 		{
@@ -122,7 +122,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\":\"changeusername2x\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"aki\",\r\n    \"password\":\"1234\"\r\n}",
+					"raw": "{\r\n    \"username\":\"changeusername2x\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"asim\"\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -268,7 +268,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " {\r\n\r\n        \"title\": \"TEST REPLACE PARITAL Wings-changetitle\",\r\n        \"image\": \"https://img.TEST REPLACE PARITAL.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"change1 HAHAHAH shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large TEST REPLACE PARITAL, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb AFAKN wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"for 4 servings\",\r\n        \"description\": \"Try TEST REPLACE PARITAL herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"changeIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about TEST REPLACE PARITAL minutes.\",\r\n            \"Season the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"While whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"Add the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"Preheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"Arrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"Serve the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"Enjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"lkasjfnkan \",\r\n            \"Baking\",\r\n            \"Chicken\",\r\n            \"High-Protein\",\r\n            \"Under 1 Hour\",\r\n            \"Weeknight\",\r\n            \"Party\",\r\n            \"Game Day\",\r\n            \"Dinner\",\r\n            \"Appetizers\",\r\n            \"Easy\",\r\n            \"Low-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"Calories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"raw": " {\r\n\r\n        \"title\": \"TEST REPLACE PARITAL Wings-changetitle\",\r\n        \"image\": \"https://img.TEST REPLACE PARITAL.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"change1 HAHAHAH shallot, minced\",\r\n                \"5 cloves garlic, minced\",\r\n                \"1 large TEST REPLACE PARITAL, minced\",\r\n                \"½ cup red wine vinegar\",\r\n                \"2 teaspoons kosher salt\",\r\n                \"1 teaspoon freshly ground black pepper\",\r\n                \"1 teaspoon red pepper flakes\",\r\n                \"¼ cup finely chopped fresh parsley\",\r\n                \"¼ cup finely chopped fresh cilantro\",\r\n                \"½ cup extra-virgin olive oil\",\r\n                \"1 lb AFAKN wings\"\r\n            ]\r\n        },\r\n        \"description\": \"Try TEST REPLACE PARITAL herby, garlicky wings for game day or any day!\",\r\n   \r\n        \"nutritionalInfo\": [\r\n            \"bbCalories 468\",\r\n            \"Fat 43g\",\r\n            \"Carbs 1g\",\r\n            \"Fiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -356,51 +356,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " {\r\n\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"REPLACEhttps://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"REPLACECalories 468\",\r\n            \"REPLACEFat 43g\",\r\n            \"REPLACECarbs 1g\",\r\n            \"REPLACEFiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/v1/recipes/{{recipe_id}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"v1",
-						"recipes",
-						"{{recipe_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "replaceRecipe Copy",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"\r",
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": " {\r\n\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"REPLACEhttps://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"REPLACECalories 468\",\r\n            \"REPLACEFat 43g\",\r\n            \"REPLACECarbs 1g\",\r\n            \"REPLACEFiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"raw": " {\r\n\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"REPLACEhttps://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"REPLACECalories 468\",\r\n            \"REPLACEFat 43g\",\r\n            \"REPLACECarbs 1g\",\r\n            \"REPLACEFiber 25g\",\r\n            \"repSugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1194,49 +1150,6 @@
 		},
 		{
 			"name": "deleteAUser",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 201\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/v1/users/{{user_id}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"v1",
-						"users",
-						"{{user_id}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "deleteAUser Copy",
 			"event": [
 				{
 					"listen": "test",

@@ -178,30 +178,20 @@ router.post("/signup", (req, res, next) => {
 //PUT----------------------------------
 //replace a user
 //TODO ADD BACK USER AUTH
-  router.put("/:userId",  async function (req, res, next) {
+router.put("/:userId", async function (req, res, next) {
+  const id = req.params.userId;
+  const { username, email, password, name, recipes, favouriteRecipes } = req.body;
 
-    const id = req.params.userId
-    const { username, email, password, name, recipes, favouriteRecipes } = req.body;
-
-    await userModel.updateOne({_id:id},
-      {$set: {
-        username,
-        email,
-        password,
-        name,
-        recipes,
-        favouriteRecipes
-      }
-    }).then(()=>{
-      return res.status(200).json({message:"User replaced"})})
-      .catch(err=>{
-        err.status=404
-        return next(err)
-      })
-
-
+  try {
+    const updatedUser = await userModel.findById(id) 
+    Object.assign(updatedUser, {username, email, password, name, recipes, favouriteRecipes});
+    await updatedUser.save();
+    res.status(200).json({ message: "User replaced", user: updatedUser });
+  } catch (err) {
+    err.status = 404;
+    return next(err);
+  }
 });
-
 
 //PATCH----------------------------------
 
@@ -222,20 +212,22 @@ router.patch("/:userId",  async (req, res, next) => {
 //ADD USER AUTH HAD BOTH
 //Also maybe move this to recipeRouter??
 router.patch("/recipes/:id", async (req, res, next) => {
-
-    const updatedRecipeData = req.body;
+  const updatedRecipeData = req.body;
+  // check if tags are provided in the request body if not skip editing them
+  if (updatedRecipeData.tags) {
     const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag);
     updatedRecipeData.tags = formattedTags;
+  }
 
-    await recipeModel.findByIdAndUpdate(req.params.id,
-      {$set:updatedRecipeData}
-      ).then((result)=>{return res.status(200).json({result})})
-      .catch(err=>{
-        err.status=404
-        return(next(err))
-      })
+  await recipeModel.findByIdAndUpdate(req.params.id, {$set: updatedRecipeData})
+    .then((result) => {
+      return res.status(200).json({ result });
+    })
+    .catch((err) => {
+      err.status = 404;
+      return next(err);
+    });
 });
-
 
 //TODO ADD AUTH BACK
 router.post("/:userId/recipes/", async (req, res, next) => {
