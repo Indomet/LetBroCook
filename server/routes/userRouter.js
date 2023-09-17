@@ -30,9 +30,9 @@ router.get("/", function (req, res, next) {
 
 //Get all recipes of user
 //ADD BACK USER AUTH ONLY HAD ONE
-router.get("/:userId/recipes/", async function (req, res, next) {
+router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
-    await recipeModel.find({owner: req.params.userId})
+    await recipeModel.find({owner: req.user.id})
     .then(function(recipes){
         res.status(200).json({ recipes: recipes });
     })
@@ -43,16 +43,6 @@ router.get("/:userId/recipes/", async function (req, res, next) {
 
 
   })
-
-  //Get user by id
-//TODO: Admin permissions
-router.get("/:id", (req, res, next) => {
-    // Label cache-ability
-    res.set("Cache-control", "no-store");
-        const user = req.params.id
-        res.status(200).json({ User: user });
-});
-
 
 //User sign in
 router.get("/sign-in", async (req, res, next) => {
@@ -76,6 +66,7 @@ router.get("/sign-in", async (req, res, next) => {
 
       user.comparePassword(password, (err, isMatch) => {
         if (isMatch) {
+            //TODO: save state
           res.status(200).json({message: "Sign-in successful", body: user});
         } else {
           res.status(401).json({ message: "Email or password is incorrect" });
@@ -88,31 +79,112 @@ router.get("/sign-in", async (req, res, next) => {
     });
 });
 
+  //Get user data by id, must be logged in since it will return personal information
+router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, next) => {
+    // Label cache-ability
+    res.set("Cache-control", "no-store");
+        const user = req.user
+        res.status(200).json({ User: user });
+});
+
 //POST----------------------------------
 
-//TODO ADD USER AUTH BACK
-router.post("/:userId/recipes/:recipeId/favorite-recipes", async (req, res, next) => {
+router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
+    const recipeData = req.body;
+    const unformattedTags = req.body.tags;
 
-    userModel.findById(req.params.userId).then(user=>{
-      if(!recipeModel.findById(req.params.recipeId))
-      {return res.status(404).json({message: "Invalid recipe id"})}
+    try {
+    var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
+      recipeData.tags = formattedTags;
+    }
+    catch (err) {
+      err.status=400//bad tags request
+    return next(err);
+    }
 
-      user.favouriteRecipes.push(req.body.recipeId);
-      return res.status(201).json({message: "recipe craeted"})
-    }) 
-    .catch(err=>{
+    var recipe = new recipeModel(recipeData);
+    const user = req.user
+    recipe.owner = user.id
+
+    recipe.save()
+    .then(function (recipe) {
+        try{
+            user.recipes.push(recipe.id);
+        }catch(error){
+            console.log("Invalid user")
+            return next(error)
+        }
+        user.save()
+            .then(function () {
+                res.status(201).json({ message: "Recipe created", Recipe: recipe });
+            })
+            .catch((err) => {
+                res.status(404).json({ message: "user not found" });
+                return next(err);
+            });
+        })
+})
+
+/* Not working
+//TODO ADD AUTH BACK
+router.post("/:userId/recipes/", async (req, res, next) => {
+
+    const recipeData = req.body;
+
+    var formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag)
+    recipeData.tags = formattedTags;
+
+    recipeData.owner = req.params.userId;
+
+    await userModel.findById(req.params.userId).then(async user=>{
+      const newRecipe = new recipeModel(recipeData);
+      await newRecipe.save()
+      return res.status(201).json({Recipe: newRecipe})
+    }).catch(err=>{
       err.status=404
       err.message="User not found"
       return next(err)
     })
 
+})
+*/
 
+//TODO ADD USER AUTH BACK
+router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+    const user = req.user
+    const recipe = req.recipe
+    /*
+    userModel.findById(user.id).then(user=>{
+      if(!recipeModel.findById(recipe.id))
+      {return res.status(404).json({message: "Invalid recipe id"})}
+
+      user.favouriteRecipes.push(recipe.id);
+      return res.status(201).json({message: "recipe created"})
+    })
+    .catch(err=>{
+      err.status=404
+      err.message="User not found"
+      return next(err)
+    })
+    */
     try {
-      const user = req.user
-      user.favouriteRecipes.push(req.body.recipeId);
-      user.save()
-      //request created
-      res.status(201).json({ message: "Recipe added to favourite list" });
+        // Prevent duplicate ids from being added to favoriteRecipes
+        for(var each of user.favouriteRecipes){
+            console.log(each)
+            if(recipe.id == each){
+                res.status = 400
+                return res.json({
+                    message: "Recipe is already favorited.",
+                    body: each
+                })
+            }
+        }
+        user.favouriteRecipes.push(recipe.id);
+        user.save()
+        //request created
+        res.status(201).json({ message: "Recipe added to favourite list", body: recipe.id });
+
+
     } catch (error) {
       error.status=400
       return next(error);
@@ -123,14 +195,10 @@ router.post("/:userId/recipes/:recipeId/favorite-recipes", async (req, res, next
 //add a comment by a user to a certain recipe
 //TODO ADD BACK USER AUTH
 //this only had userAuth.authUser
-router.post("/:userId/recipes/:recipeId/comments", (req, res, next) => {
+router.post("/:userId/recipes/:recipeId/comments", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, (req, res, next) => {
 
-    if(!req.params.userId || !req.params.recipeId){
-        return res.status(400).json({ message: "Invalid user/recipe" })
-    }
-
-    const userId = req.params.userId
-    const recipeId = req.params.recipeId
+    const userId = req.user.id
+    const recipeId = req.recipe.id
   userModel
     .findById(userId)
     .then((user) => {
@@ -162,6 +230,7 @@ router.post("/:userId/recipes/:recipeId/comments", (req, res, next) => {
 });
 
 //Create user account
+//TODO: user should be auto logged in after successful sign up
 router.post("/signup", (req, res, next) => {
     var user = new userModel(req.body);
     user
@@ -177,13 +246,12 @@ router.post("/signup", (req, res, next) => {
 
 //PUT----------------------------------
 //replace a user
-//TODO ADD BACK USER AUTH
-  router.put("/:userId",  async function (req, res, next) {
+router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async function (req, res, next) {
 
-    const id = req.params.userId
+    const userId = req.user.id
     const { username, email, password, name, recipes, favouriteRecipes } = req.body;
 
-    await userModel.updateOne({_id:id},
+    await userModel.updateOne({_id: userId},
       {$set: {
         username,
         email,
@@ -203,15 +271,18 @@ router.post("/signup", (req, res, next) => {
 });
 
 
+
+
 //PATCH----------------------------------
 
 // edit a user
 //ADD BACK USER AUTHENTICAION
-router.patch("/:userId",  async (req, res, next) => {
+router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
 
-    await userModel.findById(req.params.userId).then(user=>{Object.assign(user, req.body);
-      user.save();
-      return res.status(200).json({message:"User updated"})
+    await userModel.findById(req.user.id).then(user=>{
+        Object.assign(user, req.body);
+        user.save();
+        return res.status(200).json({message:"User updated"})
     }).catch(err=>{
       err.status=404
       return next(err)
@@ -219,15 +290,14 @@ router.patch("/:userId",  async (req, res, next) => {
 })
 
 // edit a recipe
-//ADD USER AUTH HAD BOTH
-//Also maybe move this to recipeRouter??
-router.patch("/recipes/:id", async (req, res, next) => {
+//TODO: weird bug that takes 2 requests for recipe to change
+router.patch("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
 
     const updatedRecipeData = req.body;
-    const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag);
+    const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag, req.user.id);
     updatedRecipeData.tags = formattedTags;
 
-    await recipeModel.findByIdAndUpdate(req.params.id,
+    await recipeModel.findByIdAndUpdate(req.recipe.id,
       {$set:updatedRecipeData}
       ).then((result)=>{return res.status(200).json({result})})
       .catch(err=>{
@@ -237,52 +307,33 @@ router.patch("/recipes/:id", async (req, res, next) => {
 });
 
 
-//TODO ADD AUTH BACK
-router.post("/:userId/recipes/", async (req, res, next) => {
 
-    const recipeData = req.body;
-
-    var formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag)
-    recipeData.tags = formattedTags;
-
-    recipeData.owner = req.params.userId;
-
-    await userModel.findById(req.params.userId).then(async user=>{
-      const newRecipe = new recipeModel(recipeData);
-      await newRecipe.save()
-      return res.status(201).json({Recipe: newRecipe})
-    }).catch(err=>{
-      err.status=404
-      err.message="User not found"
-      return next(err)
-    })
-    
-})
-
-
+//Update comment by id
 //TODO: Make comment into separate model and create authorization
-//TODO ADD BACK AUTH not sure if :userid is needed
-router.patch('/comments/:commentId/',  async (req, res, next) => {
+router.patch('/:userId/comments/:commentId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfComment, async (req, res, next) => {
     const newComment = req.body.comment
-    const id = req.params.commentId
+    const id = req.comment.id
     await Comment.findByIdAndUpdate(id,{comment:newComment}).then((result)=>{
-      return res.status(200).json({message: "Comment updated"})
+      return res.status(200).json({
+        message: "Comment updated",
+        body: result
+    })
     }).catch(err=>{
       err.status=400
       return next(err)
     })
   })
 
-//DELETE----------------------------------comment
-//TODO ADD BACK USER AUTH THIS HAD ONE
-router.delete('/comments/:commentid', async (req, res, next) => {
-  const commentId = req.params.commentid
-  const recipeId = req.params.recipeId
+//DELETE----------------------------------
+//Delete comment by id
+router.delete('/:userId/recipes/:recipeId/comments/:commentId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfComment, async (req, res, next) => {
+  const commentId = req.comment.id
+  const recipeId = req.recipe.id
 
   try {
-    
+
     await recipeModel.findByIdAndUpdate(recipeId,{ $pull: { comments: { _id: commentId } } });
-    await Comment.findByIdAndDelete(commentId)
+    await Comment.findOneAndRemove({_id: commentId})
     res.status(200).json({ message: "comment deleted " });
 
   } catch (err) {
@@ -291,31 +342,36 @@ router.delete('/comments/:commentid', async (req, res, next) => {
   }
 });
 
-router.delete("/:userId",async (req,res,next)=>{
-  const id = req.params.userId
-  await userModel.findByIdAndDelete(id).then(async ()=>{
+
+//Delete user by Id
+router.delete("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,res,next)=>{
+  const userId = req.user.id
+  await userModel.findByIdAndDelete(userId).then(async ()=>{
     //now i need to delete all the recipes associated with the user
-    await recipeModel.deleteMany({owner:id})
+    await recipeModel.deleteMany({owner : userId})
 
     return res.status(200).json({message:"User deleted"})
   }).catch(err=>{
     err.status=404
-    err.message="User not found" 
-    return next(err) 
-  }) 
+    err.message="User not found"
+    return next(err)
+  })
 })
 
-//method to delete everything
+
+// DANGER ZONE -------------------------------------------------------
+// Method to delete everything
+//TODO: Admin permission only
 router.delete('/', async (req, res,next) => {
   try {
     // First, delete all recipes associated with users
     await recipeModel.deleteMany({});
-    
+
     // Then, delete all users
     await userModel.deleteMany({});
 
     await Comment.deleteMany({})
-    
+
     res.status(200).json({ message: 'All users and their associated recipes have been deleted.' });
   } catch (err) {
 
@@ -326,20 +382,32 @@ router.delete('/', async (req, res,next) => {
 
 
 
-//DELETE----------------------------------favourite recipe
+//DELETE----------------------------------
+//Delete favourite recipe
 //TODO ADD BACK USER AUTH THIS HAD ONE
-router.delete("/:userId/recipes/:recipeId/favoriteDeletion", async (req, res, next) => {
-  const userId = req.params.userId
-  const recipeId= req.params.recipeId
+router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+    try{
+        const user = req.user
+        const recipeId= req.recipe.id
+        index = user.favouriteRecipes.indexOf(recipeId)
+        user.favouriteRecipes.splice(recipeId, 1)
+        user.save()
+        return res.status(200).json({message: "Favorite recipe removed"})
+    }catch(err){
+        return next(err)
+    }
+
+  /*
   userModel.findById(userId).then((user)=>{
     index = user.favouriteRecipes.indexOf(recipeId)
     user.favouriteRecipes.splice(recipeId,1)
     user.save()
-    res.status(200).json({message: "Fav recipe removed"})
+    return res.status(200).json({message: "Fav recipe removed"})
   }
   ).catch((err)=>{
     err.message = "recipe doesnt exist"
     err.status=404
     return next(err)
   })
-}) 
+  */
+})

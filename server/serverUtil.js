@@ -7,13 +7,16 @@ regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 
 //  handle existing tags
-const handleExistingTags = async (tags,model) => {
+const handleExistingTags = async (tags,model, userId) => {
     const formattedTags = [];
     for (const element of tags) {
       let existingTag = await model.findOne({ name: element });
 
       if (!existingTag) {
-        existingTag = new model({ name: element });
+        existingTag = new model({
+             name: element,
+             ownerId: userId
+            });
         await existingTag.save();
       }
 
