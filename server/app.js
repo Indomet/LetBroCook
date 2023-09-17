@@ -46,7 +46,7 @@ mongoose.connection.once("open", async function () {
     recipeData = require("../RecipeData.json");
 
     for (let i = 0; i < recipeData.length; i++) {
-        recipeData[i].tags = await serverUtil.handleExistingTags(recipeData[i].tags, Tag) // Assign the array of ObjectIds to the recipeData
+        recipeData[i].tags = await serverUtil.handleExistingTags(recipeData[i].tags, Tag, originalOGuser._id) // Assign the array of ObjectIds to the recipeData
 
         var recipe = new recipeModel(recipeData[i])
         recipe.owner= originalOGuser._id
@@ -57,10 +57,10 @@ mongoose.connection.once("open", async function () {
       console.log("Database populated")
       originalOGuser.save().catch(function(err){
         return console.error(err)
-    }) 
+    })
     }
    catch (err) {
-    console.log(err); 
+    console.log(err);
   }}
 });
 
@@ -77,7 +77,8 @@ app.use(morgan("dev"));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options("*", cors());
 app.use(cors());
-app.use(setUserData)
+
+//app.use(setUserData)
 
 
 //Routers
@@ -92,52 +93,6 @@ app.get("/api", function (req, res) {
   res.json({ message: "Welcome to your DIT342 backend ExpressJS project!" });
 });
 
-//Set the req.user to a valid user in the database with matching id.
-async function setUserData(req, res, next) {
-    const userId = req.body.userId
-    const recipeId = req.body.recipeId
-    
-    console.log("request has userId " + userId)
-    console.log("request has recipeId " + recipeId)
-    //Check that the id is not null
-    if (userId) {
-        //Check that the ObjectId is in valid format
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: "Invalid user ID format" });
-        }
-
-        await userModel.findById(userId)
-        .then(function(user){
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-            req.user = user
-        })
-        .catch(function(err){
-            next(err)
-        })
-
-    }
-    if(recipeId){
-
-        if (!mongoose.Types.ObjectId.isValid(recipeId)) {
-            return res.status(400).json({ message: "Invalid recipe ID format" });
-        }
-
-        await recipeModel.findById(recipeId)
-        .then(function(recipe){
-            if (!recipe) {
-                return res.status(404).json({ message: "recipe not found" });
-            }
-            req.recipe = recipe
-        })
-        .catch(function(err){
-            next(err)
-        })
-    }
-    next()
-}
 
 // Catch all non-error handler for api (i.e., 404 Not Found)
 app.use("/api/*", function (req, res) {
