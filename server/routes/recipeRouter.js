@@ -121,28 +121,27 @@ router.post("/:userId/tags", userAuth.setRequestData, userAuth.authUser, async f
 //THIS USED TO BE IN USER ROUTER PUT BACK IF BREAKS
 //Replaces a recipe by id
 router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-    const recipeId = req.recipe.id
+  const recipeId = req.recipe.id
+  const { title, image, sectionsAndIngredients, steps, servings, description,  nutritionalInfo } = req.body;
 
-    const updatedRecipeData = req.body;
-    const unformattedTags = req.body.tags;
+  try {
+    const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag, req.user.id);
 
-    const formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id);
-    updatedRecipeData.tags = formattedTags;
+    const updatedRecipe = await recipeModel.findById(recipeId);
 
+    Object.assign(updatedRecipe, {
+      title, image, sectionsAndIngredients, steps, servings, description, tags: formattedTags, nutritionalInfo });
 
-    await recipeModel.findByIdAndUpdate(recipeId,
-      {$set:updatedRecipeData,
-        tags:formattedTags})
+    await updatedRecipe.save();
 
-      .then(()=>{
-      return res.status(200).json({message:"Recipe replaced"})})
-      .catch(err=>{
-        err.status=404
-        return next(err)
-      })
-
-  });
-
+    res.status(200).json({
+      message: "Recipe replaced",
+      Recipe: updatedRecipe
+    });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 
 //Delete recipe by id

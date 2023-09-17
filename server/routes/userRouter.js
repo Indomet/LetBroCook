@@ -247,29 +247,19 @@ router.post("/signup", (req, res, next) => {
 //PUT----------------------------------
 //replace a user
 router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async function (req, res, next) {
+  const userId = req.user.id
+  const { username, email, password, name, recipes, favouriteRecipes } = req.body;
 
-    const userId = req.user.id
-    const { username, email, password, name, recipes, favouriteRecipes } = req.body;
-
-    await userModel.updateOne({_id: userId},
-      {$set: {
-        username,
-        email,
-        password,
-        name,
-        recipes,
-        favouriteRecipes
-      }
-    }).then(()=>{
-      return res.status(200).json({message:"User replaced"})})
-      .catch(err=>{
-        err.status=404
-        return next(err)
-      })
-
-
+  try {
+    const updatedUser = await userModel.findById(userId) 
+    Object.assign(updatedUser, {username, email, password, name, recipes, favouriteRecipes});
+    await updatedUser.save();
+    res.status(200).json({ message: "User replaced", user: updatedUser });
+  } catch (err) {
+    err.status = 404;
+    return next(err);
+  }
 });
-
 
 
 
@@ -293,19 +283,20 @@ router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,
 //TODO: weird bug that takes 2 requests for recipe to change
 router.patch("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
 
-    const updatedRecipeData = req.body;
+  const updatedRecipeData = req.body;
+  if (updatedRecipeData.tags) {
     const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag, req.user.id);
     updatedRecipeData.tags = formattedTags;
+  }
 
-    await recipeModel.findByIdAndUpdate(req.recipe.id,
-      {$set:updatedRecipeData}
-      ).then((result)=>{return res.status(200).json({result})})
-      .catch(err=>{
-        err.status=404
-        return(next(err))
-      })
+  await recipeModel.findByIdAndUpdate(req.recipe.id,
+    {$set:updatedRecipeData}
+    ).then((result)=>{return res.status(200).json({result})})
+    .catch(err=>{
+      err.status=404
+      return(next(err))
+    })
 });
-
 
 
 //Update comment by id
