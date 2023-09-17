@@ -222,20 +222,22 @@ router.patch("/:userId",  async (req, res, next) => {
 //ADD USER AUTH HAD BOTH
 //Also maybe move this to recipeRouter??
 router.patch("/recipes/:id", async (req, res, next) => {
-
-    const updatedRecipeData = req.body;
+  const updatedRecipeData = req.body;
+  // check if tags are provided in the request body if not skip editing them
+  if (updatedRecipeData.tags) {
     const formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag);
     updatedRecipeData.tags = formattedTags;
+  }
 
-    await recipeModel.findByIdAndUpdate(req.params.id,
-      {$set:updatedRecipeData}
-      ).then((result)=>{return res.status(200).json({result})})
-      .catch(err=>{
-        err.status=404
-        return(next(err))
-      })
+  await recipeModel.findByIdAndUpdate(req.params.id, {$set: updatedRecipeData})
+    .then((result) => {
+      return res.status(200).json({ result });
+    })
+    .catch((err) => {
+      err.status = 404;
+      return next(err);
+    });
 });
-
 
 //TODO ADD AUTH BACK
 router.post("/:userId/recipes/", async (req, res, next) => {
