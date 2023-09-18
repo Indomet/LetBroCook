@@ -5,12 +5,7 @@ GET http://localhost:3000/v1/users
 
 ###
 
-GET http://localhost:3000/v1/users/selectOne
-Content-Type: application/json
-
-{
-    "userId": "6502f6abb594c59b5e72305c"
-}
+GET http://localhost:3000/v1/users/4eb6e7e7e9b7f4194e000001
 
 ###
 GET http://localhost:3000/v1/recipes
@@ -195,12 +190,10 @@ Content-Type: application/json
 }
 ###
 
-PATCH http://localhost:3000/v1/users/editComment
+PATCH http://localhost:3000/v1/users/650738e7466f3905233d9528/comments/65073c1dbe5827270e5af4c4
 Content-Type: application/json
 
 {
-    "userId": "4eb6e7e7e9b7f4194e000001",
     "commentId": "650305f02bf4f7c72945d662",
-    "recipeId":"650304e62bf4f7c72945d630",
     "comment":"PLES BE EDITED"
 }
