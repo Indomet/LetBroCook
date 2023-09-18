@@ -2,6 +2,7 @@ var mongoose = require("mongoose")
 var Schema = mongoose.Schema
 var bcrypt = require("bcrypt")
 var validateEmail = require(".././serverUtil.js").validateEmail
+const serverUtil = require("../serverUtil.js")
 
 
 //salt work factor helps against rainbow table attacks if someone gets access of db
@@ -76,8 +77,10 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
         cb(null, isMatch);
     });
 };
+
 userSchema.methods.validateEmail = validateEmail
 
+userSchema.set("versionKey", false);
 
 const userModel = mongoose.model('users', userSchema);
 module.exports = userModel

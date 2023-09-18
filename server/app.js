@@ -7,7 +7,12 @@ var history = require("connect-history-api-fallback");
 const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
 const serverUtil = require('./serverUtil.js')
+const axios = require('axios');
 
+var app = express();
+
+
+ 
 // Variables
 var mongoURI =
   process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/LetBroCook";
