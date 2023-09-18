@@ -6,6 +6,35 @@ const router = express.Router();
 //will be used when deleting all tags for example
 var methodOverride = require('method-override')
 router.use(methodOverride('_method'))
+const axios = require('axios');
+
+
+//Next 2 endpoints request from a python server that is running on port 8000 
+router.get('/Search/:query', async (req, res) => {
+  const query = req.params.query
+  serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
+
+  await axios.get('http://127.0.0.1:8000/Search', { 
+    params: {
+      content: query
+    }
+  }).then((response) => {
+    return res.status(200).send(response.data);
+  
+}).catch((error) => {console.log(error)})})
+
+router.get('/Recommendation/:query', async (req, res) => {
+  serverUtil.writeToFile('./UserDataModel.json',userModel)
+
+  const query = req.params.query
+  await axios.get('http://127.0.0.1:8000/Recommendation', { 
+    params: {
+      content: query
+    }
+  }).then((response) => {
+    return res.status(200).send(response.data);
+  
+}).catch((error) => {console.log(error)})})
 
 
 const { recipeModel, Tag } = require("../models/recipeModel.js"); //. for windows
