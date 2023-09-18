@@ -4,15 +4,19 @@ var Schema = mongoose.Schema
 const serverUtil = require("../serverUtil.js")
 
 var tagSchema = new Schema({
-   name: {
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+    },
+    name: {
      type: String,
      unique : false,
-   }
+    }
 });
 
 var commentSchema = new Schema({
    ownerId: {
-      type: mongoose.Schema.Types.ObjectId, // Assuming your owner has an ID
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     recipeId: {
@@ -44,7 +48,7 @@ var recipeSchema= new Schema(
       type: Map,
       of: Array
     }
-   , 
+   ,
    steps: {
       type: Array,
       required: true,
@@ -100,11 +104,19 @@ var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
 var Comment = mongoose.model("Comment", commentSchema); // Define the Tag model
 
 
+recipeSchema.pre("findOneAndRemove", async function(next) {
+    await Comment.deleteMany({ recipeId: this._conditions._id })
+    .catch(function(err){
+        return next(err)
+    });
+ })
+
+
 
 
 
 module.exports = {
    recipeModel: recipeModel,
-   Tag:Tag,
-   Comment:Comment
+   Tag: Tag,
+   Comment: Comment
 }
