@@ -93,11 +93,12 @@ router.get("/sign-in", async (req, res, next) => {
 //TODO ADD USER AUTH BACK
 router.post("/:userId/recipes/:recipeId/favorite-recipes", async (req, res, next) => {
 
-    userModel.findById(req.params.userId).then(user=>{
+    await userModel.findById(req.params.userId).then(user=>{
       if(!recipeModel.findById(req.params.recipeId))
       {return res.status(404).json({message: "Invalid recipe id"})}
 
       user.favouriteRecipes.push(req.body.recipeId);
+      user.save();
       return res.status(201).json({message: "recipe craeted"})
     }) 
     .catch(err=>{
@@ -106,17 +107,6 @@ router.post("/:userId/recipes/:recipeId/favorite-recipes", async (req, res, next
       return next(err)
     })
 
-
-    try {
-      const user = req.user
-      user.favouriteRecipes.push(req.body.recipeId);
-      user.save()
-      //request created
-      res.status(201).json({ message: "Recipe added to favourite list" });
-    } catch (error) {
-      error.status=400
-      return next(error);
-    }
   }
 );
 
