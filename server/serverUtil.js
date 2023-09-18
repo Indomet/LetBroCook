@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
     const validateEmail = function(email) {
@@ -23,7 +25,24 @@ const handleExistingTags = async (tags,model) => {
     return formattedTags;
   };
 
+
+//TODO USE THIS METHOD WHEN SAVING USER OR RECIPE MODELS TO UPDATE THE JSON FILE TO REFLECT THE CHANGES
+//BY USING SCHEMA.POST
+const writeToFile = function(filePath,model){
+model.find({}).then(data=>{
+    fs.writeFile(filePath,JSON.stringify(data,null,4),function(err){
+        if(err){
+            console.log(err)
+        }
+        else{
+            console.log("File written")
+        }
+    })
+})}  
+
+
+
 module.exports = {
     validateEmail,
-    handleExistingTags
-}
+    handleExistingTags,
+    writeToFile}

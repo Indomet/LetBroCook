@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 const userModel = require("./userModel");
 var Schema = mongoose.Schema
+const serverUtil = require("../serverUtil.js")
 
 var tagSchema = new Schema({
    name: {
@@ -85,9 +86,20 @@ var recipeSchema= new Schema(
 
 recipeSchema.index({title: 'text'});
 
+
+/*recipeSchema.post('save', function(doc) {
+   serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
+   })
+
+recipeSchema.post("deleteOne", function(doc) {
+       serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
+       })
+*/
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
 var Comment = mongoose.model("Comment", commentSchema); // Define the Tag model
+
+
 
 
 
