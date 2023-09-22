@@ -1,20 +1,28 @@
 <template>
-  <div class="auth-links">
-    <!-- href kills the state of the current page where routerLink doesnt lose the state of the page -->
-    <router-link to="/login" class="auth-link">Login</router-link>
-    <router-link to="/signup" class="auth-link">Signup</router-link>
+  <div class="long-bar">
+    <!-- href kills the state of the current page where routerLink doesnt lose the state of the page
+    <router-link to="/login" class="auth-button">Login</router-link>
+    <router-link to="/signup" class="auth-button">Signup</router-link> -->
+    <a href="/signup" class="auth-button">Signup</a>
+    <a href="/login" class="auth-button">Login</a>
   </div>
 </template>
 
+<script>
+export default {
+  name: 'NavBar'
+}
+</script>
+
 <style scoped>
-.auth-links {
+.long-bar {
   display: flex;
   background-color: #333;
   padding: 10px 20px;
   justify-content: flex-end;
 }
 
-.auth-link {
+.auth-button {
   margin: 0 10px;
   padding: 8px 16px;
   border-radius: 4px;
@@ -24,13 +32,7 @@
   transition: background-color 0.3s;
 }
 
-.auth-link:hover {
+.auth-button:hover {
   background-color: #777;
 }
 </style>
-
-<script>
-export default {
-  name: 'NavBar'
-}
-</script>
