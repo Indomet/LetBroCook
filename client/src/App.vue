@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <NavBar/>
-    <!-- <div id="nav">
+    <div id="nav">
       <router-link to="/">Home</router-link>
-    </div> -->
+    </div>
     <!-- Render the content of the current page view -->
     <router-view/>
   </div>
