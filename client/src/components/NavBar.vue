@@ -6,14 +6,24 @@
     <div id="home-button">
       <router-link class="auth-button" to="/">Home(logohere)</router-link>
     </div>
-    <a href="/signup" class="auth-button">Signup</a>
-    <a href="/login" class="auth-button">Login</a>
+    <router-link to="/login" v-if="user" class="auth-button">Login</router-link>
+    <router-link to="/signup" v-if="user" class="auth-button">Signup</router-link>
+    <a href="/" @click="logout()" v-if="!user" class="auth-button">logout</a>
+    <!-- <a href="/signup" class="auth-button">Signup</a>
+    <a href="/login" class="auth-button">Login</a> -->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'NavBar'
+  name: 'NavBar',
+  props: ['user'],
+  methods: {
+    logout() {
+      localStorage.removeItem('user-info')
+      // this.$router.push({ name: 'home' })
+    }
+  }
 }
 </script>
 

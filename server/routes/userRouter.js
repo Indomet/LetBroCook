@@ -45,7 +45,7 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
   })
 
 //User sign in
-router.get("/sign-in", async (req, res, next) => {
+router.post("/sign-in", async (req, res, next) => {
     if(!req.body){
         return res.status(404).json({ message: "Missing body" })
     }
