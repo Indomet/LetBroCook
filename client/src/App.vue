@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link>
+      <a class="links" href="/">Home</a>
+      <a class="links" href="/recipes">Recipe Page</a>
     </div>
     <!-- Render the content of the current page view -->
     <router-view/>
@@ -15,5 +16,10 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+
+.links {
+    padding: 10px;
+    display: inline-block;
 }
 </style>
