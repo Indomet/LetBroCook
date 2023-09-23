@@ -1,14 +1,14 @@
 <template>
     <div>
-      <form class="login-form">
+      <form @submit.prevent="handleSubmit()" class="login-form">
         <h3>Login</h3>
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" class="form-control" />
+          <input type="email" id="email" v-model="email" class="form-control" />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" class="form-control" />
+          <input type="password" id="password"  v-model="password" class="form-control" />
         </div>
         <button type="submit" class="btn btn-block">Login</button>
       </form>
@@ -23,8 +23,35 @@
 
 <script>
 
+import { Api } from '@/Api'
 export default {
-  name: 'Login'
+  name: 'Login',
+  data() {
+    return {
+      email: '',
+      password: ''
+    }
+  },
+  methods: {
+    async handleSubmit() {
+      const response = await Api.post('http://localhost:3000/v1/users/sign-in', {
+        email: this.email,
+        password: this.password
+
+      })
+      console.log(response)
+      if (response.status === 200) {
+        localStorage.setItem('user-info', JSON.stringify(response.data))
+        this.$router.push({ name: 'home' })
+      }
+    }
+  },
+  mounted() {
+    const user = localStorage.getItem('user-info')
+    if (user) {
+      this.$router.push({ name: 'home' })
+    }
+  }
 }
 </script>
 

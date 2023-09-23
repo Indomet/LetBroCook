@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { Api } from '../Api'
 export default {
   name: 'Signup',
   data() {
@@ -43,20 +43,22 @@ export default {
     }
   },
   methods: {
-    handleSubmit() {
+    async handleSubmit() {
       const data = {
         username: this.username,
         name: this.name,
         email: this.email,
         password: this.password
       }
-      axios.post('http://localhost:3000/v1/users/signup', data)
-        .then(response => {
-          console.log(response)
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      const response = await Api.post('http://localhost:3000/v1/users/signup', data)
+      console.log(response)
+      this.$router.push('/login')
+    }
+  },
+  mounted() {
+    const user = localStorage.getItem('user-info')
+    if (user) {
+      this.$router.push({ name: 'home' })
     }
   }
 }
