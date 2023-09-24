@@ -6,22 +6,35 @@
     <div id="home-button">
       <router-link class="auth-button" to="/">Home(logohere)</router-link>
     </div>
-    <router-link to="/login" v-if="user" class="auth-button">Login</router-link>
-    <router-link to="/signup" v-if="user" class="auth-button">Signup</router-link>
-    <a href="/" @click="logout()" v-if="!user" class="auth-button">logout</a>
+    <router-link to="/login"  v-if="!user"  class="auth-button">Login</router-link>
+    <router-link to="/signup" v-if="!user" class="auth-button">Signup</router-link>
+    <a href="/" @click="logout()" v-if="user" class="auth-button">logout</a>
     <!-- <a href="/signup" class="auth-button">Signup</a>
     <a href="/login" class="auth-button">Login</a> -->
   </div>
 </template>
 
 <script>
+import { ref } from 'vue'
+// import Login from '../views/Login.vue'
+
+// import { Api } from '@/Api'
 export default {
   name: 'NavBar',
-  props: ['user'],
-  methods: {
-    logout() {
+  setup() {
+    const user = ref(localStorage.getItem('user-info'))
+    const logout = () => {
       localStorage.removeItem('user-info')
-      // this.$router.push({ name: 'home' })
+      user.value = null
+    }
+    return {
+      user,
+      logout
+    }
+  },
+  watch: {
+    '$route'() {
+      this.user = localStorage.getItem('user-info')
     }
   }
 }
