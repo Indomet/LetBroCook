@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f5781043-540c-4f58-8106-4fe3da4a1fea",
+		"_postman_id": "ca2ce01d-dcf9-44c3-bfb4-17ef202b102f",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "29691657"
@@ -71,11 +71,8 @@
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
