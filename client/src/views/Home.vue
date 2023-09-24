@@ -14,16 +14,6 @@ import { Api } from '@/Api'
 
 export default {
   name: 'home',
-  // data() {
-  //   return {
-  //     user: null
-  //   }
-  // },
-  // async created() {
-  //   const response = await Api.post('http://localhost:3000/v1/users/sign-in')
-  //   console.log(response)
-  //   this.user = response.data
-  // },
   methods: {
     getMessage() {
       Api.get('/')
