@@ -1,20 +1,21 @@
 <template>
   <div id="app">
     <NavBar/>
-    <div id="nav">
-
-    </div>
+    <!-- <SearchBar/> -->
     <!-- Render the content of the current page view -->
-    <router-view/>
+    <!-- <router-view/> -->
+      <router-view/>
   </div>
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue'
+// import SearchBar from './components/SearchBar.vue'
 export default {
   name: 'app',
   components: {
     NavBar
+    // SearchBar
   }
 }
 </script>
@@ -27,4 +28,5 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
+
 </style>
