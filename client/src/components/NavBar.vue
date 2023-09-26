@@ -9,7 +9,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="auth-button nav-link active" aria-current="page"  href="#">Home</a>
+          <a class="auth-button nav-link active" aria-current="page"  href="/recipes">Home</a>
         </li>
         <li class="nav-item">
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>

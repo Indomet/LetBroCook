@@ -7,7 +7,7 @@
                     <p class="title">{{ recipe.title }}</p>
                     <div v-for="(tag, j) in recipe.tags" v-bind:key="tag">
                         <div v-if="j < 5">
-                            <div class="tags">{{ getTag(tag) }}</div>
+                            <div class="tags">{{ tag.name }}</div>
                         </div>
                     </div>
                 </div>
@@ -50,18 +50,6 @@ export default {
             thumbnail: 'https://mangadex.org/covers/a914a65b-27ed-4665-9767-87396a00ea6b/9298804f-54e7-495e-afcb-70fdd7d25bf0.jpg',
             description: 'df',
             tags: ['tag1', 'tag22', 'tag333', 'tag4444', 'tag55555']
-        }
-    },
-    methods: {
-        async getTag(tagId) {
-            try {
-                const response = await axios.get('http://localhost:3000/v1/recipes/tags/' + tagId)
-                const tagName = response.data.name
-                return tagName
-            } catch (error) {
-                console.error('Error fetching tag:', error)
-                throw error
-            }
         }
     }
 }
