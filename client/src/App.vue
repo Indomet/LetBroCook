@@ -1,7 +1,11 @@
 <template>
   <div id="app">
-    <NavBar/>
-    <!-- <SearchBar/> -->
+    <div id="nav">
+      <NavBar/>
+      <a class="links" href="/">Home</a>
+      <a class="links" href="/recipes">Recipe Page</a>
+      <router-link to="/">Home</router-link>
+    </div>
     <!-- Render the content of the current page view -->
     <!-- <router-view/> -->
       <router-view/>
@@ -29,4 +33,8 @@ export default {
   color: #2c3e50;
 }
 
+.links {
+    padding: 10px;
+    display: inline-block;
+}
 </style>
