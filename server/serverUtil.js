@@ -21,7 +21,6 @@ const handleExistingTags = async (tags,model, userId) => {
             });
         await existingTag.save();
       }
-
       formattedTags.push(existingTag);
     }
 
