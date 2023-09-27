@@ -1,40 +1,39 @@
 <template>
-    <div class="signup-container">
-          <form @submit.prevent="handleSubmit" class="signup-form">
-            <h3>Create an account</h3>
-            <div class="form-group">
-              <label for="username">Username</label>
-              <input type="username" id="username" v-model="username" class="form-control" />
-              <p v-if="getError('username')" class="text-danger">{{ getError('username')}} </p>
-              <label for="name">Name</label>
-              <input type="name" id="name" v-model="name" class="form-control" />
-              <div v-if="getError('name')" class="alert alert-danger" role="alert">Name is required</div>
-            </div>
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" v-model="email" class="form-control" />
-              <div v-if="getError('email')" class="alert alert-danger" role="alert">{{ getError('email')  }}</div>
-            </div>
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" id="password" v-model="password" class="form-control" />
-              <div v-if="getError('password')" class="alert alert-danger" role="alert">{{ getError('password')  }}</div>
-              <label for="password_confirmation">Password confirmation</label>
-              <input type="password" id="password_confirmation" v-model="password_confirmation" class="form-control" />
-              <div v-if="getError('password_confirmation')" class="alert alert-danger" role="alert">{{ getError('password_confirmation')  }}</div>
-            </div>
-            <button type="submit" class="btn btn-block">Signup</button>
-            <!-- <p v-for="error of v$.$errors" :key="error.$uid">
-              <strong>{{ error.$message }}</strong>
-            </p> -->
-          </form>
-          <div class="divider">
-            <span class="divider-text">Do you have an account?</span>
-          </div>
-          <div class="account-button-container">
-            <a href="/login" class="btn btn-block">Login</a>
-          </div>
-        </div>
+  <div class="signup-container">
+    <form @submit.prevent="handleSubmit" class="signup-form">
+      <h3>Create an account</h3>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="username" id="username" v-model="username" class="form-control" :class="{ 'is-invalid': getError('username') }" />
+        <div v-if="getError('username')" class="invalid-feedback">{{ getError('username')}} </div>
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="name" id="name" v-model="name" class="form-control" :class="{ 'is-invalid': getError('name') }" />
+        <div v-if="getError('name')" class="invalid-feedback">{{ getError('name')}} </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" v-model="email" class="form-control" :class="{ 'is-invalid': getError('email') }" />
+        <div v-if="getError('email')" class="invalid-feedback">{{ getError('email')}} </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" v-model="password" class="form-control" :class="{ 'is-invalid': getError('password') }"/>
+        <div v-if="getError('password')" class="invalid-feedback">{{ getError('password')}} </div>
+        <label for="password_confirmation">Password confirmation</label>
+        <input type="password" id="password_confirmation" v-model="password_confirmation" class="form-control" :class="{ 'is-invalid': getError('username') }"/>
+        <div v-if="getError('password_confirmation')" class="invalid-feedback">{{ getError('password_confirmation')}} </div>
+      </div>
+      <button type="submit" class="btn btn-block">Signup</button>
+    </form>
+    <div class="divider">
+      <span class="divider-text">Do you have an account?</span>
+    </div>
+    <div class="account-button-container">
+      <a href="/login" class="btn btn-block">Login</a>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -57,9 +56,9 @@ export default {
   },
   validations() {
     return {
-      username: { required: helpers.withMessage('username is required', required) },
+      username: { required: helpers.withMessage('Username is required', required) },
       name: { required: helpers.withMessage('Name is required', required) },
-      email: { required: helpers.withMessage('email is required', required) },
+      email: { required: helpers.withMessage('Email is required', required) },
       password: { required: helpers.withMessage('password is required', required), minLength: minLength(3) },
       password_confirmation: {
         required: helpers.withMessage('password confirmation is required', required),
@@ -135,7 +134,7 @@ label {
 
 .form-control {
   width: 100%;
-  padding: 10px;
+  padding: 15px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 15px;
