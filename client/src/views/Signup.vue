@@ -5,20 +5,28 @@
             <div class="form-group">
               <label for="username">Username</label>
               <input type="username" id="username" v-model="username" class="form-control" />
+              <p v-if="getError('username')" class="text-danger">{{ getError('username')}} </p>
               <label for="name">Name</label>
               <input type="name" id="name" v-model="name" class="form-control" />
+              <div v-if="getError('name')" class="alert alert-danger" role="alert">Name is required</div>
             </div>
             <div class="form-group">
               <label for="email">Email</label>
               <input type="email" id="email" v-model="email" class="form-control" />
+              <div v-if="getError('email')" class="alert alert-danger" role="alert">{{ getError('email')  }}</div>
             </div>
             <div class="form-group">
               <label for="password">Password</label>
               <input type="password" id="password" v-model="password" class="form-control" />
+              <div v-if="getError('password')" class="alert alert-danger" role="alert">{{ getError('password')  }}</div>
               <label for="password_confirmation">Password confirmation</label>
-              <input type="password_confirmation" id="password_confirmation" v-model="password_confirmation" class="form-control" />
+              <input type="password" id="password_confirmation" v-model="password_confirmation" class="form-control" />
+              <div v-if="getError('password_confirmation')" class="alert alert-danger" role="alert">{{ getError('password_confirmation')  }}</div>
             </div>
             <button type="submit" class="btn btn-block">Signup</button>
+            <!-- <p v-for="error of v$.$errors" :key="error.$uid">
+              <strong>{{ error.$message }}</strong>
+            </p> -->
           </form>
           <div class="divider">
             <span class="divider-text">Do you have an account?</span>
@@ -31,8 +39,13 @@
 
 <script>
 import { Api } from '../Api'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minLength, sameAs, helpers } from '@vuelidate/validators'
 export default {
   name: 'Signup',
+  setup() {
+    return { v$: useVuelidate() }
+  },
   data() {
     return {
       username: '',
@@ -42,8 +55,26 @@ export default {
       password_confirmation: ''
     }
   },
+  validations() {
+    return {
+      username: { required: helpers.withMessage('username is required', required) },
+      name: { required: helpers.withMessage('Name is required', required) },
+      email: { required: helpers.withMessage('email is required', required) },
+      password: { required: helpers.withMessage('password is required', required), minLength: minLength(3) },
+      password_confirmation: {
+        required: helpers.withMessage('password confirmation is required', required),
+        sameAs: helpers.withMessage('Passwords should match', sameAs(this.password))
+      }
+    }
+  },
   methods: {
     async handleSubmit() {
+      const result = await this.v$.$validate()
+      if (!result) {
+        // notify user form is invalid
+        return
+      }
+
       const data = {
         username: this.username,
         name: this.name,
@@ -53,8 +84,14 @@ export default {
       const response = await Api.post('http://localhost:3000/v1/users/signup', data)
       console.log(response)
       this.$router.push('/login')
+    },
+    getError(path) {
+      const error = this.v$.$errors.find(error => error.$property === path)
+      if (error) return error.$message
+      return null
     }
   },
+
   mounted() {
     const user = localStorage.getItem('user-info')
     if (user) {
