@@ -105,7 +105,7 @@ export default {
       email: { required: helpers.withMessage('Email is required', required) },
       password: { required: helpers.withMessage('password is required', required), minLength: minLength(3) },
       password_confirmation: {
-        required: helpers.withMessage('password confirmation is required', required),
+        required: helpers.withMessage('Password confirmation is required', required),
         sameAs: helpers.withMessage('Passwords should match', sameAs(this.password))
       }
     }
