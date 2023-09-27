@@ -36,6 +36,9 @@
                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                       <button type="submit" class="btn btn-primary btn-block">Login</button>
                     </div>
+                    <div v-if="errorMessage" class="alert alert-danger">
+                      {{ errorMessage }}
+                    </div>
                   </form>
                   <div class="divider">
                     <span class="divider-text">New to our community</span>
@@ -71,12 +74,12 @@ export default {
     return {
       email: '',
       password: '',
+      errorMessage: null,
       showPassword: false
     }
   },
   validations() {
     return {
-      name: { required: helpers.withMessage('Name is required', required) },
       email: { required: helpers.withMessage('Email is required', required) },
       password: { required: helpers.withMessage('Password is required', required), minLength: minLength(3) }
     }
@@ -89,15 +92,19 @@ export default {
         // notify user form is invalid
         return
       }
-      const response = await Api.post('http://localhost:3000/v1/users/sign-in', {
-        email: this.email,
-        password: this.password
+      try {
+        const response = await Api.post('http://localhost:3000/v1/users/sign-in', {
+          email: this.email,
+          password: this.password
 
-      })
-      console.log(response)
-      if (response.status === 200) {
-        localStorage.setItem('user-info', JSON.stringify(response.data))
-        this.$router.push({ name: 'home' })
+        })
+        console.log(response)
+        if (response.status === 200) {
+          localStorage.setItem('user-info', JSON.stringify(response.data))
+          this.$router.push({ name: 'home' })
+        }
+      } catch (errorMessage) {
+        this.errorMessage = 'Either email or password is incorrect'
       }
     },
     getError(path) {
