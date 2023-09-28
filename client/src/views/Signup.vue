@@ -1,5 +1,5 @@
 <template>
-  <section class="vh-100" style="background-color: #eee;">
+  <section class="h-100" style="background-color: #eee;">
     <div class="container h-100" >
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-lg-12 col-xl-11">
@@ -50,7 +50,7 @@
                       <div class="form-outline flex-fill mb-0">
                         <label for="password_confirmation">Password confirmation</label>
                         <input type="password" id="password_confirmation" v-model="password_confirmation"
-                          class="form-control" :class="{ 'is-invalid': getError('username') }" />
+                          class="form-control" :class="{ 'is-invalid': getError('password_confirmation') }" />
                         <div v-if="getError('password_confirmation')" class="invalid-feedback">{{
                           getError('password_confirmation') }} </div>
                       </div>
