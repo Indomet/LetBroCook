@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <NavBar/>
-    <!-- <SearchBar/> -->
     <!-- Render the content of the current page view -->
     <!-- <router-view/> -->
       <router-view/>
@@ -15,7 +14,6 @@ export default {
   name: 'app',
   components: {
     NavBar
-    // SearchBar
   }
 }
 </script>
