@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import RecipeCard from './views/Recipe.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
+import Test from './views/Test.vue'
 
 Vue.use(Router)
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/signup',
       name: 'signup',
       component: Signup
+    },
+    {
+        path: '/test',
+        name: 'test',
+        component: Test
     }
     ]
 })
