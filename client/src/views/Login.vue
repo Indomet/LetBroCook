@@ -1,50 +1,116 @@
 <template>
-    <div>
-      <form @submit.prevent="handleSubmit()" class="login-form">
-        <h3>Login</h3>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" v-model="email" class="form-control" />
+  <section class="vh-100" style="background-color: #eee;">
+    <div class="container h-100">
+      <div class="d-flex justify-content-center align-items-center h-100 my-custom-container">
+        <div class="col-lg-12 col-xl-9">
+          <div class="card text-black">
+            <div class="card-body p-md-4">
+              <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-6 col-xl- order-2 order-lg-1">
+                  <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
+                  <form @submit.prevent="handleSubmit" class="mx-1 mx-md-4">
+                    <div class="hs-firstname d-flex flex-row align-items-center mb-4">
+                      <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                      <div class="form-outline flex-fill mb-0">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" v-model="email" class="form-control"
+                          :class="{ 'is-invalid': getError('email') }" />
+                        <div v-if="getError('email')" class="invalid-feedback">{{ getError('email') }} </div>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center mb-4">
+                      <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                      <div class="form-outline flex-fill mb-0">
+                        <label for="password">Password</label>
+                        <input v-if="!showPassword" type="password" id="password" v-model="password" class="form-control"
+                          :class="{ 'is-invalid': getError('password') }" />
+                        <input v-else type="text" id="password" v-model="password" class="form-control"
+                          :class="{ 'is-invalid': getError('password') }" />
+                        <div v-if="getError('password')" class="invalid-feedback">{{ getError('password') }} </div>
+                        <span class="position-absolute end-0 top-50 translate-middle-x">
+                          <i class="fas" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                            @click="showPassword = !showPassword"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                      <button type="submit" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                    <div v-if="errorMessage" class="alert alert-danger">
+                      {{ errorMessage }}
+                    </div>
+                  </form>
+                  <div class="divider">
+                    <span class="divider-text">New to our community</span>
+                  </div>
+                  <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                    <a href="/signup" class="btn btn-primary btn-lg">Signup</a>
+                  </div>
+                </div>
+                <div class="mouse col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+                  <img src="../assets/mouse.png" class="img-fluid" alt="mouse">
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password"  v-model="password" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-block">Login</button>
-      </form>
-      <div class="divider">
-          <span class="divider-text">New to our community</span>
-        </div>
-        <div class="account-button-container">
-        <a href="/signup" class="btn btn-block">Create an account</a>
       </div>
     </div>
+  </section>
 </template>
 
 <script>
 
 import { Api } from '@/Api'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minLength, helpers } from '@vuelidate/validators'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 export default {
   name: 'Login',
+  setup() {
+    return { v$: useVuelidate() }
+  },
   data() {
     return {
       email: '',
       password: '',
-      user: null
+      errorMessage: null,
+      showPassword: false
     }
   },
+  validations() {
+    return {
+      email: { required: helpers.withMessage('Email is required', required) },
+      password: { required: helpers.withMessage('Password is required', required), minLength: minLength(3) }
+    }
+  },
+
   methods: {
     async handleSubmit() {
-      const response = await Api.post('http://localhost:3000/v1/users/sign-in', {
-        email: this.email,
-        password: this.password
-
-      })
-      console.log(response)
-      if (response.status === 200) {
-        localStorage.setItem('user-info', JSON.stringify(response.data))
-        this.$router.push({ name: 'home' })
+      const result = await this.v$.$validate()
+      if (!result) {
+        // notify user form is invalid
+        return
       }
+      try {
+        const response = await Api.post('http://localhost:3000/v1/users/sign-in', {
+          email: this.email,
+          password: this.password
+
+        })
+        console.log(response)
+        if (response.status === 200) {
+          localStorage.setItem('user-info', JSON.stringify(response.data))
+          this.$router.push({ name: 'home' })
+        }
+      } catch (errorMessage) {
+        this.errorMessage = 'Either email or password is incorrect'
+      }
+    },
+    getError(path) {
+      const error = this.v$.$errors.find(error => error.$property === path)
+      if (error) return error.$message
+      return null
     }
   },
   mounted() {
@@ -57,67 +123,47 @@ export default {
 </script>
 
 <style scoped>
-.login-form {
-    /* box size */
-    max-width: 400px;
-    /* 0  auto means no space and left - right sides are auto calculated if u wanna put somethign on right side it is margin-left: auto; */
-    margin: 0 auto;
-    /* padding is the distance between box and eements inside */
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #f1f1f1;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.my-custom-container {
+  margin-top: -100px;
 }
 
-.form-group {
-    /* Space between form groups */
-    margin-bottom: 15px;
+.mouse {
+  max-width: 35%;
 }
 
 label {
-    font-weight: bold;
-    text-align: left;
-    display: block;
-    margin-bottom: 0px;
+  font-weight: bold;
+  text-align: left;
+  display: block;
+  margin-bottom: 0px;
 }
 
 .form-control {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 15px;
-}
-
-.btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 40px;
-    border: 1px solid #111;
+  border: 1px solid #ccc;
+  border-radius: 15px;
 }
 
 .divider {
-    max-width: 400px;
-    margin: 20px auto;
-    width: 100%;
-    height: 1px;
-    /* Adjust the thickness of the divider */
-    background-color: #ccc;
-    /* Adjust the color of the divider */
-
+  max-width: 400px;
+  margin: 40px auto 30px;
+  width: 100%;
+    /* thickness of the divider */
+  height: 1px;
+  background-color: #ccc;
 }
 
 .divider-text {
-    display: inline-block;
-    background-color: #fff;
-    padding: 0 10px;
-    position: relative;
-    top: -10px;
+  display: inline-block;
+  background-color: #fff;
+  padding: 0 10px;
+  position: relative;
+  top: -10px;
 }
 
-.account-button-container {
-    max-width: 400px;
-    margin: 0 auto;
-    text-align: center;
-}</style>
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 40px;
+
+}
+</style>
