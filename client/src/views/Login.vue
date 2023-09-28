@@ -1,8 +1,8 @@
 <template>
-  <section class="vh-100" style="background-color: #eee;">
+  <section class="h-100" style="background-color: #eee;">
     <div class="container h-100">
-      <div class="d-flex justify-content-center align-items-center h-100 my-custom-container">
-        <div class="col-lg-12 col-xl-9">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-lg-12 col-xl-10">
           <div class="card text-black">
             <div class="card-body p-md-4">
               <div class="row justify-content-center">
@@ -123,9 +123,6 @@ export default {
 </script>
 
 <style scoped>
-.my-custom-container {
-  margin-top: -100px;
-}
 
 .mouse {
   max-width: 35%;
