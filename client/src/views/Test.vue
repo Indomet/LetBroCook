@@ -1,8 +1,9 @@
 <template>
     <div>
-        <div class="d-flex flex-wrap ddd">
+        <div class="d-flex flex-wrap">
+            {{ trimArrayList(recipeData) }}
           <div
-            v-for="(recipe, i) in recipeData"
+            v-for="(recipe, i) in recipeArray"
             :key="recipe.id"
             class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
             style="margin-bottom: 4rem;"
@@ -15,7 +16,7 @@ background-size: 40.00px 40.00px;"
                 <b-card-body>
                     <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image">
                     <p class="card-title">{{ recipe.title }}</p>
-                    <div class="tag-group">{{ trimList(recipe.tags) }}
+                    <div>{{ trimTagList(recipe.tags) }}
                         <span v-for="(tag) in tagArray" :key="tag" class="tags">
                             {{ tag.name }}
                         </span>
@@ -31,7 +32,7 @@ background-size: 40.00px 40.00px;"
 <script>
 import axios from 'axios'
 export default {
-    el: '#card',
+    el: 'sgrgdfsf',
     mounted() {
         axios.get('http://localhost:3000/v1/recipes')
         .then((response) => {
@@ -50,15 +51,23 @@ export default {
             recipeData: '',
             loading: true,
             error: false,
-            tagArray: []
+            tagArray: [],
+            recipeArray: []
         }
     },
     methods: {
-        trimList(arr) {
+        trimTagList(arr) {
             const end = 7 // Max number of tags to be shown
             if (arr.length > end) {
                 const newArr = arr.slice(0, end)
                 this.tagArray = newArr
+            }
+        },
+        trimArrayList(arr) {
+            const end = 7 // Max number of tags to be shown
+            if (arr.length > end) {
+                const newArr = arr.slice(0, end)
+                this.recipeArray = newArr
             }
         }
     }
@@ -134,16 +143,12 @@ export default {
     outline-color: rgb(27, 18, 21);
     outline-style: solid;
     font-size: 16px;
+    padding: 4px;
+    margin:5px;
+    display: inline-block;
 }
 .tags:hover {
     background-color: rgb(96, 110, 219);
-}
-
-.tag-group {
-    display: inline-block;
-    margin-left: -20px;
-    margin-right: -20px;
-    font-size: 10%;
 }
 
 </style>

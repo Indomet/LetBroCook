@@ -12,14 +12,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="main">
-                <img class="thumbnail" v-bind:src='thumbnail' alt="Thumbnail Image">
-                <div class="title">{{ recipe.title }}</div>
-                <div class="tags" v-for="tag in tags" v-bind:key="tag">
-                    <div class="tag">{{ tag }}</div>
-                </div>
-            </div>
-            <p>{{ recipeData }}</p>-->
         </div>
     </div>
 </template>
@@ -27,7 +19,7 @@
 <script>
 import axios from 'axios'
 export default {
-    el: '#card',
+    el: '#sgf',
     mounted() {
         axios.get('http://localhost:3000/v1/recipes')
         .then((response) => {
@@ -56,76 +48,4 @@ export default {
 </script>
 
 <style>
-.main{
-    min-height: 30vw;
-    width: 20vw;
-    margin-left: 10%;
-    margin-top: 5%;
-    background-color: antiquewhite;
-    outline-width: 0.13vw;
-    outline-color: rgb(159, 159, 159);
-    outline-style:solid;
-    border-radius: 1rem;
-    float: left;
-    clear: none;
-    text-align: center;
-    position: center;
-    grid-row: 3;
-}
-
-.main:hover {
-    outline-color: rgb(8, 8, 8);
-}
-
-.title {
-    text-align: left;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-weight: bold;
-    font-size: 2vw;
-    margin-left: 3%;
-    margin-right: 5%;
-}
-
-.title:hover {
-    text-decoration: underline black;
-}
-
-.thumbnail {
-    width: 70%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 1rem;
-    position: relative;
-}
-
-.thumbnail:hover{
-    outline-width: 0.13vw;
-    outline-color: rgb(27, 18, 21);
-    outline-style: inset;
-}
-
-.tag {
-    text-align: left;
-}
-
-.tags {
-    display: inline-block;
-    overflow-wrap: break-word;
-    background-color: rgb(145, 145, 239);
-    font-size: 1.2vw;
-    padding: 0.325vw;
-    margin-left: 1vw;
-    margin-right: 0.65vw;
-    margin-bottom: 1vw;
-    border-radius: 1rem;
-    cursor: pointer;
-    outline-width: 0.13vw;
-    outline-color: rgb(27, 18, 21);
-    outline-style: solid;
-}
-.tags:hover {
-    background-color: rgb(98, 98, 221);
-}
-
 </style>
