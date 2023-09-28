@@ -1,4 +1,3 @@
-<!-- eslint-disable indent -->
 <template>
   <div class="container-fluid">
     <div class="row">
@@ -21,7 +20,11 @@
           <div class="form-floating mb-3">
             <textarea
               v-model="title"
-              class="form-control"
+              class="form-control resizable"
+              ref="textarea"
+              rows="1"
+              @focus="resize"
+              @keyup="resize"
               id="title"
             ></textarea>
             <label for="title">Title</label>
@@ -29,7 +32,11 @@
           <div class="form-floating mb-3">
             <textarea
               v-model="description"
-              class="form-control"
+              class="form-control resizable"
+              ref="textarea"
+              rows="1"
+              @focus="resize"
+              @keyup="resize"
               id="description"
             ></textarea>
             <label for="description">Description</label>
@@ -37,13 +44,25 @@
           <div class="form-floating mb-3">
             <textarea
               v-model="ingredients"
-              class="form-control"
+              class="form-control resizable"
               id="ingredients"
+              ref="textarea"
+              rows="1"
+              @focus="resize"
+              @keyup="resize"
             ></textarea>
             <label for="ingredients">Ingredients</label>
           </div>
           <div class="form-floating mb-3">
-            <textarea v-model="steps" class="form-control" id="steps"></textarea>
+            <textarea
+              v-model="steps"
+              class="form-control resizable"
+              id="steps"
+              ref="textarea"
+              rows="1"
+              @focus="resize"
+              @keyup="resize"
+            ></textarea>
             <label for="steps">Steps</label>
           </div>
           <div class="form-floating mb-3">
@@ -57,7 +76,11 @@
           <div class="form-floating mb-3">
             <textarea
               v-model="nutritionalInfo"
-              class="form-control"
+              class="form-control resizable"
+              ref="textarea"
+              rows="1"
+              @focus="resize"
+              @keyup="resize"
               id="nutritionalInfo"
             ></textarea>
             <label for="nutritionalInfo">Nutritional info (optional)</label>
@@ -72,9 +95,8 @@
             placeholder="Upload a picture"
             drop-placeholder="Drop picture here"
             @change="onFileChange"
-
           ></b-form-file>
-          <div class="dropdown selectTagsDropdown" style="margin-top: 10px">
+          <div class="dropdown selectTagsDropdown" style="margin-top: 40px">
             <button
               class="btn btn-secondary dropdown-toggle selectTagsDropdown"
               type="button"
@@ -85,11 +107,12 @@
             >
               Select tags
             </button>
+
             <div
               class="dropdown-menu pre-scrollable heightOfDropdown"
               aria-labelledby="dropdownMenuButton"
             >
-            <form>
+              <form>
                 <div class="form-group">
                   <div
                     v-for="(tag, index) in this.tags"
@@ -111,7 +134,15 @@
               </form>
             </div>
           </div>
-        </div>
+          <h5 class="text-center" style="margin-top: 30px;">Or create a new tag (optional)</h5>
+          <div class="d-flex justify-content-center">
+            <b-col lg="3"><b-button size="sm" @click="createTag">Create tag</b-button></b-col>
+  <input type="text" class="form-control ml-2 mx-auto" placeholder="Enter tag name" v-model="tagName">
+  <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+</div>
+      </div>
+
         <a
           @click="submitRecipe"
           href="#"
@@ -143,6 +174,7 @@ function splitToArray(str) {
 export default {
   name: 'Login',
   mounted() {
+    this.resize()
     const form = document.getElementById('recipe-form')
     form.addEventListener('input', (event) => {
       const inputField = event.target
@@ -174,6 +206,8 @@ export default {
       file: '',
       url: '',
       nutritionalInfo: '',
+      tagName: '',
+      successMessage: '',
       selectedTags: []
     }
   },
@@ -205,18 +239,24 @@ export default {
           nutritionalInfo: splitToArray(this.nutritionalInfo)
           // THEN ADD THE OWNER THEN POST TO DB
         }
-        await axios.post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
+        await axios
+          .post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
           .then((response) => {
             console.log(response)
             this.$router.push({ name: 'home' })
           })
-          .catch((err) => {
-            console.log(err)
+          .catch((error) => {
+            if (error.response && error.response.status === 413) {
+              // error handling when the image is too large
+              alert('Please upload an image with a smaller size')
+            } else {
+              console.log(error)
+            }
           })
       }
     },
     updateSelectedTags() {
-      this.selectedTags = this.tags.filter(tag => tag.checked)
+      this.selectedTags = this.tags.filter((tag) => tag.checked)
     },
     onFileChange(e) {
       this.file = e.target.files[0]
@@ -225,6 +265,27 @@ export default {
         this.url = reader.result
       }
       reader.readAsDataURL(this.file)
+    },
+    resize() {
+      const textareas = document.querySelectorAll('.resizable')
+      textareas.forEach((textarea) => {
+        textarea.style.height = textarea.scrollHeight - 4 + 'px'
+      })
+    },
+    createTag() {
+      const user = JSON.parse(localStorage.getItem('user-info'))
+      const userId = user.body._id
+      axios.post(`http://localhost:3000/v1/recipes/${userId}/tags`, { tag: this.tagName })
+        .then((response) => {
+          console.log(response)
+          this.tags.push(response.data.tag)
+          this.selectedTags.push(response.data.tag)
+          this.successMessage = 'Tag created successfully!'
+        }).catch((err) => {
+          if (err.response.status === 409) {
+            alert('Tag already exists')
+          }
+        })
     }
   }
 }
