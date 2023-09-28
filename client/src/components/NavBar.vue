@@ -1,15 +1,15 @@
 <template>
 <div>
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary ml-auto">
   <div class="container-fluid">
     <img src = "../assets/Screenshot.png" class="navbar-brand" />
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="auth-button nav-link active" aria-current="page"  href="#">Home</a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+        <li class="nav-item ">
+          <a class="auth-button nav-link active cur" aria-current="page"  href="#">Home</a>
         </li>
         <li class="nav-item">
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
@@ -18,6 +18,15 @@
           <router-link  to= "/signup"  v-if="!user" class="auth-button nav-link active" >Signup</router-link>
         </li>
       </ul>
+          <div class="input-group mb-3 ms-auto mb-2 mb-lg-0" >
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">All categories</button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+          </div>
       <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic d-none d-md-none d-lg-block" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
         <div class="sub-menu">
@@ -100,6 +109,10 @@ export default {
   align-content: center;
 }
 
+.cur {
+  font-family: 'Lucida Handwriting', cursive;
+}
+
 .navbar-brand{
   width: 220px;
   height: auto;
@@ -109,6 +122,12 @@ export default {
   object-fit: cover;
   width: 80px;
   height: 80px;
+}
+
+.navbar-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .logo{
