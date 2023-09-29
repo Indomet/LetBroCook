@@ -174,6 +174,10 @@ function splitToArray(str) {
 export default {
   name: 'Login',
   mounted() {
+    const user = localStorage.getItem('user-info')
+    if (!user) {
+      this.$router.push({ name: 'home' })
+    }
     this.resize()
     const form = document.getElementById('recipe-form')
     form.addEventListener('input', (event) => {
