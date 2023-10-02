@@ -20,18 +20,16 @@
                     </div>
                     <div class="d-flex flex-row align-items-center mb-4">
                       <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
-                      <div class="form-outline flex-fill mb-0">
+                      <div class="form-outline flex-fill mb-0 form-group">
                         <label for="password">Password</label>
                         <input v-if="!showPassword" type="password" id="password" v-model="password" class="form-control"
                           :class="{ 'is-invalid': getError('password') }" />
                         <input v-else type="text" id="password" v-model="password" class="form-control"
                           :class="{ 'is-invalid': getError('password') }" />
-                        <div v-if="getError('password')" class="invalid-feedback">{{ getError('password') }} </div>
-                        <span class="position-absolute end-0 top-50 translate-middle-x">
-                          <i class="fas" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                        <div v-if="getError('password')" class="invalid-feedback">{{ getError('password') }}</div>
+                        <i class="fas" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"
                             @click="showPassword = !showPassword"></i>
-                        </span>
-                      </div>
+                    </div>
                     </div>
                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                       <button type="submit" class="btn btn-primary btn-block">Login</button>
@@ -127,6 +125,22 @@ export default {
 .mouse {
   max-width: 35%;
 }
+.form-outline {
+  position: relative;
+  padding-left: 40px;
+}
+
+.form-group .fas {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 2.375rem;
+  height: 2.375rem;
+  line-height: 2.375rem;
+  text-align: center;
+  right: 10px;
+  top:40%;
+}
 
 label {
   font-weight: bold;
@@ -138,6 +152,7 @@ label {
 .form-control {
   border: 1px solid #ccc;
   border-radius: 15px;
+  position: relative;
 }
 
 .divider {
