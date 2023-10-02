@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import CreateRecipe from './views/CreateRecipe.vue'
+import EditRecipe from './views/EditRecipe.vue'
 
 Vue.use(Router)
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/CreateRecipe',
       name: 'CreateRecipe',
       component: CreateRecipe
+    },
+    {
+      path: '/EditRecipe',
+      name: 'EditRecipe',
+      component: EditRecipe
     }
   ]
 })
