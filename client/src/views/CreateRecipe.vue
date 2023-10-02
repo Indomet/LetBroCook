@@ -218,15 +218,12 @@ export default {
   },
   methods: {
     async submitRecipe() {
-      // eslint-disable-next-line space-in-parens, no-constant-condition
-      if ( false
-      // eslint-disable-next-line spaced-comment
-      /* this.title === '' ||
+      if (this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
         this.steps === '' ||
         this.servings === '' ||
-        this.url === ''*/
+        this.url === ''
       ) {
         alert('Please fill in all fields and upload an image')
       } else {
