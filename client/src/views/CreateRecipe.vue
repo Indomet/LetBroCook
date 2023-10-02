@@ -1,3 +1,4 @@
+<!-- eslint-disable no-constant-condition -->
 <template>
   <div class="container-fluid">
     <div class="row">
@@ -217,13 +218,15 @@ export default {
   },
   methods: {
     async submitRecipe() {
-      if (
-        this.title === '' ||
+      // eslint-disable-next-line space-in-parens, no-constant-condition
+      if ( false
+      // eslint-disable-next-line spaced-comment
+      /* this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
         this.steps === '' ||
         this.servings === '' ||
-        this.url === ''
+        this.url === ''*/
       ) {
         alert('Please fill in all fields and upload an image')
       } else {
@@ -243,14 +246,14 @@ export default {
           nutritionalInfo: splitToArray(this.nutritionalInfo)
           // THEN ADD THE OWNER THEN POST TO DB
         }
-        await axios
-          .post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
+        console.log(recipeData)
+        await axios.post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
           .then((response) => {
             console.log(response)
             this.$router.push({ name: 'home' })
           })
           .catch((error) => {
-            if (error.response && error.response.status === 413) {
+            if (error.response) {
               // error handling when the image is too large
               alert('Please upload an image with a smaller size')
             } else {
