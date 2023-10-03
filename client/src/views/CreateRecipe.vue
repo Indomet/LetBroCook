@@ -1,3 +1,4 @@
+<!-- eslint-disable no-constant-condition -->
 <template>
   <div class="container-fluid">
     <div class="row">
@@ -174,6 +175,10 @@ function splitToArray(str) {
 export default {
   name: 'Login',
   mounted() {
+    const user = localStorage.getItem('user-info')
+    if (!user) {
+      this.$router.push({ name: 'home' })
+    }
     this.resize()
     const form = document.getElementById('recipe-form')
     form.addEventListener('input', (event) => {
@@ -213,8 +218,7 @@ export default {
   },
   methods: {
     async submitRecipe() {
-      if (
-        this.title === '' ||
+      if (this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
         this.steps === '' ||
@@ -239,14 +243,14 @@ export default {
           nutritionalInfo: splitToArray(this.nutritionalInfo)
           // THEN ADD THE OWNER THEN POST TO DB
         }
-        await axios
-          .post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
+        console.log(recipeData)
+        await axios.post(`http://localhost:3000/v1/users/${userId}/recipes`, recipeData)
           .then((response) => {
             console.log(response)
             this.$router.push({ name: 'home' })
           })
           .catch((error) => {
-            if (error.response && error.response.status === 413) {
+            if (error.response) {
               // error handling when the image is too large
               alert('Please upload an image with a smaller size')
             } else {
