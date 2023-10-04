@@ -31,8 +31,7 @@ var userSchema= new Schema(
         },
         name: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         recipes: {
             type: [Schema.Types.ObjectId],
