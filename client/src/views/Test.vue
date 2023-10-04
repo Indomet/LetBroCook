@@ -24,7 +24,7 @@ background-size: 40.00px 40.00px;">
     </div>
 </template>
 
-<script scopes>
+<script scoped>
 import axios from 'axios'
 export default {
     el: 'sgrgdfsf',

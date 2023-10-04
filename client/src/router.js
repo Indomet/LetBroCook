@@ -5,6 +5,7 @@ import RecipeCard from './views/Recipe.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import Test from './views/Test.vue'
+import TestCopy from './views/Test_copy.vue'
 
 Vue.use(Router)
 
@@ -36,6 +37,11 @@ export default new Router({
         path: '/test',
         name: 'test',
         component: Test
+    },
+    {
+        path: '/test_copy',
+        name: 'test_copy',
+        component: TestCopy
     }
     ]
 })

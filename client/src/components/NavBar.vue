@@ -20,6 +20,9 @@
         <li  class="nav-item">
           <router-link  to= "/recipes"  v-if="!user" class="auth-button nav-link active" >Test</router-link>
         </li>
+        <li  class="nav-item">
+          <router-link  to= "/test_copy"  v-if="!user" class="auth-button nav-link active" >Test Copy</router-link>
+        </li>
       </ul>
       <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic d-none d-md-none d-lg-block" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
