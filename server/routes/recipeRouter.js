@@ -106,7 +106,8 @@ router.get("/tags/:tagId", userAuth.setRequestData, function(req, res, next){
 // hateoas
 router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
-  const recipeId = req.recipe.id
+  const recipeId = req.params.recipeId
+  console.log(recipeId)
   recipeModel.findById(recipeId).then(recipe => {
     const links = [
         // HATEOAS links
@@ -117,6 +118,7 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
     res.status(200).json({ recipe: recipe, links: links});
   })
   .catch(function(error){
+    console.log(error)
     error.status= 404
     return next(error)
   });
