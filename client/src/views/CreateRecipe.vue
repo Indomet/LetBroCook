@@ -156,6 +156,7 @@
       </div>
       <div class="col-auto p-0 sidePic ml-auto d-none d-md-block">
         <img
+          ref = "sideimg"
           id = "chef-img"
           class="chefimg"
           src="../assets/chef.jpg"
@@ -166,7 +167,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 import axios from 'axios'
 
 // eslint-disable-next-line no-unused-vars

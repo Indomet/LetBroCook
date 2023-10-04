@@ -33,8 +33,8 @@ export default new Router({
       component: CreateRecipe
     },
     {
-      path: '/editrecipe/:id',
-      name: 'editrecipe',
+      path: '/EditRecipe/:id',
+      name: 'EditRecipe',
       component: EditRecipe
     }
   ]

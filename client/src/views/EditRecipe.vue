@@ -3,7 +3,7 @@
   />
 </template>
 
-<script>
+<script scoped>
 import CreateRecipe from './CreateRecipe.vue'
 import axios from 'axios'
 
@@ -40,7 +40,6 @@ export default {
     header.textContent = 'Update Your Recipe'
     const headerDesc = createRecipeComponent.$refs.headerDesc
     headerDesc.textContent = 'Want to update your recipe? Fill in the form below and click the button to update your recipe!'
-
     createRecipeComponent.submitRecipe = async () => {
       if (
         createRecipeComponent.title === '' ||

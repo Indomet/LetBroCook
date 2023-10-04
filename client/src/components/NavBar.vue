@@ -15,7 +15,7 @@
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
         </li>
         <li  class="nav-item">
-          <router-link  to= "/signup"  v-if="!user" class="auth-button nav-link active" >Signup</router-link>
+          <router-link  to= "/signup" v-if="!user" class="auth-button nav-link active" >Signup</router-link>
         </li>
       </ul>
           <div class="input-group mb-3 ms-auto mb-2 mb-lg-0" >
