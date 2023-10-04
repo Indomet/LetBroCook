@@ -1,13 +1,12 @@
-<!-- eslint-disable no-constant-condition -->
 <template>
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
         <div>
-          <h1 class="header">
+          <h1 class="header" ref = "header">
             Submit <span class="underline">Your</span> Recipe
           </h1>
-          <p class="headerDesc">
+          <p class="headerDesc" ref="headerDesc">
             Share your culinary expertise with us, and we will spread it to the
             world. Show them why they let you cook &#x1F525;
           </p>
@@ -20,7 +19,7 @@
         <div>
           <div class="form-floating mb-3">
             <textarea
-              v-model="title"
+            v-model="title"
               class="form-control resizable"
               ref="textarea"
               rows="1"
@@ -71,6 +70,7 @@
               v-model="servings"
               class="form-control"
               id="servings"
+              ref="textarea"
             ></textarea>
             <label for="servings">Servings</label>
           </div>
@@ -147,6 +147,7 @@
         <a
           @click="submitRecipe"
           href="#"
+          ref="submitRecipeBtn"
           class="btn btn-primary createRecipeBTN"
           role="button"
           data-bs-toggle="button"
@@ -155,6 +156,8 @@
       </div>
       <div class="col-auto p-0 sidePic ml-auto d-none d-md-block">
         <img
+          ref = "sideimg"
+          id = "chef-img"
           class="chefimg"
           src="../assets/chef.jpg"
           alt="Description of the image"
@@ -164,7 +167,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 import axios from 'axios'
 
 // eslint-disable-next-line no-unused-vars
@@ -173,7 +176,7 @@ function splitToArray(str) {
 }
 
 export default {
-  name: 'Login',
+  name: 'CreateRecipe',
   mounted() {
     const user = localStorage.getItem('user-info')
     if (!user) {
@@ -216,6 +219,7 @@ export default {
       selectedTags: []
     }
   },
+
   methods: {
     async submitRecipe() {
       if (this.title === '' ||
@@ -252,7 +256,7 @@ export default {
           .catch((error) => {
             if (error.response) {
               // error handling when the image is too large
-              alert('Please upload an image with a smaller size')
+              alert('Could not create recipe at this time.')
             } else {
               console.log(error)
             }
