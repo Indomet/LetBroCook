@@ -1,27 +1,27 @@
 <template>
     <div>
         <div class="d-flex flex-wrap">
-            {{ trimArrayList(recipeData) }}
-            <div v-for="(recipe) in recipeArray" :key="recipe.id" class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
+            {{ mapArray(recipeData) }}
+            <div v-for="[key, recipe] in recipeMap" :key="recipe._id" class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
                 style="margin-bottom: 4rem;">
                 <div class="main-container">
                 <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'w-100': 'w-100'}" style="max-width: 20rem; border-radius: 1rem;
-              background-image: linear-gradient(45deg, #d8e8dc 12.50%, #ffffff 12.50%, #ffffff 25%, #f0f0f0 25%, #f0f0f0 50%, #d8e8dc 50%, #d8e8dc 62.50%, #ffffff 62.50%, #ffffff 75%, #f0f0f0 75%, #f0f0f0 100%);
-background-size: 40.00px 40.00px;">
+              background-image: linear-gradient(45deg, #d8e8dc 12.50%, #ffffff 12.50%, #ffffff 25%, #f0f0f0 25%, #f0f0f0 50%, #d8e8dc 50%, #d8e8dc 62.50%, #ffffff 62.50%, #ffffff 75%, #f0f0f0 75%, #f0f0f0 100%); background-size: 40.00px 40.00px;">
+<h3>{{ recipe.flipped }}</h3>
                     <b-card-body class="front">
                         <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image">
                         <p class="card-title">{{ recipe.title }}</p>
-                        <div class="tag-block">{{ trimTagList(recipe.tags) }}
-                            <span v-for="(tag) in tagArray" :key="tag" class="tags">
-                                {{ tag.name }}
+                        <div class="tag-block">
+                            <span v-for="tags in recipe.tags" :key="tags" class="tags">
+                                {{ tags.name }}
                             </span>
                         </div>
-                        <div @click="flipCard(recipe)" class="flip-button">More info</div>
+                        <div @click="flipCard(key)" class="flip-button">More info</div>
                     </b-card-body>
 
                     <b-card-body class="back">
                         <h5 class="card-description">{{ recipe.steps }}</h5>
-                        <div @click="flipCard(recipe)" class="flip-button">Back</div>
+                        <div @click="flipCard(key)" class="flip-button">Back</div>
                     </b-card-body>
                 </div>
             </div>
@@ -53,41 +53,46 @@ export default {
     data() {
         return {
             recipeData: '',
-            loading: true,
-            error: false,
-            title: 'Kitsune Chan',
-            thumbnail: 'https://mangadex.org/covers/a914a65b-27ed-4665-9767-87396a00ea6b/9298804f-54e7-495e-afcb-70fdd7d25bf0.jpg',
-            description: 'df',
-            tags: ['tag1', 'tag22', 'tag333', 'tag4444', 'tag55555'],
-            hasFlipped: false,
-            recipeArray: [],
-            tagArray: []
+            tagArray: [],
+            recipeMap: {}
         }
     },
     methods: {
-        flipCard(recipe) {
-            for (const each of this.recipeArray) {
-                if (each !== recipe) {
-                    each.flipped = false
-                }
-            }
-            recipe.flipped = !recipe.flipped
-        },
         trimTagList(arr) {
             const end = 7 // Max number of tags to be shown
+            let newArr = []
             if (arr.length > end) {
-                const newArr = arr.slice(0, end)
-                this.tagArray = newArr
+                newArr = arr.slice(0, end)
             }
+            return newArr
         },
-        trimArrayList(arr) {
-            const end = 10 // Max number of tags to be shown
+        mapArray(arr) {
+            let newArr = []
+            const end = 7
+            const map = new Map()
             if (arr.length > end) {
-                const newArr = arr.slice(0, end)
-                this.recipeArray = newArr
+                newArr = arr.slice(0, end)
+            } else {
+                newArr = arr
             }
+            for (const each of newArr) {
+                map.set(each._id, each)
+            }
+            this.recipeMap = map
+        },
+        flipCard(key) {
+            const newValue = this.recipeMap.get(key)
+            for (const [id, recipe] of this.recipeMap) {
+                if (key !== id) {
+                    recipe.flipped = false
+                    this.recipeMap.set(id, recipe)
+                }
+            }
+            newValue.flipped = !newValue.flipped
+            this.recipeMap.set(key, newValue)
         }
     }
+
 }
 </script>
 
