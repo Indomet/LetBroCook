@@ -55,7 +55,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .main{
     min-height: 30vw;
     width: 20vw;
