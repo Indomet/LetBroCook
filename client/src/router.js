@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import RecipeCard from './views/Recipe.vue'
+import Recipes from './views/Recipes.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
-import Test from './views/Test.vue'
-import TestCopy from './views/Test_copy.vue'
 
 Vue.use(Router)
 
@@ -13,35 +11,25 @@ export default new Router({
     mode: 'history',
     base: process.env.BASE_URL,
     routes: [
-    {
-        path: '/',
-        name: 'home',
-        component: Home
-    },
-    {
-        path: '/recipes',
-        name: 'recipes',
-        component: RecipeCard
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login
-    },
-    {
-      path: '/signup',
-      name: 'signup',
-      component: Signup
-    },
-    {
-        path: '/test',
-        name: 'test',
-        component: Test
-    },
-    {
-        path: '/test_copy',
-        name: 'test_copy',
-        component: TestCopy
-    }
+        {
+            path: '/',
+            name: 'home',
+            component: Home
+        },
+        {
+            path: '/recipes',
+            name: 'recipes',
+            component: Recipes
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: Login
+        },
+        {
+            path: '/signup',
+            name: 'signup',
+            component: Signup
+        }
     ]
 })
