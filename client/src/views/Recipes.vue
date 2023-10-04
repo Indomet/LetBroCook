@@ -1,32 +1,34 @@
 <template>
     <div>
         <div class="d-flex flex-wrap">
-            {{ mapArray(recipeData) }}
-            <div v-for="[key, recipe] in recipeMap" :key="recipe._id" class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
-                style="margin-bottom: 4rem;">
-                <div class="main-container">
-                <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'w-100': 'w-100'}" style="max-width: 20rem; border-radius: 1rem;
+            <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
+                class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
+                <div class="main-container w-100">
+                    <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'h-100': 'h-100', 'flex-fill': 'flex-fill'}"
+                        style="max-width: 20rem; border-radius: 1rem;
               background-image: linear-gradient(45deg, #d8e8dc 12.50%, #ffffff 12.50%, #ffffff 25%, #f0f0f0 25%, #f0f0f0 50%, #d8e8dc 50%, #d8e8dc 62.50%, #ffffff 62.50%, #ffffff 75%, #f0f0f0 75%, #f0f0f0 100%); background-size: 40.00px 40.00px;">
-<h3>{{ recipe.flipped }}</h3>
-                    <b-card-body class="front">
-                        <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image">
-                        <p class="card-title">{{ recipe.title }}</p>
-                        <div class="tag-block">
-                            <span v-for="tags in recipe.tags" :key="tags" class="tags">
-                                {{ tags.name }}
-                            </span>
-                        </div>
-                        <div @click="flipCard(key)" class="flip-button">More info</div>
-                    </b-card-body>
+                        <b-card-body class="front">
+                            <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image">
+                            <p class="card-title">{{ recipe.title }}</p>
+                            <div class="tag-block">
+                                <span v-for="tags in recipe.tags" :key="tags" class="tags">
+                                    {{ tags.name }}
+                                </span>
+                            </div>
+                            <div @click="flipCard(key)" class="flip-button">More info</div>
+                        </b-card-body>
 
-                    <b-card-body class="back">
-                        <h5 class="card-description">{{ recipe.steps }}</h5>
-                        <div @click="flipCard(key)" class="flip-button">Back</div>
-                    </b-card-body>
+                        <b-card-body class="back">
+                            <h2>Steps:</h2>
+                            <div v-for="(step, index) in recipe.steps" :key="index">
+                                <h5>{{ index+1 }}. {{ step }}</h5>
+                            </div>
+                            <div @click="flipCard(key)" class="flip-button">Back</div>
+                        </b-card-body>
+                    </div>
                 </div>
             </div>
-                </div>
-            </div>
+        </div>
     </div>
 </template>
 
@@ -34,10 +36,20 @@
 import axios from 'axios'
 export default {
     el: '#sgf',
+    data() {
+        return {
+            recipeData: [],
+            recipeMap: {}
+        }
+    },
     mounted() {
         axios.get('http://localhost:3000/v1/recipes')
             .then((response) => {
                 this.recipeData = response.data.recipes
+                for (const recipe of this.recipeData) {
+                    recipe.flipped = false
+                }
+                this.mapArray()
             })
             .catch((err) => {
                 console.log(err)
@@ -46,36 +58,28 @@ export default {
             .finally(() => {
                 this.loading = false
             })
-        for (const recipe of this.recipeData) {
-            recipe.flipped = false
-        }
-    },
-    data() {
-        return {
-            recipeData: '',
-            tagArray: [],
-            recipeMap: {}
-        }
     },
     methods: {
         trimTagList(arr) {
-            const end = 7 // Max number of tags to be shown
+            const maxNumberOfTags = 3 // Max number of tags to be shown
             let newArr = []
-            if (arr.length > end) {
-                newArr = arr.slice(0, end)
+            if (arr.length > maxNumberOfTags) {
+                newArr = arr.slice(0, maxNumberOfTags)
+                return newArr
             }
-            return newArr
+            return arr
         },
-        mapArray(arr) {
+        mapArray() {
             let newArr = []
-            const end = 7
+            const maxNumberOfRecipes = 7
             const map = new Map()
-            if (arr.length > end) {
-                newArr = arr.slice(0, end)
+            if (this.recipeData.length > maxNumberOfRecipes) {
+                newArr = this.recipeData.slice(0, maxNumberOfRecipes)
             } else {
-                newArr = arr
+                newArr = this.recipeData
             }
             for (const each of newArr) {
+                each.tags = this.trimTagList(each.tags)
                 map.set(each._id, each)
             }
             this.recipeMap = map
@@ -97,7 +101,6 @@ export default {
 </script>
 
 <style scoped>
-
 .main-container {
     perspective: 1000px;
     position: relative;
@@ -196,6 +199,7 @@ export default {
 .tag-block {
     margin-bottom: 20px;
 }
+
 .tags {
     background-color: rgb(160, 182, 244);
     border-radius: 1rem;
@@ -217,26 +221,26 @@ export default {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 11px;
-  margin-right: 5px;
+    width: 11px;
+    margin-right: 5px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #a2a2a2;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+    background: #a2a2a2;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #8dcc91;
-  border-radius: 1rem;
+    background: #8dcc91;
+    border-radius: 1rem;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a8e66;
+    background: #3a8e66;
 }
 </style>
