@@ -4,7 +4,7 @@
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
                 <div class="main-container w-100">
-                    <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'h-100': 'h-100', 'flex-fill': 'flex-fill'}"
+                    <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'h-100': 'h-100', 'flex-fill': 'flex-fill' }"
                         style="max-width: 20rem; border-radius: 1rem;
               background-image: linear-gradient(45deg, #d8e8dc 12.50%, #ffffff 12.50%, #ffffff 25%, #f0f0f0 25%, #f0f0f0 50%, #d8e8dc 50%, #d8e8dc 62.50%, #ffffff 62.50%, #ffffff 75%, #f0f0f0 75%, #f0f0f0 100%); background-size: 40.00px 40.00px;">
                         <b-card-body class="front">
@@ -19,11 +19,27 @@
                         </b-card-body>
 
                         <b-card-body class="back">
-                            <h2>Steps:</h2>
+                            <h2 class="info-header">Ingredients:</h2>
+                            <ul v-for="(ingredient, index) in recipe.sectionsAndIngredients.Ingredients" :key="index">
+                                <li class="bullet-point">
+                                    <h5>{{ ingredient }}</h5>
+                                </li>
+                            </ul>
+                            <h2 class="info-header">Steps:</h2>
                             <div v-for="(step, index) in recipe.steps" :key="index">
-                                <h5>{{ index+1 }}. {{ step }}</h5>
+                                <h5>{{ index + 1 }}. {{ step }}</h5>
                             </div>
+                            <h2 class="info-header">Nutritional Info:</h2>
+                            <div v-if="recipe.nutritionalInfo.length">
+                                <ul v-for="(nutrition, index) in recipe.nutritionalInfo" :key="index">
+                                    <li class="bullet-point">
+                                        <h5>{{ nutrition }}</h5>
+                                    </li>
+                                </ul>
+                            </div><div class="no-nut-info" v-else>No nutritional data.</div>
+                            <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
                             <div @click="flipCard(key)" class="flip-button">Back</div>
+                            <h2>Comments TBD</h2>
                         </b-card-body>
                     </div>
                 </div>
@@ -116,6 +132,7 @@ export default {
     outline-width: 3px;
     outline-color: rgb(255, 255, 255);
     outline-style: solid;
+    scale: 1.1;
 }
 
 .flipped {
@@ -242,5 +259,33 @@ export default {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #3a8e66;
+}
+
+.info-header {
+    font-weight: bold;
+}
+
+.serving-text {
+    text-align: left;
+    font-size: medium;
+    font-weight: bold;
+}
+
+.no-nut-info {
+    font-size: medium;
+    font-weight: bold;
+}
+
+.bullet-point {
+    text-align: left;
+}
+
+ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+h5 {
+    font-size: 18px;
 }
 </style>
