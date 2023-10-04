@@ -64,11 +64,7 @@ var recipeSchema= new Schema(
       required: true,
       default: "Empty description"
    },
-  tags: [{
-      type: Schema.Types.ObjectId,
-      ref: "Tag",
-      _id:false
-   }],
+  tags: [tagSchema],
 
    nutritionalInfo : {
       type: Array,
