@@ -55,7 +55,7 @@ var recipeSchema= new Schema(
       default: "No available steps"
    },
    servings: {
-      type: String,
+      type: String, 
       required: true,
       default: "Empty serving info"
    },
