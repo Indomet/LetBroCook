@@ -222,10 +222,7 @@ export default {
 
   methods: {
     async submitRecipe() {
-      // eslint-disable-next-line space-in-parens, no-constant-condition
-      if (
-      // eslint-disable-next-line spaced-comment
-        this.title === '' ||
+      if (this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
         this.steps === '' ||
