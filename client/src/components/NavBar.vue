@@ -1,6 +1,6 @@
 <template>
 <div>
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary ml-auto">
   <div class="container-fluid">
     <img src = "../assets/Screenshot.png" class="navbar-brand" />
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,16 @@
           <router-link  to= "/signup"  v-if="!user" class="auth-button nav-link active" >Signup</router-link>
         </li>
       </ul>
-      <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic d-none d-md-none d-lg-block" @click="showSubMenu">
+          <div class="input-group mb-3 ms-auto mb-2 mb-lg-0" >
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">All categories</button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+          </div>
+      <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
         <div class="sub-menu">
           <div class="user-info">
@@ -35,6 +44,11 @@
             <img src="../assets/logout.png">
               <p>Logout</p>
               <span>></span>
+          </a>
+          <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
+            <img src="../assets/logout.png">
+              <p>Create a recipe</p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
           </a>
         </div>
       <form class="d-flex" role="search">
@@ -100,6 +114,10 @@ export default {
   align-content: center;
 }
 
+.cur {
+  font-family: 'Lucida Handwriting', cursive;
+}
+
 .navbar-brand{
   width: 220px;
   height: auto;
@@ -111,12 +129,19 @@ export default {
   height: 80px;
 }
 
+.navbar-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .logo{
   width:220px;
   max-height: auto;
 }
 
 .userPic{
+  position: relative;
   width:80px;
   height: 80px;
   margin-right: 75px;
@@ -127,14 +152,24 @@ export default {
 }
 
 .sub-menu-wrap {
+  z-index: 9999;
   position: absolute;
+  right:1.5%;
   top:100%;
-  right: 1.5%;
   width: auto;
   max-height: 400px;
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s;
+}
+@media (max-width: 768px) {
+  .sub-menu-wrap {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .userPic{
+    margin-right: 35px;
+  }
 }
 
 .sub-menu-wrap.open-menu {
@@ -146,7 +181,6 @@ export default {
 .sub-menu{
   background: rgb(255, 255, 255);
   padding:20px;
-  z-index: 9999;
   display: flex;
   flex-direction: column;
   border: 1px solid #ccc; /* Add a 1px solid border with a gray color */

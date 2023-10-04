@@ -9,9 +9,11 @@ const userModel = require("./models/userModel.js");
 const serverUtil = require('./serverUtil.js')
 const axios = require('axios');
 
-var app = express();
-
-
+const corsOptions ={
+  origin:'http://localhost:8080', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200
+}
  
 // Variables
 var mongoURI =
@@ -75,14 +77,15 @@ mongoose.connection.once("open", async function () {
 // Create Express app
 var app = express();
 // Parse requests of content-type 'application/json'
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 // HTTP request logger
 app.use(morgan("dev"));
 // Enable cross-origin resource sharing for frontend must be registered before api
 app.options("*", cors());
-app.use(cors());
+app.use(cors(corsOptions));
 
+//accounts for 8k pic resolution
+app.use(express.json({ limit: '60mb' }));
+app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 //app.use(setUserData)
 
 
