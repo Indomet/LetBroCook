@@ -29,9 +29,13 @@ export default {
         }
     },
     mounted() {
-        axios.get('http://localhost:3000/v1/recipes')
+        const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`)
             .then((response) => {
-                this.recipeData = response.data.recipes
+                this.recipeData = response.data.favouriteRecipes
+                this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
+                console.log(this.favedRecipes)
                 for (const recipe of this.recipeData) {
                     recipe.flipped = false
                 }
@@ -44,14 +48,6 @@ export default {
             .finally(() => {
                 this.loading = false
             })
-        const user = JSON.parse(localStorage.getItem('user-info'))
-        const userId = user.body._id
-        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then((response) => {
-            this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
-            console.log(this.favedRecipes)
-        }).catch((err) => {
-            console.log(err)
-        })
     },
     methods: {
         trimTagList(arr) {
