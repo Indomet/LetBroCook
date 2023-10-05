@@ -90,11 +90,6 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
 //POST----------------------------------
 
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*")
-res.setHeader("Access-Control-Allow-Credentials", "true");
-res.setHeader("Access-Control-Max-Age", "1800");
-res.setHeader("Access-Control-Allow-Headers", "content-type");
-res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
 
@@ -274,14 +269,27 @@ router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async functio
 //ADD BACK USER AUTHENTICAION
 router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
 
-    await userModel.findById(req.user.id).then(user=>{
-        Object.assign(user, req.body);
-        user.save();
-        return res.status(200).json({message:"User updated"})
-    }).catch(err=>{
-      err.status=404
-      return next(err)
-    })
+  // check if username already exists in database
+  const usernameExists = await userModel.findOne({ username: req.body.username });
+  if (usernameExists && usernameExists._id.toString() !== req.params.userId) {
+      return res.status(400).json({ message: "Username already exists" });
+  }
+
+  // heck if email already exists in database
+  const emailExists = await userModel.findOne({ email: req.body.email });
+  if (emailExists && emailExists._id.toString() !== req.params.userId) {
+      return res.status(400).json({ message: "Email already exists" });
+  }
+
+  // if username and email are unique, update
+  await userModel.findById(req.user.id).then(user=>{
+      Object.assign(user, req.body);
+      user.save();
+      return res.status(200).json({message:user})
+  }).catch(err=>{
+    err.status=404
+    return next(err)
+  })
 })
 
 // edit a recipe

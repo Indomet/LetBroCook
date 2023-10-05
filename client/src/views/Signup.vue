@@ -15,7 +15,7 @@
                         <input type="username" id="username" v-model="username" class="form-control"
                           :class="{ 'is-invalid': getError('username') }" />
                         <div v-if="getError('username')" class="invalid-feedback">{{ getError('username') }} </div>
-                        <div v-if="usernameError" class="invalidd">{{ usernameError }}</div>
+                        <div v-if="usernameError" class="paint-red">{{ usernameError }}</div>
                       </div>
                     </div>
                     <div class="d-flex flex-row align-items-center mb-4">
@@ -34,7 +34,7 @@
                         <input type="email" id="email" v-model="email" class="form-control"
                           :class="{ 'is-invalid': getError('email')}" />
                         <div v-if="getError('email')" class="invalid-feedback">{{ getError('email') }} </div>
-                        <div v-if="emailError" >{{ emailError }}</div>
+                        <div v-if="emailError" class="paint-red">{{ emailError }}</div>
                       </div>
                     </div>
                     <div class="d-flex flex-row align-items-center mb-4">
@@ -78,7 +78,7 @@
   </div>
 </template>
 
-<script>
+<script scoped>
 import { Api } from '../Api'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, sameAs, helpers } from '@vuelidate/validators'
@@ -162,7 +162,7 @@ export default {
 </script>
 
 <style scoped>
-.invalidd{
+.paint-red{
   color: red;
 }
 .vegetables {
