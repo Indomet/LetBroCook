@@ -87,6 +87,7 @@ export default {
             this.recipeMap.set(key, newValue)
         },
         addToFavs(e) {
+            console.log(window.location.href)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
                 if (!$(e.currentTarget).hasClass('active')) {
@@ -99,7 +100,7 @@ export default {
                 } else {
                     axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`).then((response) => {
                         console.log(response)
-                        if (window.location.href.includes('FavoriteRecipes')) {
+                        if (window.location.href === 'http://localhost:8080/favoriterecipes') {
                             window.location.reload()
                         }
                     }).catch((err) => {
