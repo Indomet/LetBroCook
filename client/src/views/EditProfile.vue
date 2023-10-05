@@ -2,10 +2,10 @@
     <div class="container-xl px-4 mt-4">
         <!-- Account page navigation-->
         <nav class="nav nav-borders">
-            <a class="nav-link active ms-0" href="/EditProfile"
-                >Profile</a>
-            <a class="nav-link" href="security"
-                >Security</a>
+            <router-link class="nav-link active ms-0" to="/EditProfile"
+                >Profile</router-link>
+            <router-link class="nav-link" to="/EditPassword"
+                >Security</router-link>
         </nav>
         <hr class="mt-0 mb-4">
         <div class="row">
