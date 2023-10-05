@@ -99,6 +99,9 @@ export default {
                 } else {
                     axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`).then((response) => {
                         console.log(response)
+                        if (window.location.href.includes('FavoriteRecipes')) {
+                            window.location.reload()
+                        }
                     }).catch((err) => {
                         console.log(err)
                     })
