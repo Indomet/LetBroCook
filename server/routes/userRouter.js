@@ -154,8 +154,18 @@ router.post("/:userId/recipes/", async (req, res, next) => {
 })
 */
 
+router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
+  userModel.findById(req.params.userId).then(user=>{
+    res.status(200).json({favouriteRecipes: user.favouriteRecipes})
+  }).catch(err=>{
+    err.status=404
+    err.message="User not found"
+    return next(err)
+  })
+})
+
 //TODO ADD USER AUTH BACK
-router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const user = req.user
     const recipe = req.recipe
     /*
@@ -381,7 +391,7 @@ router.delete('/', async (req, res,next) => {
 //DELETE----------------------------------
 //Delete favourite recipe
 //TODO ADD BACK USER AUTH THIS HAD ONE
-router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     try{
         const user = req.user
         const recipeId= req.recipe.id
