@@ -6,6 +6,7 @@ import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import CreateRecipe from './views/CreateRecipe.vue'
 import EditRecipe from './views/EditRecipe.vue'
+import FavoriteRecipes from './views/FavoriteRecipes.vue'
 
 Vue.use(Router)
 
@@ -42,6 +43,11 @@ export default new Router({
       path: '/recipes',
       name: 'recipes',
       component: Recipes
+    },
+    {
+      path: '/FavoriteRecipes',
+      name: 'FavoriteRecipes',
+      component: FavoriteRecipes
     }
   ]
 })
