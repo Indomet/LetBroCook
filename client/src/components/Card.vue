@@ -53,7 +53,7 @@
                     :class="{ active: isFaved }"
                     @click="addToFavs"
                 ></div>
-                <div class="wrapper">
+                <div class="wrapper" v-if="allowDropdown">
                 <div class="btn-group dropup">
                     <button
 
@@ -131,6 +131,7 @@ export default {
         recipe: Object,
         recipeMap: Map,
         allowFavRecipe: Boolean,
+        allowDropdown: Boolean,
         DB_ID: String,
         isFaved: Boolean
     },

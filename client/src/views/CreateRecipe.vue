@@ -234,6 +234,9 @@ export default {
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         // eslint-disable-next-line spaced-comment
+        console.log('selected tags before making them ' + this.selectedTags)
+        const selectedTagNames = this.selectedTags.map(tag => tag.name)
+        console.log('selected tags after making them ' + selectedTagNames)
         const recipeData = {
           title: this.title,
           image: this.url,
@@ -243,7 +246,7 @@ export default {
           servings: this.servings,
           description: this.description,
           steps: splitToArray(this.steps),
-          tags: this.selectedTags,
+          tags: selectedTagNames,
           nutritionalInfo: splitToArray(this.nutritionalInfo)
           // THEN ADD THE OWNER THEN POST TO DB
         }
