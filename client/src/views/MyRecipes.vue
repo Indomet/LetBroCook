@@ -29,13 +29,18 @@ export default {
         }
     },
     mounted() {
-        axios.get('http://localhost:3000/v1/recipes')
+        const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        axios.get(`http://localhost:3000/v1/users/${userId}/recipes`)
             .then((response) => {
                 this.recipeData = response.data.recipes
+                console.log('recipe data is ' + JSON.stringify(this.recipeData))
+
                 for (const recipe of this.recipeData) {
                     recipe.flipped = false
                 }
                 this.mapArray()
+                // console.log('recipe map is: ' + JSON.stringify(this.recipeMap))
             })
             .catch((err) => {
                 console.log(err)
@@ -44,14 +49,6 @@ export default {
             .finally(() => {
                 this.loading = false
             })
-        const user = JSON.parse(localStorage.getItem('user-info'))
-        const userId = user.body._id
-        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then((response) => {
-            this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
-            console.log(this.favedRecipes)
-        }).catch((err) => {
-            console.log(err)
-        })
     },
     methods: {
         trimTagList(arr) {
@@ -64,20 +61,24 @@ export default {
             return arr
         },
         mapArray() {
-            let newArr = []
-            const maxNumberOfRecipes = 7
-            const map = new Map()
-            if (this.recipeData.length > maxNumberOfRecipes) {
-                newArr = this.recipeData.slice(0, maxNumberOfRecipes)
-            } else {
-                newArr = this.recipeData
-            }
-            for (const each of newArr) {
-                each.tags = this.trimTagList(each.tags)
-                map.set(each._id, each)
-            }
-            this.recipeMap = map
-        }
+    let newArr = []
+    const maxNumberOfRecipes = 7
+    const map = new Map()
+    if (this.recipeData.length > maxNumberOfRecipes) {
+        newArr = this.recipeData.slice(0, maxNumberOfRecipes)
+    } else {
+        newArr = this.recipeData
+    }
+    console.log('new arr recipe is: ' + JSON.stringify(newArr))
+    // console.log('newArr is: ' + JSON.stringify(newArr))
+    for (const each of newArr) { // recipe,link {recipe: recipe, link: link}
+        each.tags = this.trimTagList(each.tags)
+        // console.log('each is: ' + JSON.stringify(each))
+        map.set(each._id, each)
+    }
+    this.recipeMap = map
+    // console.log('map is: ' + [map.values()])
+}
     }
 
 }
