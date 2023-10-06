@@ -5,7 +5,7 @@
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
                 <div class="main-container w-100 test">
                     <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false" :DB_ID="recipe._id"
-                    :allowDropdown="true"
+                    :allowDropdown="true" :links="recipe.links"
                     ></Card>
                 </div>
             </div>
@@ -71,8 +71,7 @@ export default {
     }
     // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
     for (const each of newArr) {
-        // each.tags = this.trimTagList(each.tags)
-        console.log('each recipe is ' + JSON.stringify(each))
+        each.recipe.tags = this.trimTagList(each.recipe.tags)
         map.set(each.recipe._id, each)
     }
     this.recipeMap = map

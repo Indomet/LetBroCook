@@ -35,11 +35,11 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
         const recipes = await recipeModel.find({owner: req.user.id});
 
         const recipeList = recipes.map(recipe => {
-            const links = [
+            const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
                 // HATEOAS links
-                { rel: "itself", href: `/v1/recipes/${recipe._id}` },
-                { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
-                { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
+                { rel: "edit", href: `/editrecipe/${recipe._id}` },
+                //http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete
+                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}/delete` }
             ];
             return { recipe: recipe, links: links };
         });
