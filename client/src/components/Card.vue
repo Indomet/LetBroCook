@@ -1,26 +1,83 @@
 <template>
-    <div :class="{ 'flipped': recipe.flipped, 'card': 'card', 'h-100': 'h-100', 'flex-fill': 'flex-fill' }"
-        style="max-width: 20rem; border-radius: 1rem;
-              background-image: linear-gradient(45deg, #d8e8dc 12.50%, #ffffff 12.50%, #ffffff 25%, #f0f0f0 25%, #f0f0f0 50%, #d8e8dc 50%, #d8e8dc 62.50%, #ffffff 62.50%, #ffffff 75%, #f0f0f0 75%, #f0f0f0 100%); background-size: 40.00px 40.00px;">
+    <div
+        :class="{
+            flipped: recipe.flipped,
+            card: 'card',
+            'h-100': 'h-100',
+            'flex-fill': 'flex-fill',
+        }"
+        style="
+            max-width: 20rem;
+            border-radius: 1rem;
+            background-image: linear-gradient(
+                45deg,
+                #d8e8dc 12.5%,
+                #ffffff 12.5%,
+                #ffffff 25%,
+                #f0f0f0 25%,
+                #f0f0f0 50%,
+                #d8e8dc 50%,
+                #d8e8dc 62.5%,
+                #ffffff 62.5%,
+                #ffffff 75%,
+                #f0f0f0 75%,
+                #f0f0f0 100%
+            );
+            background-size: 40px 40px;
+        "
+    >
         <b-card-body class="front">
-            <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image">
+            <img
+                class="card-image"
+                b-card-img-top
+                :src="recipe.image"
+                alt="Thumbnail Image"
+            />
             <p class="card-title">{{ recipe.title }}</p>
             <div class="tag-block">
-                <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px;">
+                <span
+                    v-for="tags in recipe.tags"
+                    :key="tags"
+                    class="tags"
+                    style="margin-bottom: 20px"
+                >
                     {{ tags.name }}
                 </span>
             </div>
             <div class="button-container">
-        <div @click="flipCard(id)" class="flip-button">More info</div>
-        <div v-if="allowFavRecipe" id='heart' class='button'
-     :class="{ 'active': isFaved }" @click="addToFavs"></div>
-    </div>
+                <div @click="flipCard(id)" class="flip-button">More info</div>
+                <div
+                    v-if="allowFavRecipe"
+                    id="heart"
+                    class="button"
+                    :class="{ active: isFaved }"
+                    @click="addToFavs"
+                ></div>
+                <div class="wrapper">
+                <div class="btn-group dropup">
+                    <button
 
+                        type="button"
+                        class="btn btn-secondary dropdown-toggle optionsBTN"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Options
+                    </button>
+                    <ul class="dropdown-menu">
+                        <button type="button" class="btn btn-outline-secondary" style="width: 95px; border-radius: 0px; text-align: left;">Edit</button>
+                        <button class="noselect" id="deleteBTN"><span class="text">Delete</span><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path></svg></span></button>                    </ul>
+                </div>
+            </div>
+        </div>
         </b-card-body>
 
         <b-card-body class="back">
             <h2 class="info-header">Ingredients:</h2>
-            <ul v-for="(ingredient, index) in recipe.sectionsAndIngredients.Ingredients" :key="index">
+            <ul
+                v-for="(ingredient, index) in recipe.sectionsAndIngredients
+                    .Ingredients"
+                :key="index"
+            >
                 <li class="bullet-point">
                     <h5>{{ ingredient }}</h5>
                 </li>
@@ -31,7 +88,10 @@
             </div>
             <h2 class="info-header">Nutritional Info:</h2>
             <div v-if="recipe.nutritionalInfo.length">
-                <ul v-for="(nutrition, index) in recipe.nutritionalInfo" :key="index">
+                <ul
+                    v-for="(nutrition, index) in recipe.nutritionalInfo"
+                    :key="index"
+                >
                     <li class="bullet-point">
                         <h5>{{ nutrition }}</h5>
                     </li>
@@ -90,20 +150,33 @@ export default {
             console.log(window.location.href)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
-                if (!$(e.currentTarget).hasClass('active')) {
-                    // console.log('removed to fav')
-                    axios.post(`http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`).then((response) => {
+            if (!$(e.currentTarget).hasClass('active')) {
+                // console.log('removed to fav')
+                axios
+                    .post(
+                        `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
+                    )
+                    .then((response) => {
                         console.log(response)
-                    }).catch((err) => {
+                    })
+                    .catch((err) => {
                         console.log(err)
                     })
-                } else {
-                    axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`).then((response) => {
+            } else {
+                axios
+                    .delete(
+                        `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`
+                    )
+                    .then((response) => {
                         console.log(response)
-                        if (window.location.href === 'http://localhost:8080/favoriterecipes') {
+                        if (
+                            window.location.href.toLowerCase() ===
+                            'http://localhost:8080/favoriterecipes'
+                        ) {
                             window.location.reload()
                         }
-                    }).catch((err) => {
+                    })
+                    .catch((err) => {
                         console.log(err)
                     })
             }
@@ -113,12 +186,20 @@ export default {
 </script>
 
 <style scoped>
-.main-container {
-    perspective: 1000px;
-    position: relative;
-
+.dropdown-menu {
+  min-width: 95px !important;
 }
 
+.btn.dropdown-toggle {
+        padding: 5px 10px; /* Adjust the padding to make the button smaller */
+        font-size: 14px; /* Adjust the font size to make the text smaller */
+    }
+
+.dropdown-item {
+        padding: 5px 10px; /* Adjust the padding for each dropdown item */
+        font-size: 14px; /* Adjust the font size for each dropdown item */
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
 .card {
     transform-style: preserve-3d;
     transition: all 0.5s ease-in-out;
@@ -180,7 +261,10 @@ export default {
     outline-color: white;
     background-color: rgb(29, 130, 207);
 }
-
+.dropdown-menu {
+    margin: 0;
+    padding: 0;
+}
 .card-title {
     text-align: left;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
@@ -309,7 +393,7 @@ h5 {
 #heart:after {
     transition: background 0.5s ease;
     position: absolute;
-    content: "";
+    content: '';
     left: 25px; /* adjust the position */
     top: 0;
     width: 25px; /* adjust the width */
@@ -333,4 +417,78 @@ h5 {
     display: flex;
     padding: 10px; /* Add padding if necessary */
 }
+
+#deleteBTN {
+ width: 95px;
+ height: 40px;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ background: red;
+ border: none;
+ box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+ background: #e62222;
+}
+
+button, button span {
+ transition: 200ms;
+}
+
+button .text {
+text-align: left !important;
+ transform: none;
+ color: white;
+ font-weight: bold;
+}
+
+button .icon {
+ opacity: 0;
+ position: relative;
+ border-left: 1px solid #c41b1b;
+ transform: translateX(80px);
+ height: 40px;
+ width: 40px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+}
+
+button svg {
+ width: 15px;
+ fill: #eee;
+}
+
+#deleteBTN:hover {
+ background: #ff3636;
+}
+#deleteBTN:hover .icon{
+    opacity: 1; /* Show the icon on hover */
+    transform: translateX(-55%); /* Move the icon to the center horizontally */
+}
+
+button:hover .text {
+ color: transparent;
+}
+
+button:hover .icon {
+ width: 150px;
+ border-left: none;
+ transform: translateX(0);
+}
+
+button:focus {
+ outline: none;
+}
+
+button:active .icon svg {
+ transform: scale(0.8);
+}
+.optionsBTN{
+    width: 95px;
+    background-color: rgb(167, 165, 165);
+}
+.wrapper{
+    margin-bottom: -1.5px !important;
+}
+
 </style>
