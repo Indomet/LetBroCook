@@ -125,12 +125,12 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
 });
 
-//replace a recipe
 //TODO ADD BACK USER AUUTH
 //THIS HAD BOTH
 router.post("/:userId/tags", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
   const newTag = req.body.tag
-  const existingTag = await Tag.find({name:newTag})//will return empty so check for if not tag
+  console.log("the tag is"  + newTag)
+  const existingTag = await Tag.find({name:newTag})//will return empty array if no tag exists
   if(existingTag.length>0){return res.status(409).json({messsage:"Tag already exists"})}
   else{
     await new Tag({

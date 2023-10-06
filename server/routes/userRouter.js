@@ -90,13 +90,10 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
 //POST----------------------------------
 
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*")
-res.setHeader("Access-Control-Allow-Credentials", "true");
-res.setHeader("Access-Control-Max-Age", "1800");
-res.setHeader("Access-Control-Allow-Headers", "content-type");
-res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
+ 
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
+
 
     try {
     var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
