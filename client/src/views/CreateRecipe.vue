@@ -266,6 +266,7 @@ export default {
           })
       }
     },
+
     updateSelectedTags() {
       this.selectedTags = this.tags.filter((tag) => tag.checked)
     },

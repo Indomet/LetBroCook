@@ -29,20 +29,30 @@ router.get("/", function (req, res, next) {
 
 
 //Get all recipes of user
-//ADD BACK USER AUTH ONLY HAD ONE
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
-    await recipeModel.find({owner: req.user.id})
-    .then(function(recipes){
-        res.status(200).json({ recipes: recipes });
-    })
-    .catch(function (error) {
-        error.status= 400
+    try {
+        const recipes = await recipeModel.find({owner: req.user.id});
+
+        const recipeList = recipes.map(recipe => {
+            const links = [
+                // HATEOAS links
+                { rel: "itself", href: `/v1/recipes/${recipe._id}` },
+                { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
+                { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
+            ];
+            return { recipe: recipe, links: links };
+        });
+
+        res.status(200).json({ recipes: recipeList });
+    } catch (error) {
+        error.status = 400;
         return next(error); // Handle the error using Express's error handling middleware
-      });
+    }
 
+    console.log("Recipe search completed."); // Log a message after the search is completed
 
-  })
+});
 
 //User sign in
 router.post("/sign-in", async (req, res, next) => {

@@ -4,7 +4,7 @@
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
                 <div class="main-container w-100 test">
-                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false" :DB_ID="recipe._id"
+                    <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false" :DB_ID="recipe._id"
                     :allowDropdown="true"
                     ></Card>
                 </div>
@@ -35,13 +35,12 @@ export default {
         axios.get(`http://localhost:3000/v1/users/${userId}/recipes`)
             .then((response) => {
                 this.recipeData = response.data.recipes
-                console.log('recipe data is ' + JSON.stringify(this.recipeData))
+                // console.log('recipe data is ' + JSON.stringify(this.recipeData))
 
                 for (const recipe of this.recipeData) {
                     recipe.flipped = false
                 }
                 this.mapArray()
-                // console.log('recipe map is: ' + JSON.stringify(this.recipeMap))
             })
             .catch((err) => {
                 console.log(err)
@@ -70,15 +69,13 @@ export default {
     } else {
         newArr = this.recipeData
     }
-    console.log('new arr recipe is: ' + JSON.stringify(newArr))
-    // console.log('newArr is: ' + JSON.stringify(newArr))
-    for (const each of newArr) { // recipe,link {recipe: recipe, link: link}
-        each.tags = this.trimTagList(each.tags)
-        // console.log('each is: ' + JSON.stringify(each))
-        map.set(each._id, each)
+    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
+    for (const each of newArr) {
+        // each.tags = this.trimTagList(each.tags)
+        console.log('each recipe is ' + JSON.stringify(each))
+        map.set(each.recipe._id, each)
     }
     this.recipeMap = map
-    // console.log('map is: ' + [map.values()])
 }
     }
 
