@@ -63,8 +63,8 @@
                         Options
                     </button>
                     <ul class="dropdown-menu">
-                        <button type="button" class="btn btn-outline-secondary" style="width: 95px; border-radius: 0px; text-align: left;">Edit</button>
-                        <button class="noselect" id="deleteBTN"><span class="text">Delete</span><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path></svg></span></button>                    </ul>
+                        <button type="button" @click="editOrDelete('edit')" class="btn btn-outline-secondary" style="width: 95px; border-radius: 0px; text-align: left;">Edit</button>
+                        <button class="noselect" id="deleteBTN" @click="editOrDelete('delete')"><span class="text">Delete</span><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path></svg></span></button>                    </ul>
                 </div>
             </div>
         </div>
@@ -112,6 +112,7 @@ import axios from 'axios'
 export default {
     name: 'Card',
     async mounted() {
+        // console.log(this.links)
         $(document).ready(function () {
             const timeline = new mojs.Timeline()
 
@@ -132,7 +133,8 @@ export default {
         allowFavRecipe: Boolean,
         allowDropdown: Boolean,
         DB_ID: String,
-        isFaved: Boolean
+        isFaved: Boolean,
+        links: Array
     },
     methods: {
         flipCard(key) {
@@ -146,6 +148,25 @@ export default {
             newValue.flipped = !newValue.flipped
             this.recipeMap.set(key, newValue)
         },
+        editOrDelete(operation) {
+            const link = this.links.find(link => link.rel === operation)
+                if (operation === 'edit') {
+                console.log(`The edit link is ${link.href}`)
+                this.$router.push(link.href)
+                } else if (operation === 'delete') {
+                    console.log(`The delete link is ${link.href}`)
+                    axios.delete(link.href)
+                    .then((response) => {
+                        console.log(response)
+                        window.location.reload()
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+                } else {
+                    console.log('No edit link found')
+                }
+},
         addToFavs(e) {
             console.log(window.location.href)
             const user = JSON.parse(localStorage.getItem('user-info'))
