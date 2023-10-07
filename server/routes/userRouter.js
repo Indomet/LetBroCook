@@ -29,20 +29,30 @@ router.get("/", function (req, res, next) {
 
 
 //Get all recipes of user
-//ADD BACK USER AUTH ONLY HAD ONE
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
-    await recipeModel.find({owner: req.user.id})
-    .then(function(recipes){
-        res.status(200).json({ recipes: recipes });
-    })
-    .catch(function (error) {
-        error.status= 400
+    try {
+        const recipes = await recipeModel.find({owner: req.user.id});
+
+        const recipeList = recipes.map(recipe => {
+            const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
+                // HATEOAS links
+                { rel: "edit", href: `/editrecipe/${recipe._id}` },
+                //http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete
+                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}/delete` }
+            ];
+            return { recipe: recipe, links: links };
+        });
+
+        res.status(200).json({ recipes: recipeList });
+    } catch (error) {
+        error.status = 400;
         return next(error); // Handle the error using Express's error handling middleware
-      });
+    }
 
+    console.log("Recipe search completed."); // Log a message after the search is completed
 
-  })
+});
 
 //User sign in
 router.post("/sign-in", async (req, res, next) => {
@@ -90,13 +100,10 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
 //POST----------------------------------
 
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*")
-res.setHeader("Access-Control-Allow-Credentials", "true");
-res.setHeader("Access-Control-Max-Age", "1800");
-res.setHeader("Access-Control-Allow-Headers", "content-type");
-res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
+ 
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
+
 
     try {
     var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
