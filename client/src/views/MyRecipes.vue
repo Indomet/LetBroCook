@@ -58,21 +58,21 @@ export default {
             return arr
         },
         mapArray() {
-            let newArr = []
-            const maxNumberOfRecipes = 7
-            const map = new Map()
-            if (this.recipeData.length > maxNumberOfRecipes) {
-                newArr = this.recipeData.slice(0, maxNumberOfRecipes)
-            } else {
-                newArr = this.recipeData
-            }
-// console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
-            for (const each of newArr) {
-                each.recipe.tags = this.trimTagList(each.recipe.tags)
-                map.set(each.recipe._id, each)
-            }
-            this.recipeMap = map
-        }
+    let newArr = []
+    const maxNumberOfRecipes = 7
+    const map = new Map()
+    if (this.recipeData.length > maxNumberOfRecipes) {
+        newArr = this.recipeData.slice(0, maxNumberOfRecipes)
+    } else {
+        newArr = this.recipeData
+    }
+    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0].links))
+    for (const each of newArr) {
+        each.recipe.tags = this.trimTagList(each.recipe.tags)
+        map.set(each.recipe._id, each)
+    }
+    this.recipeMap = map
+}
     }
 
 }

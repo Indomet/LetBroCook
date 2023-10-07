@@ -120,36 +120,36 @@ export default {
         links: Array
     },
     methods: {
-        flipCard(key) {
-            let newValue
-            // MyRecipes page contains slightly different data format due to hateos
-            const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+flipCard(key) {
+    let newValue
+    const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+    if (isInMyRecipes) {
+        console.log('myrecipes')
+        newValue = this.recipeMap.get(key).recipe
+    } else {
+        // console.log('not myrecipes')
+        newValue = this.recipeMap.get(key)
+    }
+    for (const [id, recipe] of this.recipeMap) {
+        if (key !== id) {
             if (isInMyRecipes) {
-                console.log('myrecipes')
-                newValue = this.recipeMap.get(key).recipe
+                console.log('flipped')
+                recipe.recipe.flipped = false
             } else {
-                // console.log('not myrecipes')
-                newValue = this.recipeMap.get(key)
+                recipe.flipped = false
             }
-            for (const [id, recipe] of this.recipeMap) {
-                if (key !== id) {
-                    if (isInMyRecipes) {
-                        console.log('flipped')
-                        recipe.recipe.flipped = false
-                    } else {
-                        recipe.flipped = false
-                    }
-                    this.recipeMap.set(id, recipe)
-                }
-            }
-            newValue.flipped = !newValue.flipped
-            if (isInMyRecipes) {
-                this.recipeMap.set(key, { recipe: newValue, links: newValue.links })
-            } else {
-                this.recipeMap.set(key, newValue)
-            }
-        },
+            this.recipeMap.set(id, recipe)
+        }
+    }
+    newValue.flipped = !newValue.flipped
+    if (isInMyRecipes) {
+        this.recipeMap.set(key, { recipe: newValue, links: newValue.links })
+    } else {
+        this.recipeMap.set(key, newValue)
+    }
+},
         editOrDelete(operation) {
+            console.log(this.links)
             const link = this.links.find(link => link.rel === operation)
             if (operation === 'edit') {
                 console.log(`The edit link is ${link.href}`)
