@@ -3,11 +3,8 @@
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
-                <div class="main-container w-100 test">
-                    <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false" :DB_ID="recipe._id"
-                    :allowDropdown="true" :links="recipe.links"
-                    ></Card>
-                </div>
+                <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false"
+                    :DB_ID="recipe._id" :allowDropdown="true" :links="recipe.links"></Card>
             </div>
         </div>
     </div>
@@ -69,7 +66,7 @@ export default {
     } else {
         newArr = this.recipeData
     }
-    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
+    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0].links))
     for (const each of newArr) {
         each.recipe.tags = this.trimTagList(each.recipe.tags)
         map.set(each.recipe._id, each)
