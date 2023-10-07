@@ -1,12 +1,11 @@
 <template>
-    <div
-        :class="{
+    <div class="main-container  w-100">
+        <div :class="{
             flipped: recipe.flipped,
             card: 'card',
             'h-100': 'h-100',
-            'flex-fill': 'flex-fill',
-        }"
-        style="
+            'flex-fill': 'flex-fill'
+        }" style="
             max-width: 20rem;
             border-radius: 1rem;
             background-image: linear-gradient(
@@ -24,83 +23,67 @@
                 #f0f0f0 100%
             );
             background-size: 40px 40px;
-        "
-    >
-        <b-card-body class="front">
-            <img
-                class="card-image"
-                b-card-img-top
-                :src="recipe.image"
-                alt="Thumbnail Image"
-            />
-            <p class="card-title">{{ recipe.title }}</p>
-            <div class="tag-block">
-                <span
-                    v-for="tags in recipe.tags"
-                    :key="tags"
-                    class="tags"
-                    style="margin-bottom: 20px"
-                >
-                    {{ tags.name }}
-                </span>
-            </div>
-            <div class="button-container">
-                <div @click="flipCard(id)" class="flip-button">More info</div>
-                <div
-                    v-if="allowFavRecipe"
-                    id="heart"
-                    class="button"
-                    :class="{ active: isFaved }"
-                    @click="addToFavs"
-                ></div>
-                <div class="wrapper" v-if="allowDropdown">
-                <div class="btn-group dropup">
-                    <button
-                        type="button"
-                        class="btn btn-secondary dropdown-toggle optionsBTN"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Options
-                    </button>
-                    <ul class="dropdown-menu">
-                        <button type="button" @click="editOrDelete('edit')" class="btn btn-outline-secondary" style="width: 95px; border-radius: 0px; text-align: left;">Edit</button>
-                        <button class="noselect" id="deleteBTN" @click="editOrDelete('delete')"><span class="text">Delete</span><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path></svg></span></button>                    </ul>
+        ">
+            <b-card-body class="front">
+                <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image" />
+                <p class="card-title">{{ recipe.title }}</p>
+                <div class="tag-block">
+                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px">
+                        {{ tags.name }}
+                    </span>
                 </div>
-            </div>
-        </div>
-        </b-card-body>
+                <div class="button-container">
+                    <div @click="flipCard(id)" class="flip-button">More info</div>
+                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs">
+                    </div>
+                    <div class="wrapper" v-if="allowDropdown">
+                        <div class="btn-group dropup">
+                            <button type="button" class="btn btn-secondary dropdown-toggle optionsBTN"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Options
+                            </button>
+                            <ul class="dropdown-menu">
+                                <button type="button" @click="editOrDelete('edit')" class="btn btn-outline-secondary"
+                                    style="width: 95px; border-radius: 0px; text-align: left;">Edit</button>
+                                <button class="noselect" id="deleteBTN" @click="editOrDelete('delete')"><span
+                                        class="text">Delete</span><span class="icon"><svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24" viewBox="0 0 24 24">
+                                            <path
+                                                d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z">
+                                            </path>
+                                        </svg></span></button>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </b-card-body>
 
-        <b-card-body class="back">
-            <h2 class="info-header">Ingredients:</h2>
-            <ul
-                v-for="(ingredient, index) in recipe.sectionsAndIngredients
-                    .Ingredients"
-                :key="index"
-            >
-                <li class="bullet-point">
-                    <h5>{{ ingredient }}</h5>
-                </li>
-            </ul>
-            <h2 class="info-header">Steps:</h2>
-            <div v-for="(step, index) in recipe.steps" :key="index">
-                <h5>{{ index + 1 }}. {{ step }}</h5>
-            </div>
-            <h2 class="info-header">Nutritional Info:</h2>
-            <div v-if="recipe.nutritionalInfo.length">
-                <ul
-                    v-for="(nutrition, index) in recipe.nutritionalInfo"
-                    :key="index"
-                >
+            <b-card-body class="back">
+                <h2 class="info-header">Ingredients:</h2>
+                <ul v-for="(ingredient, index) in recipe.sectionsAndIngredients
+                    .Ingredients" :key="index">
                     <li class="bullet-point">
-                        <h5>{{ nutrition }}</h5>
+                        <h5>{{ ingredient }}</h5>
                     </li>
                 </ul>
-            </div>
-            <div class="no-nut-info" v-else>No nutritional data.</div>
-            <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
-            <div @click="flipCard(id)" class="flip-button">Back</div>
-            <h2>Comments TBD</h2>
-        </b-card-body>
+                <h2 class="info-header">Steps:</h2>
+                <div v-for="(step, index) in recipe.steps" :key="index">
+                    <h5>{{ index + 1 }}. {{ step }}</h5>
+                </div>
+                <h2 class="info-header">Nutritional Info:</h2>
+                <div v-if="recipe.nutritionalInfo.length">
+                    <ul v-for="(nutrition, index) in recipe.nutritionalInfo" :key="index">
+                        <li class="bullet-point">
+                            <h5>{{ nutrition }}</h5>
+                        </li>
+                    </ul>
+                </div>
+                <div class="no-nut-info" v-else>No nutritional data.</div>
+                <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
+                <div @click="flipCard(id)" class="flip-button">Back</div>
+                <h2>Comments TBD</h2>
+            </b-card-body>
+        </div>
     </div>
 </template>
 
@@ -138,24 +121,42 @@ export default {
     },
     methods: {
         flipCard(key) {
-            const newValue = this.recipeMap.get(key)
+            let newValue
+            // MyRecipes page contains slightly different data format due to hateos
+            const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+            if (isInMyRecipes) {
+                console.log('myrecipes')
+                newValue = this.recipeMap.get(key).recipe
+            } else {
+                // console.log('not myrecipes')
+                newValue = this.recipeMap.get(key)
+            }
             for (const [id, recipe] of this.recipeMap) {
                 if (key !== id) {
-                    recipe.flipped = false
+                    if (isInMyRecipes) {
+                        console.log('flipped')
+                        recipe.recipe.flipped = false
+                    } else {
+                        recipe.flipped = false
+                    }
                     this.recipeMap.set(id, recipe)
                 }
             }
             newValue.flipped = !newValue.flipped
-            this.recipeMap.set(key, newValue)
+            if (isInMyRecipes) {
+                this.recipeMap.set(key, { recipe: newValue, links: newValue.links })
+            } else {
+                this.recipeMap.set(key, newValue)
+            }
         },
         editOrDelete(operation) {
             const link = this.links.find(link => link.rel === operation)
-                if (operation === 'edit') {
+            if (operation === 'edit') {
                 console.log(`The edit link is ${link.href}`)
                 this.$router.push(link.href)
-                } else if (operation === 'delete') {
-                    console.log(`The delete link is ${link.href}`)
-                    axios.delete(link.href)
+            } else if (operation === 'delete') {
+                console.log(`The delete link is ${link.href}`)
+                axios.delete(link.href)
                     .then((response) => {
                         console.log(response)
                         window.location.reload()
@@ -163,10 +164,10 @@ export default {
                     .catch((err) => {
                         console.log(err)
                     })
-                } else {
-                    console.log('No edit link found')
-                }
-},
+            } else {
+                console.log('No edit link found')
+            }
+        },
         addToFavs(e) {
             console.log(window.location.href)
             const user = JSON.parse(localStorage.getItem('user-info'))
@@ -208,29 +209,40 @@ export default {
 
 <style scoped>
 .dropdown-menu {
-  min-width: 95px !important;
+    min-width: 95px !important;
 }
 
 .btn.dropdown-toggle {
-        padding: 5px 10px; /* Adjust the padding to make the button smaller */
-        font-size: 14px; /* Adjust the font size to make the text smaller */
-    }
+    padding: 5px 10px;
+    /* Adjust the padding to make the button smaller */
+    font-size: 14px;
+    /* Adjust the font size to make the text smaller */
+}
 
 .dropdown-item {
-        padding: 5px 10px; /* Adjust the padding for each dropdown item */
-        font-size: 14px; /* Adjust the font size for each dropdown item */
-        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    padding: 5px 10px;
+    /* Adjust the padding for each dropdown item */
+    font-size: 14px;
+    /* Adjust the font size for each dropdown item */
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
+
+.main-container {
+    perspective: 1000px;
+    position: relative;
+}
+
 .card {
     transform-style: preserve-3d;
     transition: all 0.5s ease-in-out;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 .card:hover {
     outline-width: 3px;
     outline-color: rgb(255, 255, 255);
     outline-style: solid;
-    scale: 1.1;
+    scale: 1.098;
 }
 
 .flipped {
@@ -282,10 +294,12 @@ export default {
     outline-color: white;
     background-color: rgb(29, 130, 207);
 }
+
 .dropdown-menu {
     margin: 0;
     padding: 0;
 }
+
 .card-title {
     text-align: left;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
@@ -323,7 +337,7 @@ export default {
     background-color: rgb(160, 182, 244);
     border-radius: 1rem;
     cursor: pointer;
-    outline-width: 10%;
+    outline-width: 2px;
     outline-color: rgb(27, 18, 21);
     outline-style: solid;
     font-size: 14px;
@@ -333,7 +347,7 @@ export default {
 }
 
 .tags:hover {
-    background-color: rgb(96, 110, 219);
+    background-color: rgb(146, 155, 221);
 }
 
 /* Scrollbar styling */
@@ -406,8 +420,10 @@ h5 {
 }
 
 #heart {
-    width: 50px; /* reduce the width */
-    height: 45px; /* reduce the height */
+    width: 50px;
+    /* reduce the width */
+    height: 45px;
+    /* reduce the height */
 }
 
 #heart:before,
@@ -415,12 +431,16 @@ h5 {
     transition: background 0.5s ease;
     position: absolute;
     content: '';
-    left: 25px; /* adjust the position */
+    left: 25px;
+    /* adjust the position */
     top: 0;
-    width: 25px; /* adjust the width */
-    height: 40px; /* adjust the height */
+    width: 25px;
+    /* adjust the width */
+    height: 40px;
+    /* adjust the height */
     background: dimgrey;
-    border-radius: 25px 25px 0 0; /* adjust the border-radius */
+    border-radius: 25px 25px 0 0;
+    /* adjust the border-radius */
     transform: rotate(-45deg);
     transform-origin: 0 100%;
 }
@@ -430,86 +450,93 @@ h5 {
     transform: rotate(45deg);
     transform-origin: 100% 100%;
 }
+
 .button-container {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     display: flex;
-    padding: 10px; /* Add padding if necessary */
+    padding: 10px;
+    /* Add padding if necessary */
 }
 
 #deleteBTN {
- width: 95px;
- height: 40px;
- cursor: pointer;
- display: flex;
- align-items: center;
- background: red;
- border: none;
- box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
- background: #e62222;
+    width: 95px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    background: red;
+    border: none;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    background: #e62222;
 }
 
-button, button span {
- transition: 200ms;
+button,
+button span {
+    transition: 200ms;
 }
 
 button .text {
-text-align: left !important;
- transform: none;
- color: white;
- font-weight: bold;
+    text-align: left !important;
+    transform: none;
+    color: white;
+    font-weight: bold;
 }
 
 button .icon {
- opacity: 0;
- position: relative;
- border-left: 1px solid #c41b1b;
- transform: translateX(80px);
- height: 40px;
- width: 40px;
- display: flex;
- align-items: center;
- justify-content: center;
+    opacity: 0;
+    position: relative;
+    border-left: 1px solid #c41b1b;
+    transform: translateX(80px);
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button svg {
- width: 15px;
- fill: #eee;
+    width: 15px;
+    fill: #eee;
 }
 
 #deleteBTN:hover {
- background: #ff3636;
+    background: #ff3636;
 }
-#deleteBTN:hover .icon{
-    opacity: 1; /* Show the icon on hover */
-    transform: translateX(-55%); /* Move the icon to the center horizontally */
+
+#deleteBTN:hover .icon {
+    opacity: 1;
+    /* Show the icon on hover */
+    transform: translateX(-55%);
+    /* Move the icon to the center horizontally */
 }
 
 button:hover .text {
- color: transparent;
+    color: transparent;
 }
 
 button:hover .icon {
- width: 150px;
- border-left: none;
- transform: translateX(0);
+    width: 150px;
+    border-left: none;
+    transform: translateX(0);
 }
 
 button:focus {
- outline: none;
+    outline: none;
 }
 
 button:active .icon svg {
- transform: scale(0.8);
+    transform: scale(0.8);
 }
-.optionsBTN{
+
+.optionsBTN {
     width: 95px;
     background-color: rgb(167, 165, 165);
 }
-.wrapper{
+
+.wrapper {
     margin-bottom: -1.5px !important;
 }
-
 </style>
