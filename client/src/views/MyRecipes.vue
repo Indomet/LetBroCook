@@ -69,7 +69,7 @@ export default {
     } else {
         newArr = this.recipeData
     }
-    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
+    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0].links))
     for (const each of newArr) {
         each.recipe.tags = this.trimTagList(each.recipe.tags)
         map.set(each.recipe._id, each)
