@@ -123,9 +123,11 @@ export default {
 flipCard(key) {
     let newValue
     const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+    let recipeLinks
     if (isInMyRecipes) {
         console.log('myrecipes')
         newValue = this.recipeMap.get(key).recipe
+        recipeLinks = this.recipeMap.get(key).links
     } else {
         // console.log('not myrecipes')
         newValue = this.recipeMap.get(key)
@@ -143,7 +145,8 @@ flipCard(key) {
     }
     newValue.flipped = !newValue.flipped
     if (isInMyRecipes) {
-        this.recipeMap.set(key, { recipe: newValue, links: newValue.links })
+        this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
+        console.log(this.links)
     } else {
         this.recipeMap.set(key, newValue)
     }
