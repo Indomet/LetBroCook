@@ -57,7 +57,10 @@ router.get("/", function (req, res, next) {
 
     var recipes;
     //users can only filter or search not both
-    if (tags) {
+    if (tags && searchTerm) {
+      recipes = recipeModel.find({ tags: { $in: tags }, $text: { $search: searchTerm } });
+    }
+    else if (tags) {
       recipes = recipeModel.find({ tags: { $in: tags } });
     } else if (searchTerm) {
       recipes = recipeModel.find({ $text: { $search: searchTerm } });

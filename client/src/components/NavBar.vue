@@ -25,7 +25,7 @@
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
             </ul>
-            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+            <input type="text" class="form-control" aria-label="Text input with dropdown button" @keydown.enter="search" v-model="searchQuery">
           </div>
       <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
@@ -62,11 +62,14 @@
 
 <script scoped>
 import { ref } from 'vue'
-// import Login from '../views/Login.vue'
 
-// import { Api } from '@/Api'
 export default {
   name: 'NavBar',
+  data() {
+    return {
+      searchQuery: ''
+    }
+  },
   setup() {
     const user = ref(localStorage.getItem('user-info'))
     const logout = () => {
@@ -89,6 +92,10 @@ export default {
       const subMenuWrap = document.getElementById('subMenu')
       // Toggle the sub-menu-wrap element's opacity class
       subMenuWrap.classList.toggle('open-menu')
+    },
+    search() {
+      this.$emitter.emit('search', this.searchQuery)
+      // console.log('Search query:', this.searchQuery)
     }
   }
 }
