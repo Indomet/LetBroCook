@@ -4,9 +4,9 @@
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
                 <div class="main-container w-100 test">
-                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true" :DB_ID="recipe._id"
-                    :allowDropdown="false"
-                    :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
+                    <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false" :DB_ID="recipe._id"
+                    :allowDropdown="true" :links="recipe.links"
+                    ></Card>
                 </div>
             </div>
         </div>
@@ -32,11 +32,11 @@ export default {
     mounted() {
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
-        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`)
+        axios.get(`http://localhost:3000/v1/users/${userId}/recipes`)
             .then((response) => {
-                this.recipeData = response.data.favouriteRecipes
-                this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
-                console.log(this.favedRecipes)
+                this.recipeData = response.data.recipes
+                // console.log('recipe data is ' + JSON.stringify(this.recipeData))
+
                 for (const recipe of this.recipeData) {
                     recipe.flipped = false
                 }
@@ -61,20 +61,21 @@ export default {
             return arr
         },
         mapArray() {
-            let newArr = []
-            const maxNumberOfRecipes = 7
-            const map = new Map()
-            if (this.recipeData.length > maxNumberOfRecipes) {
-                newArr = this.recipeData.slice(0, maxNumberOfRecipes)
-            } else {
-                newArr = this.recipeData
-            }
-            for (const each of newArr) {
-                each.tags = this.trimTagList(each.tags)
-                map.set(each._id, each)
-            }
-            this.recipeMap = map
-        }
+    let newArr = []
+    const maxNumberOfRecipes = 7
+    const map = new Map()
+    if (this.recipeData.length > maxNumberOfRecipes) {
+        newArr = this.recipeData.slice(0, maxNumberOfRecipes)
+    } else {
+        newArr = this.recipeData
+    }
+    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0]))
+    for (const each of newArr) {
+        each.recipe.tags = this.trimTagList(each.recipe.tags)
+        map.set(each.recipe._id, each)
+    }
+    this.recipeMap = map
+}
     }
 
 }
