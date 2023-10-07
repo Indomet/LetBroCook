@@ -3,11 +3,9 @@
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
-                <div class="main-container w-100 test">
-                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true" :DB_ID="recipe._id"
-                    :allowDropdown="false"
-                    :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
-                </div>
+                <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true" :DB_ID="recipe._id"
+                :allowDropdown="false"
+                :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
             </div>
         </div>
     </div>
