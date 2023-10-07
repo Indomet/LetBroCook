@@ -3,9 +3,8 @@
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
-                <div class="main-container w-100 test">
+                <div class="main-container w-100 test" style="perspective: 1000px;">
                     <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true" :DB_ID="recipe._id"
-                    :allowDropdown="false"
                     :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
                 </div>
             </div>
@@ -30,13 +29,9 @@ export default {
         }
     },
     mounted() {
-        const user = JSON.parse(localStorage.getItem('user-info'))
-        const userId = user.body._id
-        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`)
+        axios.get('http://localhost:3000/v1/recipes')
             .then((response) => {
-                this.recipeData = response.data.favouriteRecipes
-                this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
-                console.log(this.favedRecipes)
+                this.recipeData = response.data.recipes
                 for (const recipe of this.recipeData) {
                     recipe.flipped = false
                 }
@@ -49,6 +44,14 @@ export default {
             .finally(() => {
                 this.loading = false
             })
+        const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then((response) => {
+            this.favedRecipes = response.data.favouriteRecipes.map(recipe => recipe._id)
+            console.log(this.favedRecipes)
+        }).catch((err) => {
+            console.log(err)
+        })
     },
     methods: {
         trimTagList(arr) {
@@ -79,3 +82,12 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.main-container {
+    perspective: 1000px !important;
+    position: relative;
+
+}
+
+</style>
