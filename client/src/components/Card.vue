@@ -34,8 +34,9 @@
                 </div>
                 <div class="button-container">
                     <div @click="flipCard(id)" class="flip-button">More info</div>
-                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs">
-                    </div>
+                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
+    <i class="fa fa-heart"></i>
+</div>
                     <div class="wrapper" v-if="allowDropdown">
                         <div class="btn-group dropup">
                             <button type="button" class="btn btn-secondary dropdown-toggle optionsBTN"
@@ -93,22 +94,7 @@ import $ from 'jquery'
 import axios from 'axios'
 
 export default {
-    name: 'Card',
-    async mounted() {
-        // console.log(this.links)
-        $(document).ready(function () {
-            const timeline = new mojs.Timeline()
-
-            $('.button').click(function () {
-                if ($(this).hasClass('active')) {
-                    $(this).removeClass('active')
-                } else {
-                    timeline.play()
-                    $(this).addClass('active')
-                }
-            })
-        })
-    },
+  name: 'Card',
     props: {
         id: Number,
         recipe: Object,
@@ -118,6 +104,11 @@ export default {
         DB_ID: String,
         isFaved: Boolean,
         links: Array
+    },
+    data() {
+        return {
+            faved: this.isFaved
+        }
     },
     methods: {
 flipCard(key) {
@@ -172,16 +163,22 @@ flipCard(key) {
             }
         },
         addToFavs(e) {
-            console.log(window.location.href)
+            console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
-            if (!$(e.currentTarget).hasClass('active')) {
-                // console.log('removed to fav')
+            if (this.faved === false) {
+                const timeline = new mojs.Timeline()
+                timeline.play()
+                // eslint-disable-next-line vue/no-mutating-props
+                this.faved = true
+                $(this).addClass('active')
+                console.log('user id is' + userId)
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
                     )
                     .then((response) => {
+                        this.faved = true
                         console.log(response)
                     })
                     .catch((err) => {
@@ -193,6 +190,8 @@ flipCard(key) {
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`
                     )
                     .then((response) => {
+                        this.faved = false
+                        $(this).removeClass('active')
                         console.log(response)
                         if (
                             window.location.href.toLowerCase() ===
