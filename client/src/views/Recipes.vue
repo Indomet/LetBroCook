@@ -94,7 +94,21 @@ export default {
                 })
         },
         getRecommendation() {
-            console.log('test')
+            const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then(async (response) => {
+            const favedRecipesIds = response.data.favouriteRecipes.map((recipe) => recipe._id).filter((id) => id)
+            const recipeParams = favedRecipesIds.map((id) => `recipe=${id}`).join('&')
+            await axios.get('http://localhost:8000?' + recipeParams).then((response) => {
+                this.recipeData = response.data
+                for (const recipe of this.recipeData) {
+                        recipe.flipped = false
+                    }
+                    this.mapArray()
+                })
+        }).catch((err) => {
+            console.log(err)
+        })
         },
         trimTagList(arr) {
             const maxNumberOfTags = 3 // Max number of tags to be shown
