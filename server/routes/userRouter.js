@@ -7,7 +7,7 @@ const { recipeModel, Tag ,Comment} = require("../models/recipeModel.js"); //. fo
 const userModel = require("../models/userModel.js");
 const serverUtil = require("../serverUtil.js")
 const userAuth = require("../basicAuth.js")
-
+var bcrypt = require("bcrypt")
 module.exports = router
 
 //GET----------------------------------
@@ -281,14 +281,25 @@ router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,
       return res.status(400).json({ message: "Email already exists" });
   }
 
-  // if username and email are unique, update
-  await userModel.findById(req.user.id).then(user=>{
-      Object.assign(user, req.body);
-      user.save();
-      return res.status(200).json({message:user})
-  }).catch(err=>{
-    err.status=404
-    return next(err)
+  bcrypt.compare(req.body.current_password, req.user.password, function (err, isMatch) {
+    console.log("isMatch: " + isMatch)
+    if (err){
+      console.log(err)
+    }
+    if (isMatch || !req.body.password) {
+      // if username and email are unique, update
+      userModel.findById(req.user.id).then(user => {
+        Object.assign(user, req.body);
+        user.save();
+        return res.status(200).json({ message: user })
+      }).catch(err => {
+        err.status = 404
+        return next(err)
+      })
+    }
+    else {
+      return res.status(403).json({ message: "Incorrect password" })
+    }
   })
 })
 
