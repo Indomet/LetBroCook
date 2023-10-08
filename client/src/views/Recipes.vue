@@ -6,6 +6,7 @@
             </p>
         </div>
         <div v-else>
+            <button @click="getRecommendation" style="margin-top: 50px; margin-bottom: 50px;">clcik my ass </button>
             <div class="d-flex flex-wrap">
                 <div
                     v-for="[key, recipe] in recipeMap"
@@ -91,6 +92,9 @@ export default {
                 .catch((err) => {
                     console.log(err)
                 })
+        },
+        getRecommendation() {
+            console.log('test')
         },
         trimTagList(arr) {
             const maxNumberOfTags = 3 // Max number of tags to be shown

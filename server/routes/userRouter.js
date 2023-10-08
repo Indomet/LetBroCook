@@ -404,16 +404,6 @@ router.delete('/', async (req, res,next) => {
 //Delete favourite recipe
 //TODO ADD BACK USER AUTH THIS HAD ONE
 router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-    /*try{
-        const user = req.user
-        const recipeId= req.recipe.id
-        index = user.favouriteRecipes.indexOf(recipeId)
-        user.favouriteRecipes.splice(recipeId, 1)
-        user.save()
-        return res.status(200).json({message: "Favorite recipe removed"})
-    }catch(err){
-        return next(err)
-    }*/
     const userId = req.params.userId;
     const recipeId = req.params.recipeId;
     try {

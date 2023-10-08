@@ -121,11 +121,25 @@ export default {
       const subMenuWrap = document.getElementById('subMenu')
       // Toggle the sub-menu-wrap element's opacity class
       subMenuWrap.classList.toggle('open-menu')
+      // subMenuWrap.style.display = subMenuWrap.style.display === 'none' ? 'block' : 'none'
     },
     search() {
-      this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
-      // console.log('Search query:', this.searchQuery)
+      if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
+  }, 500)
+
+  /* const searchQuery = this.searchQuery.trim()
+  const selectedTags = this.selectedTags
+  this.$emitter.emit('search', { tags: selectedTags, searchQuery })
+
+  // Check if the current route is not 'home' before redirecting */
+
+  // Clear the search input field
 }
+
   }
 }
 </script>
@@ -203,7 +217,15 @@ export default {
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none;
 }
+.sub-menu-wrap.open-menu {
+  pointer-events: all;
+  opacity: 1;
+  max-height: 400px;
+  overflow: visible;
+}
+
 @media (max-width: 768px) {
   .sub-menu-wrap {
     left: 50%;
@@ -212,12 +234,6 @@ export default {
   .userPic{
     margin-right: 35px;
   }
-}
-
-.sub-menu-wrap.open-menu {
-  opacity: 1;
-  max-height: 400px;
-  overflow: visible;
 }
 
 .sub-menu{
