@@ -1,4 +1,5 @@
 from urllib.parse import urlparse, parse_qs
+from numpy import rec
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -14,21 +15,22 @@ PORT =8000
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        print("GOT REQUEST")
-        
-        userPath = os.path.abspath("UserDataModel.json")
-        recipePath = os.path.abspath("RecipeDataModel.json")
-        print(f"userPath is {userPath} and recipePath is {recipePath}")
-        
+        parsed_url = urlparse(self.path)
+        query_params = parse_qs(parsed_url.query)
+        recipes = query_params.get('recipe', None)
         rec = Recommendation()
         # parse the request body
-        content_length = int(self.headers['Content-Length'])
+        '''content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         data = json.loads(body)
-        recipes = data['recipes']
+        recipes = data['recipes']'''
+        print(recipes)
         res = rec.findSimilarRecipes(recipes)
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', 'http://localhost:8080')  # Replace with the appropriate origin URL
+        self.send_header('Access-Control-Allow-Methods', 'GET')  # Add more methods if needed
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')  # Add more headers if needed
         self.end_headers()
         self.wfile.write(res.encode("utf-8"))
 
