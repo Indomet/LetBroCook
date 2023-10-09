@@ -61,17 +61,17 @@
               <span>></span>
           </a>
           <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
-            <img src="../assets/logout.png">
+            <img src="../assets/NewRecipe.png">
               <p>Create a Recipe</p>
               &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
           </a>
           <a href="/MyRecipes" class = "sub-menu-link">
-            <img src="../assets/profile.png">
+            <img src="../assets/recipe-book.png" style="zoom: 100%;">
               <p>My Recipes</p>
               <span>></span>
           </a>
           <a href="/FavoriteRecipes" class = "sub-menu-link">
-            <img src="../assets/profile.png">
+            <img src="../assets/1480758-200.png">
               <p>My Favorite Recipes</p>
               <span>></span>
           </a>
