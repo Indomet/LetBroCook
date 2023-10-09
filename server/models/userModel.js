@@ -10,7 +10,10 @@ const serverUtil = require("../serverUtil.js")
 const SALT_WORK_FACTOR = 10;
 
 var userSchema= new Schema(
-    {
+    {   
+        image: {
+            type: String
+        },
         username:  {
             type: String,
             required: true,

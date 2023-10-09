@@ -15,7 +15,7 @@
                         <input type="username" id="username" v-model="username" class="form-control"
                           :class="{ 'is-invalid': getError('username') }" />
                         <div v-if="getError('username')" class="invalid-feedback">{{ getError('username') }} </div>
-                        <div v-if="usernameError" class="paint-red">{{ usernameError }}</div>
+                        <div v-if="usernameError" class="invalid-feedback d-block">{{ usernameError }}</div>
                       </div>
                     </div>
                     <div class="d-flex flex-row align-items-center mb-4">
@@ -27,14 +27,14 @@
                         <div v-if="getError('name')" class="invalid-feedback">{{ getError('name') }} </div>
                       </div>
                     </div>
-                    <div class="hs-firstname d-flex flex-row align-items-center mb-4">
+                    <div class="d-flex flex-row align-items-center mb-4">
                       <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
                       <div class="form-outline flex-fill mb-0">
                         <label class="form-label" for="email">Email</label>
                         <input type="email" id="email" v-model="email" class="form-control"
                           :class="{ 'is-invalid': getError('email')}" />
                         <div v-if="getError('email')" class="invalid-feedback">{{ getError('email') }} </div>
-                        <div v-if="emailError" class="paint-red">{{ emailError }}</div>
+                        <div v-if="emailError"  class="invalid-feedback d-block">{{ emailError }}</div>
                       </div>
                     </div>
                     <div class="d-flex flex-row align-items-center mb-4">
@@ -91,6 +91,7 @@ export default {
   },
   data() {
     return {
+      image: 'https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop',
       username: '',
       name: '',
       email: '',
@@ -121,6 +122,7 @@ export default {
       }
 
       const data = {
+        image: this.image,
         username: this.username,
         name: this.name,
         email: this.email,
@@ -205,57 +207,4 @@ label {
 
 }
 
-/* .card-body {
-    flex: 1 1 auto;
-    padding: var(--mdb-card-spacer-y) var(--mdb-card-spacer-x);
-    color: var(--mdb-card-color);
-}
-.card {
-    --mdb-card-spacer-y: 1.5rem;
-    --mdb-card-spacer-x: 1.5rem;
-    --mdb-card-title-spacer-y: 0.5rem;
-    --mdb-card-border-width: 1px;
-    --mdb-card-border-color: var(--mdb-border-color-translucent);
-    --mdb-card-border-radius: 0.5rem;
-    --mdb-card-box-shadow: 0 2px 15px -3px rgba(0,0,0,0.07),0 10px 20px -2px rgba(0,0,0,0.04);
-    --mdb-card-inner-border-radius: calc(0.5rem - 1px);
-    --mdb-card-cap-padding-y: 0.75rem;
-    --mdb-card-cap-padding-x: 1.5rem;
-    --mdb-card-cap-bg: hsla(0,0%,100%,0);
-    --mdb-card-bg: #fff;
-    --mdb-card-img-overlay-padding: 1.5rem;
-    --mdb-card-group-margin: 0.75rem;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    height: var(--mdb-card-height);
-    word-wrap: break-word;
-    background-color: var(--mdb-card-bg);
-    background-clip: border-box;
-    border: var(--mdb-card-border-width) solid var(--mdb-card-border-color);
-    border-radius: var(--mdb-card-border-radius);
-    box-shadow: var(--mdb-card-box-shadow);
-} */
-/* .hs-firstname {
-  position: relative;
-}
-
-label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  font-size: 18px;
-  transition: all 0.2s ease-in-out;
-}
-
-input:focus ~ label {
-  top: -15px;
-  font-size: 12px;
-} */
-/* .account-button-container {
-  max-width: 300px;
-  margin: 0 auto;
-  text-align: center;
-} */
 </style>
