@@ -96,6 +96,7 @@
             placeholder="Upload a picture"
             drop-placeholder="Drop picture here"
             @change="onFileChange"
+            accept=".png, .jpg, .jpeg"
           ></b-form-file>
           <div class="dropdown selectTagsDropdown" style="margin-top: 40px">
             <button
@@ -219,7 +220,16 @@ export default {
       selectedTags: []
     }
   },
-
+  watch: {
+  file: function(newFile, oldFile) {
+    if (newFile && !newFile.type.startsWith('image/')) {
+      this.$nextTick(() => {
+        this.file = null
+        alert('Please upload an image file.')
+      })
+    }
+  }
+},
   methods: {
     async submitRecipe() {
       if (this.title === '' ||
