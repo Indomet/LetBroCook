@@ -6,7 +6,6 @@
             </p>
         </div>
         <div v-else>
-            <button @click="getRecommendation" style="margin-top: 50px; margin-bottom: 50px;">clcik my ass </button>
             <div class="d-flex flex-wrap">
                 <div
                     v-for="[key, recipe] in recipeMap"
@@ -46,6 +45,10 @@ export default {
         }
     },
     mounted() {
+        this.$emitter.on('recommendation', (data) => {
+            this.getRecommendation()
+        })
+
         this.$emitter.on('search', (data) => {
             if (data) {
                 const searchQuery = data.searchQuery

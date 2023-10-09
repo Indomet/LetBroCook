@@ -12,6 +12,9 @@
           <a class="auth-button nav-link active" aria-current="page"  href="/recipes">Home</a>
         </li>
         <li class="nav-item">
+          <a class="auth-button nav-link active recommendBTN" aria-current="page"  @click="getRecommendation">Recommendations</a>
+        </li>
+        <li class="nav-item">
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
         </li>
         <li  class="nav-item">
@@ -130,14 +133,9 @@ export default {
   setTimeout(() => {
     this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
   }, 500)
-
-  /* const searchQuery = this.searchQuery.trim()
-  const selectedTags = this.selectedTags
-  this.$emitter.emit('search', { tags: selectedTags, searchQuery })
-
-  // Check if the current route is not 'home' before redirecting */
-
-  // Clear the search input field
+},
+getRecommendation() {
+  this.$emitter.emit('recommendation')
 }
 
   }
@@ -151,6 +149,14 @@ export default {
   box-shadow: none !important;
 
 }
+.recommendBTN{
+  cursor: pointer;
+}
+
+.recommendBTN:hover{  color: black !important; /* Change the text color to red when hovering */
+
+}
+
 .auth-button {
   margin: 0px 10px;
   padding: 8px 16px;
