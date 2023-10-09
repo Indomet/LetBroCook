@@ -34,7 +34,7 @@
                 </div>
                 <div class="button-container">
                     <div @click="flipCard(id)" class="flip-button">More info</div>
-                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
+                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs" ref="heartIcon">
     <i class="fa fa-heart"></i>
 </div>
                     <div class="wrapper" v-if="allowDropdown">
@@ -52,7 +52,7 @@
                                             <path
                                                 d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z">
                                             </path>
-                                        </svg></span></button>
+                                </svg></span></button>
                             </ul>
                         </div>
                     </div>
@@ -110,6 +110,11 @@ export default {
             faved: this.isFaved
         }
     },
+    watch: {
+  isFaved: function(newVal) {
+    this.faved = newVal
+  }
+},
     methods: {
 flipCard(key) {
     let newValue
@@ -163,16 +168,19 @@ flipCard(key) {
             }
         },
         addToFavs(e) {
-            console.log('THE DB ID IS ' + this.DB_ID)
+            console.log('isFaved is ' + this.isFaved)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
-            if (this.faved === false) {
+            this.faved = !this.faved
+            this.$emit('update:isFaved', this.faved) // emit event to update isFaved prop
+            console.log('after isFaved is ' + this.faved)
+
+            if (this.faved) {
                 const timeline = new mojs.Timeline()
                 timeline.play()
                 // eslint-disable-next-line vue/no-mutating-props
-                this.faved = true
-                $(this).addClass('active')
-                console.log('user id is' + userId)
+                this.$refs.heartIcon.classList.add('active') // add active class to heart icon
+                console.log('added class active')
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
@@ -192,6 +200,8 @@ flipCard(key) {
                     .then((response) => {
                         this.faved = false
                         $(this).removeClass('active')
+                        this.$refs.heartIcon.classList.remove('active') // add active class to heart icon
+
                         console.log(response)
                         if (
                             window.location.href.toLowerCase() ===

@@ -60,15 +60,25 @@
               <p>Edit Profile</p>
               <span>></span>
           </a>
+          <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
+            <img src="../assets/logout.png">
+              <p>Create a Recipe</p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
+          </a>
+          <a href="/MyRecipes" class = "sub-menu-link">
+            <img src="../assets/profile.png">
+              <p>My Recipes</p>
+              <span>></span>
+          </a>
+          <a href="/FavoriteRecipes" class = "sub-menu-link">
+            <img src="../assets/profile.png">
+              <p>My Favorite Recipes</p>
+              <span>></span>
+          </a>
           <a href="/" @click="logout()" v-if="user" class = "sub-menu-link">
             <img src="../assets/logout.png">
               <p>Logout</p>
               <span>></span>
-          </a>
-          <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
-            <img src="../assets/logout.png">
-              <p>Create a recipe</p>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
           </a>
         </div>
       <form class="d-flex" role="search">
