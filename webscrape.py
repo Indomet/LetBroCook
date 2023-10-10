@@ -1,3 +1,4 @@
+from pydoc import describe
 from typing import Dict, List, Callable, Optional
 from bs4 import BeautifulSoup
 import requests
@@ -7,16 +8,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from tqdm.contrib import tzip
 import json
-import cv2
-import urllib.request
-import numpy as np
+
+     
 
 def main():
-    #https://tasty.co/tag/high_fiber
     url="https://tasty.co/latest"
+        
     driver = webdriver.Chrome()
     driver.get(url)
-    showMore(driver,200)#click show more button a few times to get more links
+    showMore(driver,50)#click show more button a few times to get more links
     htmlSource = driver.page_source
         
     #get the inital source
@@ -30,13 +30,11 @@ def main():
         
     #Now we extract the info from each page
     recipes= []
-    invalidRecipes=0
     for title,image,link in tzip(titles,images,links):
         recipe=createRecipe(link,title,image)
         #ADD IF STATMEENT TO CHECK FOR STEPS SECTIONS AND INGREDIENTS AND TAGS
-        if not recipe.tags or not recipe.steps or not recipe.sectionsAndIngredients or not recipe.description or not isValidImage(recipe.image):
-            print(f"invalid recipe. The counter is at {invalidRecipes} out of {len(titles)}")
-            invalidRecipes+=1
+        if not recipe.tags or not recipe.steps or not recipe.sectionsAndIngredients or not recipe.description:
+            print("invalid recipe")
         else:
             recipes.append(recipe)
         
@@ -158,9 +156,8 @@ def extractFeatures(soup: BeautifulSoup):
 
 def showMore(driver: webdriver.Chrome,clicksAmount):
     
-    for i in range(clicksAmount):
+    for _ in range(clicksAmount):
         try:
-            print(f"Clicking show more button {i+1} times out of {clicksAmount}")
             #wait for driver to locate the button
             showMoreBTN = WebDriverWait(driver, 15).until(
                 #presence of elemnt returns the button object after its located
@@ -171,22 +168,5 @@ def showMore(driver: webdriver.Chrome,clicksAmount):
         
         except Exception as e:
             print(f"Error: {e}")
-            
-def isURL(image : str):
-    return image.startswith("http")
 
-def faceIsPresent(imageURL: str) -> bool:
-    response = urllib.request.urlopen(imageURL)
-    imgArray = np.array(bytearray(response.read()), dtype=np.uint8)
-    
-    image = cv2.imdecode(imgArray, -1)
-    
-    faceClassifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-    
-    faces = faceClassifier.detectMultiScale(image, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
-    return len(faces) > 0
-
-def isValidImage(imageURL: str) -> bool:
-    return isURL(imageURL) and not faceIsPresent(imageURL)
-    
 if __name__=="__main__":main()
