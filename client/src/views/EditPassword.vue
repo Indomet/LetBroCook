@@ -95,7 +95,6 @@ export default {
       const result = await this.v$.$validate()
       if (!result) {
         // notify user form is invalid
-        alert('np')
         return
       }
 
