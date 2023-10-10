@@ -7,19 +7,19 @@
     </nav>
     <hr class="mt-0 mb-4">
     <div class="row">
-      <div class="col-xl-4">
+      <div class="col-lg-4">
         <!-- Profile picture card-->
         <div class="card mb-4 mb-xl-0">
           <div class="card-header">Profile Picture</div>
           <div class="card-body text-center">
             <!-- Profile picture image-->
             <div>
-              <img class="img-fluid img-account-profile rounded-circle mb-2" :src="image" alt="" >
+              <img id="image" class="img-fluid img-account-profile rounded-circle mb-2" :src="image" alt="" >
             </div>
             <!-- Profile picture upload button-->
             <div>
               <form @submit.prevent="onFormSubmit">
-                <div class="field" style="display: flex; flex-direction: column; margin-top: 30px">
+                <div class="field mb-3" style="display: flex; flex-direction: column; margin-top: 30px">
                   <b-form-file v-model="file" placeholder="Upload a picture" drop-placeholder="Drop picture here"
                     @change="onFileChange"></b-form-file>
                 </div>
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="col-xl-8">
+      <div class="col-lg-8">
         <!-- Account details card-->
         <div class="card mb-4">
           <div class="card-header">Account Details</div>
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      // this sends the request just for data that is filled in
+      // this sends the request just for data that is filled in, ... helps to separate the data
       const data = {
         ...(this.username ? { username: this.username } : {}),
         ...(this.name ? { name: this.name } : {}),
@@ -132,14 +132,19 @@ export default {
 </script>
 
 <style scoped>
+@media screen and (min-width: 992px) {
+  #image {
+    width: 40%;
+  }
+}
 
 .card-body {
     margin-top: 20px;
 }
 
 .img-account-profile {
-  max-width:40%;
-    height: 30%;
+    width: 100px;
+    /* height: 30%; */
     aspect-ratio: 1/1;
     object-fit: cover;
     position: relative;
