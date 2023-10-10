@@ -294,7 +294,7 @@ flipCard(key) {
     opacity: 50;
     border-radius: 1rem;
     background-color: inherit;
-    background-color: rgb(0, 92, 163);
+    background-image: linear-gradient(to right, #3bf053, #12b012);
     position: static;
     bottom: 0;
     margin-left: auto;
@@ -347,7 +347,7 @@ flipCard(key) {
 }
 
 .tags {
-    background-image: linear-gradient(to right, #5eda39, #24be45);
+    background-image: linear-gradient(to right, #ccc8c8, #929792);
     border-radius: 1rem;
     cursor: pointer;
     outline-width: 2px;
