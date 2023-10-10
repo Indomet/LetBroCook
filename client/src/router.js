@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
 import Recipes from './views/Recipes.vue'
 import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
@@ -17,7 +16,7 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Recipes
     },
     {
       path: '/login',
@@ -38,11 +37,6 @@ export default new Router({
       path: '/EditRecipe/:id',
       name: 'EditRecipe',
       component: EditRecipe
-    },
-    {
-      path: '/recipes',
-      name: 'recipes',
-      component: Recipes
     },
     {
       path: '/FavoriteRecipes',

@@ -7,21 +7,10 @@
         </div>
         <div v-else>
             <div class="d-flex flex-wrap">
-                <div
-                    v-for="[key, recipe] in recipeMap"
-                    :key="recipe._id"
-                    class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
-                    style="margin-bottom: 4rem"
-                >
-                        <Card
-                            :recipe="recipe"
-                            @flip-card="flipCard"
-                            :recipeMap="recipeMap"
-                            :id="key"
-                            :allowFavRecipe="true"
-                            :DB_ID="recipe._id"
-                            :isFaved="this.favedRecipes.includes(recipe._id)"
-                        ></Card>
+                <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
+                    class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem">
+                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true"
+                    :DB_ID="recipe._id" :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
                 </div>
             </div>
         </div>
@@ -29,6 +18,7 @@
 </template>
 
 <script scoped>
+import { ref } from 'vue'
 import axios from 'axios'
 import Card from '../components/Card.vue'
 
@@ -36,6 +26,17 @@ export default {
     el: '#sgf',
     components: {
         Card
+    },
+    setup() {
+        const user = ref(localStorage.getItem('user-info'))
+        return {
+            user
+        }
+    },
+    watch: {
+        '$route'() {
+            this.user = localStorage.getItem('user-info')
+        }
     },
     data() {
         return {
@@ -77,26 +78,37 @@ export default {
                     this.loading = false
                 })
             const user = JSON.parse(localStorage.getItem('user-info'))
-            const userId = user.body._id
-            axios
-                .get(
-                    `http://localhost:3000/v1/users/${userId}/favorite-recipes`
-                )
-                .then((response) => {
-                    this.favedRecipes = response.data.favouriteRecipes.map(
-                        (recipe) => recipe._id
+            if (user) {
+                const userId = user.body._id
+                axios
+                    .get(
+                        `http://localhost:3000/v1/users/${userId}/favorite-recipes`
                     )
-                    console.log(this.favedRecipes)
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
+                    .then((response) => {
+                        this.favedRecipes = response.data.favouriteRecipes.map(
+                            (recipe) => recipe._id
+                        )
+                        console.log(this.favedRecipes)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
         },
         trimTagList(arr) {
             const maxNumberOfTags = 3 // Max number of tags to be shown
             let newArr = []
             if (arr.length > maxNumberOfTags) {
                 newArr = arr.slice(0, maxNumberOfTags)
+                return newArr
+            }
+            return arr
+        },
+        trimCommentList(arr) {
+            const maxNumberOfComments = 10 // Max number of tags to be shown
+            let newArr = []
+            if (arr.length > maxNumberOfComments) {
+                newArr = arr.slice(0, maxNumberOfComments)
                 return newArr
             }
             return arr
@@ -112,6 +124,8 @@ export default {
             }
             for (const each of newArr) {
                 each.tags = this.trimTagList(each.tags)
+                each.comments = this.trimCommentList(each.comments)
+                console.log(each.comments)
                 map.set(each._id, each)
             }
             this.recipeMap = map
