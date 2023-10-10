@@ -96,7 +96,7 @@
             placeholder="Upload a picture"
             drop-placeholder="Drop picture here"
             @change="onFileChange"
-            accept=".png, .jpg, .jpeg"
+            accept=".png, .jpg,   .jpeg"
           ></b-form-file>
           <div class="dropdown selectTagsDropdown" style="margin-top: 40px">
             <button
@@ -222,10 +222,18 @@ export default {
   },
   watch: {
   file: function(newFile, oldFile) {
-    if (newFile && !newFile.type.startsWith('image/')) {
+    if (!newFile) {
+      return
+    }
+    if (!newFile.type.startsWith('image/')) {
       this.$nextTick(() => {
         this.file = null
         alert('Please upload an image file.')
+      })
+    } else if (newFile.size > 1024 * 1024) {
+      this.$nextTick(() => {
+        this.file = null
+        alert('Please upload an image file smaller than 16MB.')
       })
     }
   }

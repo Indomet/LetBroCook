@@ -115,7 +115,7 @@ export default {
         })
         },
         trimTagList(arr) {
-            const maxNumberOfTags = 3 // Max number of tags to be shown
+            const maxNumberOfTags = 4 // Max number of tags to be shown
             let newArr = []
             if (arr.length > maxNumberOfTags) {
                 newArr = arr.slice(0, maxNumberOfTags)
