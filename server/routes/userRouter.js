@@ -29,20 +29,30 @@ router.get("/", function (req, res, next) {
 
 
 //Get all recipes of user
-//ADD BACK USER AUTH ONLY HAD ONE
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
-    await recipeModel.find({owner: req.user.id})
-    .then(function(recipes){
-        res.status(200).json({ recipes: recipes });
-    })
-    .catch(function (error) {
-        error.status= 400
+    try {
+        const recipes = await recipeModel.find({owner: req.user.id});
+
+        const recipeList = recipes.map(recipe => {
+            const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
+                // HATEOAS links
+                { rel: "edit", href: `/editrecipe/${recipe._id}` },
+                //http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete
+                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}/delete` }
+            ];
+            return { recipe: recipe, links: links };
+        });
+
+        res.status(200).json({ recipes: recipeList });
+    } catch (error) {
+        error.status = 400;
         return next(error); // Handle the error using Express's error handling middleware
-      });
+    }
 
+    console.log("Recipe search completed."); // Log a message after the search is completed
 
-  })
+});
 
 //User sign in
 router.post("/sign-in", async (req, res, next) => {
@@ -92,6 +102,7 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
+
 
     try {
     var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
@@ -149,8 +160,23 @@ router.post("/:userId/recipes/", async (req, res, next) => {
 })
 */
 
+router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
+  userModel.findById(req.params.userId).then(user=>{
+    const favedArray = user.favouriteRecipes
+    recipeModel.find({ _id: { $in: favedArray } }).then(recipes => {
+      res.status(200).json({favouriteRecipes: recipes});
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send("Error retrieving recipes");
+    });
+  }).catch(err => {
+    console.error(err);
+    res.status(500).send("Error retrieving user");
+  });
+});
+
 //TODO ADD USER AUTH BACK
-router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const user = req.user
     const recipe = req.recipe
     /*
@@ -400,29 +426,25 @@ router.delete('/', async (req, res,next) => {
 //DELETE----------------------------------
 //Delete favourite recipe
 //TODO ADD BACK USER AUTH THIS HAD ONE
-router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
-    try{
-        const user = req.user
-        const recipeId= req.recipe.id
-        index = user.favouriteRecipes.indexOf(recipeId)
-        user.favouriteRecipes.splice(recipeId, 1)
-        user.save()
-        return res.status(200).json({message: "Favorite recipe removed"})
-    }catch(err){
-        return next(err)
+router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
+    const userId = req.params.userId;
+    const recipeId = req.params.recipeId;
+    try {
+      const user = await userModel.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+  
+      const index = user.favouriteRecipes.indexOf(recipeId);
+      if (index === -1) {
+        throw new Error('Recipe not found in favourites');
+      }
+  
+      user.favouriteRecipes.splice(index, 1);
+      await user.save();
+      return res.status(200).json({ message: 'Recipe removed from favourites' });
+    } catch (error) {
+      return next(error)
     }
 
-  /*
-  userModel.findById(userId).then((user)=>{
-    index = user.favouriteRecipes.indexOf(recipeId)
-    user.favouriteRecipes.splice(recipeId,1)
-    user.save()
-    return res.status(200).json({message: "Fav recipe removed"})
-  }
-  ).catch((err)=>{
-    err.message = "recipe doesnt exist"
-    err.status=404
-    return next(err)
-  })
-  */
 })

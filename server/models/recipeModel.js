@@ -10,7 +10,6 @@ var tagSchema = new Schema({
     },
     name: {
      type: String,
-     unique : false,
     }
 });
 
@@ -30,10 +29,6 @@ var commentSchema = new Schema({
 
 var recipeSchema= new Schema(
 {
-   /*ingredients : { //for now its just an array but ideally it would be a map/dict
-      type: Array,
-      required: true,
-   },*/
    title: {
       type: String
    },
@@ -55,7 +50,7 @@ var recipeSchema= new Schema(
       default: "No available steps"
    },
    servings: {
-      type: String,
+      type: String, 
       required: true,
       default: "Empty serving info"
    },
@@ -64,11 +59,7 @@ var recipeSchema= new Schema(
       required: true,
       default: "Empty description"
    },
-  tags: [{
-      type: Schema.Types.ObjectId,
-      ref: "Tag",
-      _id:false
-   }],
+  tags: [tagSchema],
 
    nutritionalInfo : {
       type: Array,
@@ -90,15 +81,6 @@ var recipeSchema= new Schema(
 
 recipeSchema.index({title: 'text'});
 
-
-/*recipeSchema.post('save', function(doc) {
-   serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
-   })
-
-recipeSchema.post("deleteOne", function(doc) {
-       serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
-       })
-*/
 const recipeModel = mongoose.model("recipes",recipeSchema)
 var Tag = mongoose.model("Tag", tagSchema); // Define the Tag model
 var Comment = mongoose.model("Comment", commentSchema); // Define the Tag model
