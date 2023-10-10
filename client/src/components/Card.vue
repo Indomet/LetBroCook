@@ -3,6 +3,7 @@
         <div :class="{
             flipped: recipe.flipped,
             card: 'card',
+            recipeCard: 'recipeCard',
             'h-100': 'h-100',
             'flex-fill': 'flex-fill'
         }" style="
@@ -81,13 +82,64 @@
                 <div class="no-nut-info" v-else>No nutritional data.</div>
                 <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
                 <div @click="flipCard(id)" class="flip-button">Back</div>
-                <h2>Comments TBD</h2>
+                <button @click="showComment()" class=" btn btn-secondary" id="show-comment-button">Show comments</button>
+                <div class="comment-section" v-if="this.showComments">
+                    <form @submit.prevent="postComment(id)">
+                        <div class="form-group">
+                            <label for="input-1" id="comment-field">Write a comment:</label>
+                            <textarea class="form-control" id="input-1" v-model="this.comment" rows="2" required></textarea>
+                            <button type="submit" id="submit-button" class="btn btn-primary"
+                                style="text-align: center; margin-top: 5px;">Submit</button>
+                        </div>
+                    </form>
+                    <div v-if="recipe.comments.length == 0">
+                        <h5>Nothing to show here~</h5>
+                    </div>
+                    <div v-else>
+                        <div v-for="each in recipe.comments" :key="each._id">
+                            <div class="row d-flex">
+                                <div class="card mb-1">
+                                    <div class="card-body" style="margin-bottom: 0px; padding: 5px;">
+                                        <div class="d-flex flex-row align-items-center">
+                                            <img id="comment-pfp"
+                                                src="https://preview.redd.it/xl4vo7dypk661.jpg?width=750&format=pjpg&auto=webp&s=37db154454fd21f68a6c092419112fc586e60961"
+                                                alt="avatar" width="40" height="40" />
+                                            <div class="small mb-0 ms-2" style="margin-left: 10px;">{{
+                                                each.ownerId.username }}</div>
+                                        </div>
+                                        <div v-if="this.user">
+                                            <div v-if="this.user.body._id == each.ownerId._id">
+                                                <button @click="editComment(each)" class="btn" id="edit-comment-button"><img
+                                                        src="../assets/edit-icon-black.png" width="20" height="20"></button>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-top: 5px; margin-bottom: 2px;">
+                                        <div v-if="each.editing">
+                                            <form @submit.prevent="updateComment(each._id)">
+                                                <div class="form-group">
+                                                    <label for="input-1" id="comment-field">Editing comment:</label>
+                                                    <input class="form-control" id="input-1" rows="2" required :value="each.comment">
+                                                    <button type="submit" id="submit-button" class="btn btn-secondary"
+                                                        style="text-align: center; margin-top: 5px;">Confirm</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div v-else class="align-items-left">
+                                            <div style="text-align: left;">{{ each.comment }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </b-card-body>
         </div>
     </div>
 </template>
 
-<script>
+<script scoped>
 import mojs from '@mojs/core'
 import $ from 'jquery'
 import axios from 'axios'
@@ -109,8 +161,17 @@ export default {
             })
         })
     },
+    data() {
+        return {
+            comment: '',
+            editedComment: '',
+            showComments: false,
+            commentList: this.createCommentList(),
+            user: JSON.parse(localStorage.getItem('user-info'))
+        }
+    },
     props: {
-        id: Number,
+        id: String,
         recipe: Object,
         recipeMap: Map,
         allowFavRecipe: Boolean,
@@ -120,37 +181,40 @@ export default {
         links: Array
     },
     methods: {
-flipCard(key) {
-    let newValue
-    const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
-    let recipeLinks
-    if (isInMyRecipes) {
-        console.log('myrecipes')
-        newValue = this.recipeMap.get(key).recipe
-        recipeLinks = this.recipeMap.get(key).links
-    } else {
-        // console.log('not myrecipes')
-        newValue = this.recipeMap.get(key)
-    }
-    for (const [id, recipe] of this.recipeMap) {
-        if (key !== id) {
+        showComment() {
+            this.showComments = !this.showComments
+        },
+        flipCard(key) {
+            let newValue
+            const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+            let recipeLinks
             if (isInMyRecipes) {
-                console.log('flipped')
-                recipe.recipe.flipped = false
+                console.log('myrecipes')
+                newValue = this.recipeMap.get(key).recipe
+                recipeLinks = this.recipeMap.get(key).links
             } else {
-                recipe.flipped = false
+                // console.log('not myrecipes')
+                newValue = this.recipeMap.get(key)
             }
-            this.recipeMap.set(id, recipe)
-        }
-    }
-    newValue.flipped = !newValue.flipped
-    if (isInMyRecipes) {
-        this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
-        console.log(this.links)
-    } else {
-        this.recipeMap.set(key, newValue)
-    }
-},
+            for (const [id, recipe] of this.recipeMap) {
+                if (key !== id) {
+                    if (isInMyRecipes) {
+                        console.log('flipped')
+                        recipe.recipe.flipped = false
+                    } else {
+                        recipe.flipped = false
+                    }
+                    this.recipeMap.set(id, recipe)
+                }
+            }
+            newValue.flipped = !newValue.flipped
+            if (isInMyRecipes) {
+                this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
+                console.log(this.links)
+            } else {
+                this.recipeMap.set(key, newValue)
+            }
+        },
         editOrDelete(operation) {
             console.log(this.links)
             const link = this.links.find(link => link.rel === operation)
@@ -205,6 +269,60 @@ flipCard(key) {
                         console.log(err)
                     })
             }
+        },
+        createCommentList() {
+            const arr = this.recipe.comments
+            for (const each of arr) {
+                each.editing = false
+            }
+            return arr
+        },
+        editComment(comment) {
+            comment.editing = !comment.editing
+        },
+        postComment(id) {
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                const data = {
+                    ownerId: userId,
+                    recipeId: id,
+                    comment: this.comment,
+                    author: user.body.username
+                }
+                axios.post(`http://localhost:3000/v1/users/${userId}/recipes/${id}/comments`, data)
+                    .then((res) => {
+                        console.log(res.data)
+                        this.commentList.push(res.data)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
+        updateComment(commentId) {
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                const data = {
+                    _id: commentId,
+                    ownerId: userId,
+                    comment: 'jhdsfjkdhfgjkdljrfgdkjrljjkdgsfjlfg',
+                    author: user.body.username
+                }
+                axios.put(`http://localhost:3000/v1/users/${userId}/comments/${commentId}`, data)
+                    .then((res) => {
+                        console.log(res.data)
+                        this.commentList.push(res.data)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
         }
     }
 }
@@ -241,7 +359,7 @@ flipCard(key) {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-.card:hover {
+.recipeCard:hover {
     outline-width: 3px;
     outline-color: rgb(255, 255, 255);
     outline-style: solid;
@@ -312,10 +430,6 @@ flipCard(key) {
     margin-right: 5%;
 }
 
-.card-title:hover {
-    text-decoration: underline black;
-}
-
 .card-image {
     margin-top: auto;
     width: 100%;
@@ -339,7 +453,6 @@ flipCard(key) {
 .tags {
     background-color: rgb(160, 182, 244);
     border-radius: 1rem;
-    cursor: pointer;
     outline-width: 2px;
     outline-color: rgb(27, 18, 21);
     outline-style: solid;
@@ -351,6 +464,39 @@ flipCard(key) {
 
 .tags:hover {
     background-color: rgb(146, 155, 221);
+}
+
+#comment-field {
+    margin-top: 5px;
+    text-align: left;
+}
+
+#show-comment-button {
+    margin-top: 10px;
+}
+
+#submit-button {
+    margin-top: 5px;
+}
+
+#edit-comment-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 5px;
+    padding: 0;
+}
+
+#edit-comment-button:hover {
+    scale: 1.1;
+}
+
+#comment-card {
+    margin-bottom: 5px;
+}
+
+#comment-pfp {
+    border-radius: 50%;
 }
 
 /* Scrollbar styling */
@@ -365,8 +511,6 @@ flipCard(key) {
 ::-webkit-scrollbar-track {
     background: #a2a2a2;
     border-radius: 1rem;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
 }
 
 /* Handle */
