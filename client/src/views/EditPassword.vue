@@ -17,19 +17,19 @@
                             <div class="mb-3 text-start">
                                 <label class="small mb-1" for="current_password">Current Password</label>
                                 <input class="form-control"  id="current_password" type="password" v-model="current_password" placeholder="Enter current password">
-                                <div v-if="getError('current_password')" class="invalid-feedback">{{ getError('current_password') }} </div>
+                                <div v-if="getError('current_password')" class="invalid-feedback d-block">{{ getError('current_password') }} </div>
                               </div>
                             <!-- Form Group (new password)-->
                             <div class="mb-3 text-start">
                                 <label class="small mb-1" for="new_password">New Password</label>
-                                <input class="form-control" id="new_password" type="new_password" v-model="new_password" placeholder="Enter new password">
-                                <div v-if="getError('new_password')" class="invalid-feedback">{{ getError('new_password') }} </div>
+                                <input class="form-control" id="new_password" type="password" v-model="new_password" placeholder="Enter new password">
+                                <div v-if="getError('new_password')" class="invalid-feedback d-block">{{ getError('new_password') }} </div>
                               </div>
                             <!-- Form Group (confirm password)-->
                             <div class="mb-3 text-start">
                                 <label class="small mb-1" for="confirm_password">Confirm Password</label>
-                                <input class="form-control" id="confirm_password" type="confirm_password" v-model="confirm_password"  placeholder="Confirm new password">
-                                <div v-if="getError('confirm_password')" class="invalid-feedback">{{ getError('confirm_password') }} </div>
+                                <input class="form-control" :class="{ 'is-invalid': getError('password_confirmation') }" id="confirm_password" type="password" v-model="confirm_password"  placeholder="Confirm new password"/>
+                                <div v-if="getError('confirm_password')"  class="invalid-feedback d-block">{{ getError('confirm_password') }} </div>
                               </div>
                             <button class="btn btn-primary" type="submit">Save</button>
                         </form>
@@ -92,19 +92,13 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      console.log('submit')
-      // const result = await this.v$.$validate()
-      // eslint-disable-next-line no-constant-condition
-      if (false) {
+      const result = await this.v$.$validate()
+      if (!result) {
         // notify user form is invalid
         alert('np')
         return
       }
-      // if (this.current_password !== this.original_password) {
-      //   alert('Current password is incorrect. Please try again.')
-      //   return
-      // }
-      // this sends the request just for data that is filled in
+
       const data = {
         current_password: this.current_password,
         password: this.new_password
@@ -116,15 +110,16 @@ export default {
         console.log(response)
         this.$router.push('/')
       } catch (error) {
-        if (error.response.status === 403) {
-    alert('Current password is incorrect. Please try again')
-  } else {
-    console.log(error)
-  }
-}
+        if (error.response && error.response.status === 403) {
+          alert('Current password is incorrect. Please try again')
+        } else {
+          console.log(error)
+        }
+      }
     },
     async deleteAccount() {
-      console.log('delete')
+      const text = 'Are you sure you want to delete your account?'
+      if (confirm(text) === false) return
       const user = JSON.parse(localStorage.getItem('user-info'))
       const userId = user.body._id
       const response = await Api.delete(`http://localhost:3000/v1/users/${userId}`)
@@ -170,8 +165,7 @@ export default {
     background-color: rgba(33, 40, 50, 0.03);
     border-bottom: 1px solid rgba(33, 40, 50, 0.125);
 }
-.form-control, .dataTable-input {
-    display: block;
+.form-control{
     width: 100%;
     padding: 0.875rem 1.125rem;
     font-size: 0.875rem;
