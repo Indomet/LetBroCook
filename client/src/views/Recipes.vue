@@ -97,6 +97,7 @@ export default {
                 })
         },
         getRecommendation() {
+            console.log('get recommendation')
             const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then(async (response) => {
@@ -114,7 +115,7 @@ export default {
         })
         },
         trimTagList(arr) {
-            const maxNumberOfTags = 3 // Max number of tags to be shown
+            const maxNumberOfTags = 4 // Max number of tags to be shown
             let newArr = []
             if (arr.length > maxNumberOfTags) {
                 newArr = arr.slice(0, maxNumberOfTags)
