@@ -28,13 +28,13 @@
                 <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image" />
                 <p class="card-title">{{ recipe.title }}</p>
                 <div class="tag-block">
-                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px">
+                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px" @click="filterByTag(tags)">
                         {{ tags.name }}
                     </span>
                 </div>
                 <div class="button-container">
                     <div @click="flipCard(id)" class="flip-button">More info</div>
-                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs" ref="heartIcon">
+                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
     <i class="fa fa-heart"></i>
 </div>
                     <div class="wrapper" v-if="allowDropdown">
@@ -52,7 +52,7 @@
                                             <path
                                                 d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z">
                                             </path>
-                                </svg></span></button>
+                                        </svg></span></button>
                             </ul>
                         </div>
                     </div>
@@ -110,11 +110,6 @@ export default {
             faved: this.isFaved
         }
     },
-    watch: {
-  isFaved: function(newVal) {
-    this.faved = newVal
-  }
-},
     methods: {
 flipCard(key) {
     let newValue
@@ -168,19 +163,16 @@ flipCard(key) {
             }
         },
         addToFavs(e) {
-            console.log('isFaved is ' + this.isFaved)
+            console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
-            this.faved = !this.faved
-            this.$emit('update:isFaved', this.faved) // emit event to update isFaved prop
-            console.log('after isFaved is ' + this.faved)
-
-            if (this.faved) {
+            if (this.faved === false) {
                 const timeline = new mojs.Timeline()
                 timeline.play()
                 // eslint-disable-next-line vue/no-mutating-props
-                this.$refs.heartIcon.classList.add('active') // add active class to heart icon
-                console.log('added class active')
+                this.faved = true
+                $(this).addClass('active')
+                console.log('user id is' + userId)
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
@@ -200,8 +192,6 @@ flipCard(key) {
                     .then((response) => {
                         this.faved = false
                         $(this).removeClass('active')
-                        this.$refs.heartIcon.classList.remove('active') // add active class to heart icon
-
                         console.log(response)
                         if (
                             window.location.href.toLowerCase() ===
@@ -214,8 +204,19 @@ flipCard(key) {
                         console.log(err)
                     })
             }
-        }
-    }
+        },
+        filterByTag(selectedTag) {
+        console.log(selectedTag)
+     if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    const tag = [selectedTag]
+    this.$emitter.emit('search', { tags: tag, searchQuery: '' })
+  }, 500)
+}
+
+}
 }
 </script>
 
@@ -346,7 +347,7 @@ flipCard(key) {
 }
 
 .tags {
-    background-color: rgb(160, 182, 244);
+    background-image: linear-gradient(to right, #5eda39, #24be45);
     border-radius: 1rem;
     cursor: pointer;
     outline-width: 2px;
@@ -359,7 +360,7 @@ flipCard(key) {
 }
 
 .tags:hover {
-    background-color: rgb(146, 155, 221);
+    background-image: linear-gradient(to right, #4dd025, #1eb93f);
 }
 
 /* Scrollbar styling */
