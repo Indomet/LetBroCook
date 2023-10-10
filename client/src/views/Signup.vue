@@ -1,5 +1,4 @@
 <template>
-  <section class="h-100" style="background-color: #eee;">
     <div class="container h-100" >
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-lg-12 col-xl-11">
@@ -33,7 +32,7 @@
                       <div class="form-outline flex-fill mb-0">
                         <label class="form-label" for="email">Email</label>
                         <input type="email" id="email" v-model="email" class="form-control"
-                          :class="{ 'is-invalid': getError('email') }" />
+                          :class="{ 'is-invalid': getError('email')}" />
                         <div v-if="getError('email')" class="invalid-feedback">{{ getError('email') }} </div>
                         <div v-if="emailError"  class="invalid-feedback d-block">{{ emailError }}</div>
                       </div>
@@ -77,10 +76,9 @@
         </div>
     </div>
   </div>
-</section>
 </template>
 
-<script>
+<script scoped>
 import { Api } from '../Api'
 import { useVuelidate } from '@vuelidate/core'
 import { required, minLength, sameAs, helpers } from '@vuelidate/validators'
@@ -98,7 +96,9 @@ export default {
       name: '',
       email: '',
       password: '',
-      password_confirmation: ''
+      password_confirmation: '',
+      usernameError: '',
+      emailError: ''
     }
   },
   validations() {
@@ -128,9 +128,24 @@ export default {
         email: this.email,
         password: this.password
       }
-      const response = await Api.post('http://localhost:3000/v1/users/signup', data)
-      console.log(response)
-      this.$router.push('/login')
+      try {
+        const response = await Api.post('http://localhost:3000/v1/users/signup', data)
+        console.log(response)
+        this.$router.push('/login')
+      } catch (error) {
+        if (error.response) {
+          const { data } = await error.response
+          if (data.message.includes('username')) {
+            this.usernameError = 'Username already exists'
+          }
+          if (data.message.includes('email')) {
+            this.emailError = 'Email already exists'
+          }
+        } else {
+          // handle other errors
+          console.error(error)
+        }
+      }
     },
     getError(path) {
       const error = this.v$.$errors.find(error => error.$property === path)
@@ -149,7 +164,9 @@ export default {
 </script>
 
 <style scoped>
-
+.paint-red{
+  color: red;
+}
 .vegetables {
   max-width: 47%;
 }

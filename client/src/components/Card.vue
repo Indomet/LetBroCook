@@ -116,14 +116,17 @@ flipCard(key) {
     const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
     let recipeLinks
     if (isInMyRecipes) {
+        console.log('myrecipes')
         newValue = this.recipeMap.get(key).recipe
         recipeLinks = this.recipeMap.get(key).links
     } else {
+        // console.log('not myrecipes')
         newValue = this.recipeMap.get(key)
     }
     for (const [id, recipe] of this.recipeMap) {
         if (key !== id) {
             if (isInMyRecipes) {
+                console.log('flipped')
                 recipe.recipe.flipped = false
             } else {
                 recipe.flipped = false
@@ -134,17 +137,22 @@ flipCard(key) {
     newValue.flipped = !newValue.flipped
     if (isInMyRecipes) {
         this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
+        console.log(this.links)
     } else {
         this.recipeMap.set(key, newValue)
     }
 },
         editOrDelete(operation) {
+            console.log(this.links)
             const link = this.links.find(link => link.rel === operation)
             if (operation === 'edit') {
+                console.log(`The edit link is ${link.href}`)
                 this.$router.push(link.href)
             } else if (operation === 'delete') {
+                console.log(`The delete link is ${link.href}`)
                 axios.delete(link.href)
                     .then((response) => {
+                        console.log(response)
                         window.location.reload()
                     })
                     .catch((err) => {
@@ -155,6 +163,7 @@ flipCard(key) {
             }
         },
         addToFavs(e) {
+            console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
             if (this.faved === false) {
@@ -163,12 +172,14 @@ flipCard(key) {
                 // eslint-disable-next-line vue/no-mutating-props
                 this.faved = true
                 $(this).addClass('active')
+                console.log('user id is' + userId)
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
                     )
                     .then((response) => {
                         this.faved = true
+                        console.log(response)
                     })
                     .catch((err) => {
                         console.log(err)
@@ -181,6 +192,7 @@ flipCard(key) {
                     .then((response) => {
                         this.faved = false
                         $(this).removeClass('active')
+                        console.log(response)
                         if (
                             window.location.href.toLowerCase() ===
                             'http://localhost:8080/favoriterecipes'
