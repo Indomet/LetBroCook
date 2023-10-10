@@ -28,7 +28,7 @@
                 <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image" />
                 <p class="card-title">{{ recipe.title }}</p>
                 <div class="tag-block">
-                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px">
+                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px" @click="filterByTag(tags)">
                         {{ tags.name }}
                     </span>
                 </div>
@@ -204,8 +204,19 @@ flipCard(key) {
                         console.log(err)
                     })
             }
-        }
-    }
+        },
+        filterByTag(selectedTag) {
+        console.log(selectedTag)
+     if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    const tag = [selectedTag]
+    this.$emitter.emit('search', { tags: tag, searchQuery: '' })
+  }, 500)
+}
+
+}
 }
 </script>
 
@@ -283,7 +294,7 @@ flipCard(key) {
     opacity: 50;
     border-radius: 1rem;
     background-color: inherit;
-    background-color: rgb(0, 92, 163);
+    background-image: linear-gradient(to right, #3bf053, #12b012);
     position: static;
     bottom: 0;
     margin-left: auto;
@@ -336,7 +347,7 @@ flipCard(key) {
 }
 
 .tags {
-    background-color: rgb(160, 182, 244);
+    background-image: linear-gradient(to right, #ccc8c8, #929792);
     border-radius: 1rem;
     cursor: pointer;
     outline-width: 2px;
@@ -349,7 +360,7 @@ flipCard(key) {
 }
 
 .tags:hover {
-    background-color: rgb(146, 155, 221);
+    background-image: linear-gradient(to right, #4dd025, #1eb93f);
 }
 
 /* Scrollbar styling */
