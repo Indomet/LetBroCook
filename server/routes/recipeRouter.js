@@ -9,25 +9,13 @@ router.use(methodOverride('_method'))
 const axios = require('axios');
 
 
-//Next 2 endpoints request from a python server that is running on port 8000 
-router.get('/Search/:query', async (req, res) => {
-  const query = req.params.query
-  serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
+//Next endpoints request from a python server that is running on port 8000 
 
-  await axios.get('http://127.0.0.1:8000/Search', { 
-    params: {
-      content: query
-    }
-  }).then((response) => {
-    return res.status(200).send(response.data);
-  
-}).catch((error) => {console.log(error)})})
-
-router.get('/Recommendation/:query', async (req, res) => {
+router.get('/Recommendation', async (req, res) => {
   serverUtil.writeToFile('./UserDataModel.json',userModel)
 
   const query = req.params.query
-  await axios.get('http://127.0.0.1:8000/Recommendation', { 
+  await axios.get('http://127.0.0.1:8000', { 
     params: {
       content: query
     }
@@ -57,9 +45,12 @@ router.get("/", function (req, res, next) {
 
     var recipes;
     //users can only filter or search not both
-    if (tags) {
-      recipes = recipeModel.find({ tags: { $in: tags } });
-    } else if (searchTerm) {
+    if (tags && searchTerm) {
+      recipes = recipeModel.find({ "tags.name": { $in: tags }, $text: { $search: searchTerm } });
+    }
+    else if (tags) {
+      recipes = recipeModel.find({ "tags.name": { $in: tags } });
+        } else if (searchTerm) {
       recipes = recipeModel.find({ $text: { $search: searchTerm } });
     } else {
       recipes = recipeModel.find({});
@@ -106,7 +97,8 @@ router.get("/tags/:tagId", userAuth.setRequestData, function(req, res, next){
 // hateoas
 router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
-  const recipeId = req.recipe.id
+  const recipeId = req.params.recipeId
+  console.log(recipeId)
   recipeModel.findById(recipeId).then(recipe => {
     const links = [
         // HATEOAS links
@@ -117,18 +109,19 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
     res.status(200).json({ recipe: recipe, links: links});
   })
   .catch(function(error){
+    console.log(error)
     error.status= 404
     return next(error)
   });
 
 });
 
-//replace a recipe
 //TODO ADD BACK USER AUUTH
 //THIS HAD BOTH
 router.post("/:userId/tags", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
   const newTag = req.body.tag
-  const existingTag = await Tag.find({name:newTag})//will return empty so check for if not tag
+  console.log("the tag is"  + newTag)
+  const existingTag = await Tag.find({name:newTag})//will return empty array if no tag exists
   if(existingTag.length>0){return res.status(409).json({messsage:"Tag already exists"})}
   else{
     await new Tag({

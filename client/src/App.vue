@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <NavBar/>
+    <div id="nav">
+      <NavBar/>
+    </div>
     <!-- Render the content of the current page view -->
     <!-- <router-view/> -->
       <router-view/>
@@ -9,7 +11,6 @@
 
 <script>
 import NavBar from './components/NavBar.vue'
-// import SearchBar from './components/SearchBar.vue'
 export default {
   name: 'app',
   components: {
@@ -27,4 +28,8 @@ export default {
   color: #2c3e50;
 }
 
+.links {
+    padding: 10px;
+    display: inline-block;
+}
 </style>

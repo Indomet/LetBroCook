@@ -7,25 +7,45 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
-        <li class="nav-item ">
-          <a class="auth-button nav-link active cur" aria-current="page"  href="#">Home</a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="auth-button nav-link active" aria-current="page"  href="/recipes">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="auth-button nav-link active recommendBTN" aria-current="page"  @click="getRecommendation">Recommendations</a>
         </li>
         <li class="nav-item">
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
         </li>
         <li  class="nav-item">
-          <router-link  to= "/signup"  v-if="!user" class="auth-button nav-link active" >Signup</router-link>
+          <router-link  to= "/signup" v-if="!user" class="auth-button nav-link active" >Signup</router-link>
         </li>
       </ul>
           <div class="input-group mb-3 ms-auto mb-2 mb-lg-0" >
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">All categories</button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tags</button>
+            <ul class="dropdown-menu" style="max-height: 200px; overflow-y: auto;">
+              <form>
+                <div class="form-group">
+                  <div
+                    v-for="(tag, index) in this.tags"
+                    :key="tag._id"
+                    class="form-check"
+                  >
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      :value="tag"
+                      :id="'tag' + index"
+                      v-model="selectedTags"
+                    />
+                    <label class="form-check-label" :for="'tag' + index">
+                      {{ tag.name }}
+                    </label>
+                  </div>
+                </div>
+              </form>
             </ul>
-            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+            <input type="text" class="form-control" aria-label="Text input with dropdown button" @keydown.enter="search" v-model="searchQuery">
           </div>
       <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
@@ -60,13 +80,28 @@
 </div>
 </template>
 
-<script>
+<script scoped>
 import { ref } from 'vue'
-// import Login from '../views/Login.vue'
-
-// import { Api } from '@/Api'
+import axios from 'axios'
 export default {
   name: 'NavBar',
+  data() {
+    return {
+      searchQuery: '',
+      tags: [],
+      selectedTags: []
+    }
+  },
+  mounted() {
+    axios
+      .get('http://localhost:3000/v1/recipes/tags')
+      .then((response) => {
+        this.tags = response.data.tags
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   setup() {
     const user = ref(localStorage.getItem('user-info'))
     const logout = () => {
@@ -89,12 +124,39 @@ export default {
       const subMenuWrap = document.getElementById('subMenu')
       // Toggle the sub-menu-wrap element's opacity class
       subMenuWrap.classList.toggle('open-menu')
-    }
+      // subMenuWrap.style.display = subMenuWrap.style.display === 'none' ? 'block' : 'none'
+    },
+    search() {
+      if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
+  }, 500)
+},
+getRecommendation() {
+  this.$emitter.emit('recommendation')
+}
+
   }
 }
 </script>
 
 <style>
+.form-check-input:checked{
+  background-color: rgb(41, 199, 41) !important;
+  border-color: rgb(41, 199, 41) !important;
+  box-shadow: none !important;
+
+}
+.recommendBTN{
+  cursor: pointer;
+}
+
+.recommendBTN:hover{  color: black !important; /* Change the text color to red when hovering */
+
+}
+
 .auth-button {
   margin: 0px 10px;
   padding: 8px 16px;
@@ -161,7 +223,15 @@ export default {
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none;
 }
+.sub-menu-wrap.open-menu {
+  pointer-events: all;
+  opacity: 1;
+  max-height: 400px;
+  overflow: visible;
+}
+
 @media (max-width: 768px) {
   .sub-menu-wrap {
     left: 50%;
@@ -170,12 +240,6 @@ export default {
   .userPic{
     margin-right: 35px;
   }
-}
-
-.sub-menu-wrap.open-menu {
-  opacity: 1;
-  max-height: 400px;
-  overflow: visible;
 }
 
 .sub-menu{
