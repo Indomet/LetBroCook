@@ -1,68 +1,72 @@
 <template>
-    <div class="container-xl px-4 mt-4">
-        <!-- Account page navigation-->
-        <nav class="nav nav-borders">
-            <router-link class="nav-link active ms-0" to="/EditProfile"
-                >Profile</router-link>
-            <router-link class="nav-link" to="/EditPassword"
-                >Security</router-link>
-        </nav>
-        <hr class="mt-0 mb-4">
-        <div class="row">
-            <div class="col-xl-4">
-                <!-- Profile picture card-->
-                <div class="card mb-4 mb-xl-0">
-                    <div class="card-header">Profile Picture</div>
-                    <div class="card-body text-center">
-                        <!-- Profile picture image-->
-                        <div>
-                        <img class="img-account-profile rounded-circle mb-2"
-                            src="https://media.licdn.com/dms/image/C4E03AQHLYqGPV_jvPQ/profile-displayphoto-shrink_200_200/0/1661597791434?e=1701907200&v=beta&t=gOxfNw3gncjzGlfPye4Pyl4TOgzlc7TyqITgZKpv1zg" alt="">
-                        </div>
-                        <!-- Profile picture upload button-->
-                        <button class="btn btn-primary" type="button">Upload new image</button>
-                    </div>
-                </div>
+  <div class="container-xl px-4 mt-4">
+    <!-- Account page navigation-->
+    <nav class="nav nav-borders">
+      <router-link class="nav-link active ms-0" to="/EditProfile">Profile</router-link>
+      <router-link class="nav-link" to="/EditPassword">Security</router-link>
+    </nav>
+    <hr class="mt-0 mb-4">
+    <div class="row">
+      <div class="col-lg-4">
+        <!-- Profile picture card-->
+        <div class="card mb-4 mb-xl-0">
+          <div class="card-header">Profile Picture</div>
+          <div class="card-body text-center">
+            <!-- Profile picture image-->
+            <div>
+              <img id="image" class="img-fluid img-account-profile rounded-circle mb-2" :src="image" alt="" >
             </div>
-            <div class="col-xl-8">
-                <!-- Account details card-->
-                <div class="card mb-4">
-                    <div class="card-header">Account Details</div>
-                    <div class="card-body ">
-                        <form  @submit.prevent="handleSubmit">
-                            <!-- Form Row-->
-                            <div class="row gx-3 mb-3 text-start">
-                                <!-- Form Group (username)-->
-                                <div class="col-md-6">
-                                    <label class="small mb-1" for="username">Username</label>
-                                    <input class="form-control" id="username" type="text"
-                                        placeholder="Enter your username" v-model="username">
-                                    <div v-if="usernameError" class="paint-red">{{ usernameError }}</div>
-                                </div>
-                                <!-- Form Group (name)-->
-                                <div class="col-md-6">
-                                    <label class="small mb-1" for="name">Name</label>
-                                    <input class="form-control" id="name" type="text"
-                                        placeholder="Enter your  name" v-model="name" >
-                                </div>
-                            </div>
-                            <!-- Form Row        -->
-                            <!-- Form Group (email address)-->
-                            <div class="mb-3 text-start">
-                                <label class="small mb-1" for="email">Email address</label>
-                                <input class="form-control" id="email" type="email"
-                                    placeholder="Enter your email address" v-model="email">
-                                    <div v-if="emailError" class="paint-red">{{ emailError }}</div>
-                            </div>
-                            <!-- Form Row-->
-                            <!-- Save changes button-->
-                            <button class="btn btn-primary" type="submit">Save changes</button>
-                        </form>
-                    </div>
+            <!-- Profile picture upload button-->
+            <div>
+              <form @submit.prevent="onFormSubmit">
+                <div class="field mb-3" style="display: flex; flex-direction: column; margin-top: 30px">
+                  <b-form-file v-model="file" placeholder="Upload a picture" drop-placeholder="Drop picture here"
+                    @change="onFileChange"></b-form-file>
                 </div>
+                <button class="btn btn-primary" type="submit">Upload new image</button>
+              </form>
             </div>
+          </div>
         </div>
+      </div>
+      <div class="col-lg-8">
+        <!-- Account details card-->
+        <div class="card mb-4">
+          <div class="card-header">Account Details</div>
+          <div class="card-body ">
+            <form @submit.prevent="handleSubmit">
+              <!-- Form Row-->
+              <div class="row gx-3 mb-3 text-start">
+                <!-- Form Group (username)-->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="username">Username</label>
+                  <input class="form-control" id="username" type="text" placeholder="Enter your username"
+                    v-model="username">
+                  <div v-if="usernameError" class="invalid-feedback d-block">{{ usernameError }}</div>
+                </div>
+                <!-- Form Group (name)-->
+                <div class="col-md-6">
+                  <label class="small mb-1" for="name">Name</label>
+                  <input class="form-control" id="name" type="text" placeholder="Enter your  name" v-model="name">
+                </div>
+              </div>
+              <!-- Form Row        -->
+              <!-- Form Group (email address)-->
+              <div class="mb-3 text-start">
+                <label class="small mb-1" for="email">Email address</label>
+                <input class="form-control" id="email" type="email" placeholder="Enter your email address"
+                  v-model="email">
+                <div v-if="emailError" class="invalid-feedback d-block">{{ emailError }}</div>
+              </div>
+              <!-- Form Row-->
+              <!-- Save changes button-->
+              <button class="btn btn-primary" type="submit">Save changes</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -71,6 +75,7 @@ export default {
   name: 'EditProfile',
   data() {
     return {
+      image: 'https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop',
       username: '',
       name: '',
       email: '',
@@ -86,14 +91,15 @@ export default {
     }
     const userId = user.body._id
     const response = await Api.get(`http://localhost:3000/v1/users/${userId}`)
-    const { username, name, email } = response.data.User
+    const { image, username, name, email } = response.data.User
+    this.image = image
     this.username = username
     this.name = name
     this.email = email
   },
   methods: {
     async handleSubmit() {
-      // this sends the request just for data that is filled in
+      // this sends the request just for data that is filled in, ... helps to separate the data
       const data = {
         ...(this.username ? { username: this.username } : {}),
         ...(this.name ? { name: this.name } : {}),
@@ -126,16 +132,22 @@ export default {
 </script>
 
 <style scoped>
-.paint-red {
-  color: red;
+@media screen and (min-width: 992px) {
+  #image {
+    width: 40%;
+  }
 }
+
 .card-body {
     margin-top: 20px;
-
 }
 
 .img-account-profile {
-    height: 10rem;
+    width: 100px;
+    /* height: 30%; */
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    position: relative;
 }
 
 .rounded-circle {
