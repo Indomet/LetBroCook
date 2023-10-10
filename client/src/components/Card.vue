@@ -34,7 +34,7 @@
                     </span>
                 </div>
                 <div class="button-container">
-                    <div @click="flipCard(id)" class="flip-button">More info</div>
+                    <div @click="flipCard(recipeId)" class="flip-button">More info</div>
                     <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs">
                     </div>
                     <div class="wrapper" v-if="allowDropdown">
@@ -81,13 +81,13 @@
                 </div>
                 <div class="no-nut-info" v-else>No nutritional data.</div>
                 <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
-                <div @click="flipCard(id)" class="flip-button">Back</div>
+                <div @click="flipCard(recipeId)" class="flip-button">Back</div>
                 <button @click="showComment()" class=" btn btn-secondary" id="show-comment-button">Show comments</button>
                 <div class="comment-section" v-if="this.showComments">
-                    <form @submit.prevent="postComment(id)">
+                    <form @submit.prevent="postComment(recipeId)">
                         <div class="form-group">
                             <label for="input-1" id="comment-field">Write a comment:</label>
-                            <textarea class="form-control" id="input-1" v-model="this.comment" rows="2" required></textarea>
+                            <textarea class="form-control" id="input-1" v-model="this.comment" rows="1" required></textarea>
                             <button type="submit" id="submit-button" class="btn btn-primary"
                                 style="text-align: center; margin-top: 5px;">Submit</button>
                         </div>
@@ -102,25 +102,36 @@
                                     <div class="card-body" style="margin-bottom: 0px; padding: 5px;">
                                         <div class="d-flex flex-row align-items-center">
                                             <img id="comment-pfp"
-                                                src="https://preview.redd.it/xl4vo7dypk661.jpg?width=750&format=pjpg&auto=webp&s=37db154454fd21f68a6c092419112fc586e60961"
+                                                src="https://gachax.com/anime/wp-content/uploads/sites/29/2023/06/cute-anime-girl-pfp-profile-pictures-chibi.png"
                                                 alt="avatar" width="40" height="40" />
-                                            <div class="small mb-0 ms-2" style="margin-left: 10px;">{{
-                                                each.ownerId.username }}</div>
+                                            <div v-if="this.user">
+                                                <div v-if="each.ownerId._id == this.user.body._id">
+                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                        {{ each.ownerId.username }} (You)</div>
+                                                </div>
+                                                <div v-else>
+                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                        {{ each.ownerId.username }}</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div v-if="this.user">
-                                            <div v-if="this.user.body._id == each.ownerId._id">
+                                            <div v-if="each.ownerId._id == this.user.body._id">
                                                 <button @click="editComment(each)" class="btn" id="edit-comment-button"><img
                                                         src="../assets/edit-icon-black.png" width="20" height="20"></button>
                                             </div>
                                         </div>
                                         <hr style="margin-top: 5px; margin-bottom: 2px;">
                                         <div v-if="each.editing">
-                                            <form @submit.prevent="updateComment(each._id)">
-                                                <div class="form-group">
+                                            <form @submit.prevent="updateComment(each)">
+                                                <div class="form-group" style="margin-bottom: 0;">
                                                     <label for="input-1" id="comment-field">Editing comment:</label>
-                                                    <input class="form-control" id="input-1" rows="2" required :value="each.comment">
-                                                    <button type="submit" id="submit-button" class="btn btn-secondary"
-                                                        style="text-align: center; margin-top: 5px;">Confirm</button>
+                                                    <input class="form-control" id="input-1" rows="2" required
+                                                        v-model="each.editedComment">
+                                                    <button type="submit" id="submit-comment-btn" class="btn btn-success"
+                                                        style="text-align: center; margin-top: 5px;">Save</button>
+                                                    <button @click="deleteComment(each, recipeId)" class="btn btn-danger"
+                                                        id="delete-comment-btn">Delete</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -171,7 +182,7 @@ export default {
         }
     },
     props: {
-        id: String,
+        recipeId: String,
         recipe: Object,
         recipeMap: Map,
         allowFavRecipe: Boolean,
@@ -274,6 +285,7 @@ export default {
             const arr = this.recipe.comments
             for (const each of arr) {
                 each.editing = false
+                each.editedComment = each.comment
             }
             return arr
         },
@@ -287,7 +299,10 @@ export default {
             } else {
                 const userId = user.body._id
                 const data = {
-                    ownerId: userId,
+                    ownerId: {
+                        username: user.body.username,
+                        _id: userId
+                    },
                     recipeId: id,
                     comment: this.comment,
                     author: user.body.username
@@ -295,14 +310,26 @@ export default {
                 axios.post(`http://localhost:3000/v1/users/${userId}/recipes/${id}/comments`, data)
                     .then((res) => {
                         console.log(res.data)
-                        this.commentList.push(res.data)
+                        const temp = {
+                            _id: res.data._id,
+                            ownerId: {
+                                username: user.body.username,
+                                _id: userId
+                            },
+                            recipeId: res.data.recipeId,
+                            comment: res.data.comment,
+                            author: res.data.author,
+                            editedComment: this.comment
+                        }
+                        this.commentList.push(temp)
                     })
                     .catch((err) => {
                         console.log(err)
                     })
             }
         },
-        updateComment(commentId) {
+        updateComment(comment) {
+            const commentId = comment._id
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (!user) {
                 alert('You must be logged in first')
@@ -310,14 +337,40 @@ export default {
                 const userId = user.body._id
                 const data = {
                     _id: commentId,
-                    ownerId: userId,
-                    comment: 'jhdsfjkdhfgjkdljrfgdkjrljjkdgsfjlfg',
+                    ownerId: { username: userId },
+                    comment: comment.editedComment,
                     author: user.body.username
                 }
                 axios.put(`http://localhost:3000/v1/users/${userId}/comments/${commentId}`, data)
                     .then((res) => {
                         console.log(res.data)
-                        this.commentList.push(res.data)
+                        comment.editing = false
+                        for (const each of this.commentList) {
+                            if (each._id === commentId) {
+                                each.comment = comment.editedComment
+                                break
+                            }
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
+        deleteComment(comment, recipeId) {
+            const commentId = comment._id
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                console.log(commentId)
+                axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${recipeId}/comments/${commentId}`)
+                    .then((res) => {
+                        console.log(res.data)
+                        comment.editing = false
+                        this.commentList.splice(this.commentList.indexOf(comment), 1)
+                        alert('Comment deleted successfully!')
                     })
                     .catch((err) => {
                         console.log(err)
@@ -473,10 +526,19 @@ export default {
 
 #show-comment-button {
     margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-#submit-button {
+#submit-comment-btn {
     margin-top: 5px;
+    padding: 3px;
+    margin-right: 20px;
+}
+
+#delete-comment-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px;
 }
 
 #edit-comment-button {
@@ -497,6 +559,7 @@ export default {
 
 #comment-pfp {
     border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Scrollbar styling */
