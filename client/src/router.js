@@ -6,6 +6,9 @@ import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import CreateRecipe from './views/CreateRecipe.vue'
 import EditRecipe from './views/EditRecipe.vue'
+import EditProfile from './views/EditProfile.vue'
+import EditPassword from './views/EditPassword.vue'
+
 import FavoriteRecipes from './views/FavoriteRecipes.vue'
 import MyRecipes from './views/MyRecipes.vue'
 Vue.use(Router)
@@ -38,6 +41,16 @@ export default new Router({
       path: '/EditRecipe/:id',
       name: 'EditRecipe',
       component: EditRecipe
+    },
+    {
+      path: '/EditProfile',
+      name: 'EditProfile',
+      component: EditProfile
+    },
+    {
+      path: '/EditPassword',
+      name: 'EditPassword',
+      component: EditPassword
     },
     {
       path: '/recipes',
