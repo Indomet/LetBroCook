@@ -55,7 +55,7 @@
             <h2>John Doe</h2>
           </div>
           <hr>
-          <a href="#" class = "sub-menu-link">
+          <a href="/EditProfile" class = "sub-menu-link">
             <img src="../assets/profile.png">
               <p>Edit Profile</p>
               <span>></span>
