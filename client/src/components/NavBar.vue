@@ -12,6 +12,9 @@
           <a class="auth-button nav-link active" aria-current="page"  href="/">Home</a>
         </li>
         <li class="nav-item">
+          <a class="auth-button nav-link active recommendBTN" aria-current="page"  @click="getRecommendation">Recommendations</a>
+        </li>
+        <li class="nav-item">
           <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
         </li>
         <li  class="nav-item">
@@ -52,20 +55,30 @@
             <h2>John Doe</h2>
           </div>
           <hr>
-          <a href="#" class = "sub-menu-link">
+          <a href="/EditProfile" class = "sub-menu-link">
             <img src="../assets/profile.png">
               <p>Edit Profile</p>
+              <span>></span>
+          </a>
+          <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
+            <img src="../assets/NewRecipe.png">
+              <p>Create a Recipe</p>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
+          </a>
+          <a href="/MyRecipes" class = "sub-menu-link">
+            <img src="../assets/recipe-book.png" style="zoom: 100%;">
+              <p>My Recipes</p>
+              <span>></span>
+          </a>
+          <a href="/FavoriteRecipes" class = "sub-menu-link">
+            <img src="../assets/1480758-200.png">
+              <p>My Favorite Recipes</p>
               <span>></span>
           </a>
           <a href="/" @click="logout()" v-if="user" class = "sub-menu-link">
             <img src="../assets/logout.png">
               <p>Logout</p>
               <span>></span>
-          </a>
-          <a href="/CreateRecipe" v-if="user" class = "sub-menu-link">
-            <img src="../assets/logout.png">
-              <p>Create a recipe</p>
-              &nbsp;&nbsp;&nbsp;&nbsp;<span>></span>
           </a>
         </div>
       <form class="d-flex" role="search">
@@ -121,11 +134,20 @@ export default {
       const subMenuWrap = document.getElementById('subMenu')
       // Toggle the sub-menu-wrap element's opacity class
       subMenuWrap.classList.toggle('open-menu')
+      // subMenuWrap.style.display = subMenuWrap.style.display === 'none' ? 'block' : 'none'
     },
     search() {
-      this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
-      // console.log('Search query:', this.searchQuery)
+      if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
+  }, 500)
+},
+getRecommendation() {
+  this.$emitter.emit('recommendation')
 }
+
   }
 }
 </script>
@@ -137,6 +159,14 @@ export default {
   box-shadow: none !important;
 
 }
+.recommendBTN{
+  cursor: pointer;
+}
+
+.recommendBTN:hover{  color: black !important; /* Change the text color to red when hovering */
+
+}
+
 .auth-button {
   margin: 0px 10px;
   padding: 8px 16px;
@@ -203,7 +233,15 @@ export default {
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none;
 }
+.sub-menu-wrap.open-menu {
+  pointer-events: all;
+  opacity: 1;
+  max-height: 400px;
+  overflow: visible;
+}
+
 @media (max-width: 768px) {
   .sub-menu-wrap {
     left: 50%;
@@ -212,12 +250,6 @@ export default {
   .userPic{
     margin-right: 35px;
   }
-}
-
-.sub-menu-wrap.open-menu {
-  opacity: 1;
-  max-height: 400px;
-  overflow: visible;
 }
 
 .sub-menu{

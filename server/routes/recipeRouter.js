@@ -9,25 +9,13 @@ router.use(methodOverride('_method'))
 const axios = require('axios');
 
 
-//Next 2 endpoints request from a python server that is running on port 8000
-router.get('/Search/:query', async (req, res) => {
-  const query = req.params.query
-  serverUtil.writeToFile('./RecipeDataModel.json',recipeModel)
+//Next endpoints request from a python server that is running on port 8000
 
-  await axios.get('http://127.0.0.1:8000/Search', {
-    params: {
-      content: query
-    }
-  }).then((response) => {
-    return res.status(200).send(response.data);
-
-}).catch((error) => {console.log(error)})})
-
-router.get('/Recommendation/:query', async (req, res) => {
+router.get('/Recommendation', async (req, res) => {
   serverUtil.writeToFile('./UserDataModel.json',userModel)
 
   const query = req.params.query
-  await axios.get('http://127.0.0.1:8000/Recommendation', {
+  await axios.get('http://127.0.0.1:8000', {
     params: {
       content: query
     }

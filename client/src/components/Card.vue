@@ -29,14 +29,15 @@
                 <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image" />
                 <p class="card-title">{{ recipe.title }}</p>
                 <div class="tag-block">
-                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px">
+                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px" @click="filterByTag(tags)">
                         {{ tags.name }}
                     </span>
                 </div>
                 <div class="button-container">
                     <div @click="flipCard(recipeId)" class="flip-button">More info</div>
-                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: isFaved }" @click="addToFavs">
-                    </div>
+                    <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
+    <i class="fa fa-heart"></i>
+</div>
                     <div class="wrapper" v-if="allowDropdown">
                         <div class="btn-group dropup">
                             <button type="button" class="btn btn-secondary dropdown-toggle optionsBTN"
@@ -156,29 +157,15 @@ import $ from 'jquery'
 import axios from 'axios'
 
 export default {
-    name: 'Card',
-    async mounted() {
-        // console.log(this.links)
-        $(document).ready(function () {
-            const timeline = new mojs.Timeline()
-
-            $('.button').click(function () {
-                if ($(this).hasClass('active')) {
-                    $(this).removeClass('active')
-                } else {
-                    timeline.play()
-                    $(this).addClass('active')
-                }
-            })
-        })
-    },
+  name: 'Card',
     data() {
         return {
             comment: '',
             editedComment: '',
             showComments: false,
             commentList: this.createCommentList(),
-            user: JSON.parse(localStorage.getItem('user-info'))
+            user: JSON.parse(localStorage.getItem('user-info')),
+            faved: this.isFaved
         }
     },
     props: {
@@ -247,16 +234,22 @@ export default {
             }
         },
         addToFavs(e) {
-            console.log(window.location.href)
+            console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
             const userId = user.body._id
-            if (!$(e.currentTarget).hasClass('active')) {
-                // console.log('removed to fav')
+            if (this.faved === false) {
+                const timeline = new mojs.Timeline()
+                timeline.play()
+                // eslint-disable-next-line vue/no-mutating-props
+                this.faved = true
+                $(this).addClass('active')
+                console.log('user id is' + userId)
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
                     )
                     .then((response) => {
+                        this.faved = true
                         console.log(response)
                     })
                     .catch((err) => {
@@ -268,6 +261,8 @@ export default {
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favoriteDeletion`
                     )
                     .then((response) => {
+                        this.faved = false
+                        $(this).removeClass('active')
                         console.log(response)
                         if (
                             window.location.href.toLowerCase() ===
@@ -378,8 +373,19 @@ export default {
                         console.log(err)
                     })
             }
-        }
-    }
+        },
+        filterByTag(selectedTag) {
+        console.log(selectedTag)
+     if (this.$router.currentRoute.name !== 'recipes') {
+    this.$router.push({ name: 'recipes' })
+  }
+  setTimeout(() => {
+    const tag = [selectedTag]
+    this.$emitter.emit('search', { tags: tag, searchQuery: '' })
+  }, 500)
+}
+
+}
 }
 </script>
 
@@ -457,7 +463,7 @@ export default {
     opacity: 50;
     border-radius: 1rem;
     background-color: inherit;
-    background-color: rgb(0, 92, 163);
+    background-image: linear-gradient(to right, #3bf053, #12b012);
     position: static;
     bottom: 0;
     margin-left: auto;
@@ -506,7 +512,7 @@ export default {
 }
 
 .tags {
-    background-color: rgb(160, 182, 244);
+    background-image: linear-gradient(to right, #ccc8c8, #929792);
     border-radius: 1rem;
     outline-width: 2px;
     outline-color: rgb(27, 18, 21);
@@ -518,7 +524,50 @@ export default {
 }
 
 .tags:hover {
-    background-color: rgb(146, 155, 221);
+    background-image: linear-gradient(to right, #4dd025, #1eb93f);
+}
+
+#comment-field {
+    margin-top: 5px;
+    text-align: left;
+}
+
+#show-comment-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#submit-comment-btn {
+    margin-top: 5px;
+    padding: 3px;
+    margin-right: 20px;
+}
+
+#delete-comment-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px;
+}
+
+#edit-comment-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 5px;
+    padding: 0;
+}
+
+#edit-comment-button:hover {
+    scale: 1.1;
+}
+
+#comment-card {
+    margin-bottom: 5px;
+}
+
+#comment-pfp {
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 #comment-field {
