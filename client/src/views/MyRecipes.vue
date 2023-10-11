@@ -23,7 +23,8 @@ export default {
         return {
             recipeData: [],
             recipeMap: {},
-            favedRecipes: []
+            favedRecipes: [],
+            numberOfRecipesToShow: 8
         }
     },
     mounted() {

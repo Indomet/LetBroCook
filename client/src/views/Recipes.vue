@@ -53,7 +53,7 @@ export default {
             recipeData: [],
             recipeMap: {},
             favedRecipes: [],
-            numberOfRecipesToShow: 4,
+            numberOfRecipesToShow: 8,
             isAtBottom: false
 
         }
@@ -163,7 +163,7 @@ export default {
             this.adjustMap(this.numberOfRecipesToShow)
         },
         loadMore() {
-            this.numberOfRecipesToShow += 4
+            this.numberOfRecipesToShow += 8
             this.adjustMap(this.numberOfRecipesToShow)
         },
         adjustMap(maxNumberOfRecipes) {
