@@ -3,6 +3,7 @@
         <div :class="{
             flipped: recipe.flipped,
             card: 'card',
+            recipeCard: 'recipeCard',
             'h-100': 'h-100',
             'flex-fill': 'flex-fill'
         }" style="
@@ -33,7 +34,7 @@
                     </span>
                 </div>
                 <div class="button-container">
-                    <div @click="flipCard(id)" class="flip-button">More info</div>
+                    <div @click="flipCard(recipeId)" class="flip-button">More info</div>
                     <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
     <i class="fa fa-heart"></i>
 </div>
@@ -81,22 +82,94 @@
                 </div>
                 <div class="no-nut-info" v-else>No nutritional data.</div>
                 <h4 class="serving-text">Serving size: {{ recipe.servings }}</h4>
-                <div @click="flipCard(id)" class="flip-button">Back</div>
-                <h2>Comments TBD</h2>
+                <div @click="flipCard(recipeId)" class="flip-button">Back</div>
+                <button @click="showComment()" class=" btn btn-secondary" id="show-comment-button">Show comments</button>
+                <div class="comment-section" v-if="this.showComments">
+                    <form @submit.prevent="postComment(recipeId)">
+                        <div class="form-group">
+                            <label for="input-1" id="comment-field">Write a comment:</label>
+                            <textarea class="form-control" id="input-1" v-model="this.comment" rows="1" required></textarea>
+                            <button type="submit" id="submit-button" class="btn btn-primary"
+                                style="text-align: center; margin-top: 5px;">Submit</button>
+                        </div>
+                    </form>
+                    <div v-if="recipe.comments.length == 0">
+                        <h5>Nothing to show here~</h5>
+                    </div>
+                    <div v-else>
+                        <div v-for="each in recipe.comments" :key="each._id">
+                            <div class="row d-flex">
+                                <div class="card mb-1">
+                                    <div class="card-body" style="margin-bottom: 0px; padding: 5px;">
+                                        <div class="d-flex flex-row align-items-center">
+                                            <img id="comment-pfp"
+                                                src="https://gachax.com/anime/wp-content/uploads/sites/29/2023/06/cute-anime-girl-pfp-profile-pictures-chibi.png"
+                                                alt="avatar" width="40" height="40" />
+                                            <div v-if="this.user">
+                                                <div v-if="each.ownerId._id == this.user.body._id">
+                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                        {{ each.ownerId.username }} (You)</div>
+                                                </div>
+                                                <div v-else>
+                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                        {{ each.ownerId.username }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-if="this.user">
+                                            <div v-if="each.ownerId._id == this.user.body._id">
+                                                <button @click="editComment(each)" class="btn" id="edit-comment-button"><img
+                                                        src="../assets/edit-icon-black.png" width="20" height="20"></button>
+                                            </div>
+                                        </div>
+                                        <hr style="margin-top: 5px; margin-bottom: 2px;">
+                                        <div v-if="each.editing">
+                                            <form @submit.prevent="updateComment(each)">
+                                                <div class="form-group" style="margin-bottom: 0;">
+                                                    <label for="input-1" id="comment-field">Editing comment:</label>
+                                                    <input class="form-control" id="input-1" rows="2" required
+                                                        v-model="each.editedComment">
+                                                    <button type="submit" id="submit-comment-btn" class="btn btn-success"
+                                                        style="text-align: center; margin-top: 5px;">Save</button>
+                                                    <button @click="deleteComment(each, recipeId)" class="btn btn-danger"
+                                                        id="delete-comment-btn">Delete</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div v-else class="align-items-left">
+                                            <div style="text-align: left;">{{ each.comment }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </b-card-body>
         </div>
     </div>
 </template>
 
-<script>
+<script scoped>
 import mojs from '@mojs/core'
 import $ from 'jquery'
 import axios from 'axios'
 
 export default {
   name: 'Card',
+    data() {
+        return {
+            comment: '',
+            editedComment: '',
+            showComments: false,
+            commentList: this.createCommentList(),
+            user: JSON.parse(localStorage.getItem('user-info')),
+            faved: this.isFaved
+        }
+    },
     props: {
-        id: Number,
+        recipeId: String,
         recipe: Object,
         recipeMap: Map,
         allowFavRecipe: Boolean,
@@ -105,43 +178,41 @@ export default {
         isFaved: Boolean,
         links: Array
     },
-    data() {
-        return {
-            faved: this.isFaved
-        }
-    },
     methods: {
-flipCard(key) {
-    let newValue
-    const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
-    let recipeLinks
-    if (isInMyRecipes) {
-        console.log('myrecipes')
-        newValue = this.recipeMap.get(key).recipe
-        recipeLinks = this.recipeMap.get(key).links
-    } else {
-        // console.log('not myrecipes')
-        newValue = this.recipeMap.get(key)
-    }
-    for (const [id, recipe] of this.recipeMap) {
-        if (key !== id) {
+        showComment() {
+            this.showComments = !this.showComments
+        },
+        flipCard(key) {
+            let newValue
+            const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
+            let recipeLinks
             if (isInMyRecipes) {
-                console.log('flipped')
-                recipe.recipe.flipped = false
+                console.log('myrecipes')
+                newValue = this.recipeMap.get(key).recipe
+                recipeLinks = this.recipeMap.get(key).links
             } else {
-                recipe.flipped = false
+                // console.log('not myrecipes')
+                newValue = this.recipeMap.get(key)
             }
-            this.recipeMap.set(id, recipe)
-        }
-    }
-    newValue.flipped = !newValue.flipped
-    if (isInMyRecipes) {
-        this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
-        console.log(this.links)
-    } else {
-        this.recipeMap.set(key, newValue)
-    }
-},
+            for (const [id, recipe] of this.recipeMap) {
+                if (key !== id) {
+                    if (isInMyRecipes) {
+                        console.log('flipped')
+                        recipe.recipe.flipped = false
+                    } else {
+                        recipe.flipped = false
+                    }
+                    this.recipeMap.set(id, recipe)
+                }
+            }
+            newValue.flipped = !newValue.flipped
+            if (isInMyRecipes) {
+                this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
+                console.log(this.links)
+            } else {
+                this.recipeMap.set(key, newValue)
+            }
+        },
         editOrDelete(operation) {
             console.log(this.links)
             const link = this.links.find(link => link.rel === operation)
@@ -205,6 +276,104 @@ flipCard(key) {
                     })
             }
         },
+        createCommentList() {
+            const arr = this.recipe.comments
+            console.log(typeof arr)
+            for (const each of arr) {
+                console.log(each)
+                each.editing = false
+                each.editedComment = each.comment
+            }
+            return arr
+        },
+        editComment(comment) {
+            comment.editing = !comment.editing
+        },
+        postComment(id) {
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                const data = {
+                    ownerId: {
+                        username: user.body.username,
+                        _id: userId
+                    },
+                    recipeId: id,
+                    comment: this.comment,
+                    author: user.body.username
+                }
+                axios.post(`http://localhost:3000/v1/users/${userId}/recipes/${id}/comments`, data)
+                    .then((res) => {
+                        console.log(res.data)
+                        const temp = {
+                            _id: res.data._id,
+                            ownerId: {
+                                username: user.body.username,
+                                _id: userId
+                            },
+                            recipeId: res.data.recipeId,
+                            comment: res.data.comment,
+                            author: res.data.author,
+                            editedComment: this.comment
+                        }
+                        this.commentList.push(temp)
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
+        updateComment(comment) {
+            const commentId = comment._id
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                const data = {
+                    _id: commentId,
+                    ownerId: { username: userId },
+                    comment: comment.editedComment,
+                    author: user.body.username
+                }
+                axios.put(`http://localhost:3000/v1/users/${userId}/comments/${commentId}`, data)
+                    .then((res) => {
+                        console.log(res.data)
+                        comment.editing = false
+                        for (const each of this.commentList) {
+                            if (each._id === commentId) {
+                                each.comment = comment.editedComment
+                                break
+                            }
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
+        deleteComment(comment, recipeId) {
+            const commentId = comment._id
+            const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+            } else {
+                const userId = user.body._id
+                console.log(commentId)
+                axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${recipeId}/comments/${commentId}`)
+                    .then((res) => {
+                        console.log(res.data)
+                        comment.editing = false
+                        this.commentList.splice(this.commentList.indexOf(comment), 1)
+                        alert('Comment deleted successfully!')
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            }
+        },
         filterByTag(selectedTag) {
         console.log(selectedTag)
      if (this.$router.currentRoute.name !== 'recipes') {
@@ -251,7 +420,7 @@ flipCard(key) {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-.card:hover {
+.recipeCard:hover {
     outline-width: 3px;
     outline-color: rgb(255, 255, 255);
     outline-style: solid;
@@ -322,10 +491,6 @@ flipCard(key) {
     margin-right: 5%;
 }
 
-.card-title:hover {
-    text-decoration: underline black;
-}
-
 .card-image {
     margin-top: auto;
     width: 100%;
@@ -349,7 +514,6 @@ flipCard(key) {
 .tags {
     background-image: linear-gradient(to right, #ccc8c8, #929792);
     border-radius: 1rem;
-    cursor: pointer;
     outline-width: 2px;
     outline-color: rgb(27, 18, 21);
     outline-style: solid;
@@ -361,6 +525,92 @@ flipCard(key) {
 
 .tags:hover {
     background-image: linear-gradient(to right, #4dd025, #1eb93f);
+}
+
+#comment-field {
+    margin-top: 5px;
+    text-align: left;
+}
+
+#show-comment-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#submit-comment-btn {
+    margin-top: 5px;
+    padding: 3px;
+    margin-right: 20px;
+}
+
+#delete-comment-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px;
+}
+
+#edit-comment-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 5px;
+    padding: 0;
+}
+
+#edit-comment-button:hover {
+    scale: 1.1;
+}
+
+#comment-card {
+    margin-bottom: 5px;
+}
+
+#comment-pfp {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#comment-field {
+    margin-top: 5px;
+    text-align: left;
+}
+
+#show-comment-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#submit-comment-btn {
+    margin-top: 5px;
+    padding: 3px;
+    margin-right: 20px;
+}
+
+#delete-comment-btn {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px;
+}
+
+#edit-comment-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 5px;
+    padding: 0;
+}
+
+#edit-comment-button:hover {
+    scale: 1.1;
+}
+
+#comment-card {
+    margin-bottom: 5px;
+}
+
+#comment-pfp {
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Scrollbar styling */
@@ -375,8 +625,6 @@ flipCard(key) {
 ::-webkit-scrollbar-track {
     background: #a2a2a2;
     border-radius: 1rem;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
 }
 
 /* Handle */

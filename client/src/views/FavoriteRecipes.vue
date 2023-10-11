@@ -3,7 +3,7 @@
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
-                <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="true" :DB_ID="recipe._id"
+                <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :recipeId="key" :allowFavRecipe="true" :DB_ID="recipe._id"
                 :allowDropdown="false"
                 :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
             </div>
@@ -58,6 +58,15 @@ export default {
             }
             return arr
         },
+        trimCommentList(arr) {
+            const maxNumberOfComments = 10 // Max number of tags to be shown
+            let newArr = []
+            if (arr.length > maxNumberOfComments) {
+                newArr = arr.slice(0, maxNumberOfComments)
+                return newArr
+            }
+            return arr
+        },
         mapArray() {
             let newArr = []
             const maxNumberOfRecipes = 7
@@ -69,6 +78,7 @@ export default {
             }
             for (const each of newArr) {
                 each.tags = this.trimTagList(each.tags)
+                each.comments = this.trimCommentList(each.comments)
                 map.set(each._id, each)
             }
             this.recipeMap = map
