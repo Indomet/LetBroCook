@@ -37,7 +37,7 @@
                     <div @click="flipCard(recipeId)" class="flip-button">More info</div>
                     <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
     <i class="fa fa-heart"></i>
-</div>
+                    </div>
                     <div class="wrapper" v-if="allowDropdown">
                         <div class="btn-group dropup">
                             <button type="button" class="btn btn-secondary dropdown-toggle optionsBTN"
@@ -187,11 +187,9 @@ export default {
             const isInMyRecipes = window.location.href.toLowerCase().includes('myrecipes')
             let recipeLinks
             if (isInMyRecipes) {
-                console.log('myrecipes')
                 newValue = this.recipeMap.get(key).recipe
                 recipeLinks = this.recipeMap.get(key).links
             } else {
-                // console.log('not myrecipes')
                 newValue = this.recipeMap.get(key)
             }
             for (const [id, recipe] of this.recipeMap) {
@@ -208,19 +206,16 @@ export default {
             newValue.flipped = !newValue.flipped
             if (isInMyRecipes) {
                 this.recipeMap.set(key, { recipe: newValue, links: recipeLinks })
-                console.log(this.links)
             } else {
                 this.recipeMap.set(key, newValue)
             }
         },
         editOrDelete(operation) {
-            console.log(this.links)
             const link = this.links.find(link => link.rel === operation)
             if (operation === 'edit') {
                 console.log(`The edit link is ${link.href}`)
                 this.$router.push(link.href)
             } else if (operation === 'delete') {
-                console.log(`The delete link is ${link.href}`)
                 axios.delete(link.href)
                     .then((response) => {
                         console.log(response)
@@ -234,7 +229,6 @@ export default {
             }
         },
         addToFavs(e) {
-            console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (!user) {
                 alert('You must be logged in first')
@@ -247,14 +241,12 @@ export default {
                 // eslint-disable-next-line vue/no-mutating-props
                 this.faved = true
                 $(this).addClass('active')
-                console.log('user id is' + userId)
                 axios
                     .post(
                         `http://localhost:3000/v1/users/${userId}/recipes/${this.DB_ID}/favorite-recipes`
                     )
                     .then((response) => {
                         this.faved = true
-                        console.log(response)
                     })
                     .catch((err) => {
                         console.log(err)
@@ -267,7 +259,6 @@ export default {
                     .then((response) => {
                         this.faved = false
                         $(this).removeClass('active')
-                        console.log(response)
                         if (
                             window.location.href.toLowerCase() ===
                             'http://localhost:8080/favoriterecipes'
@@ -282,9 +273,7 @@ export default {
         },
         createCommentList() {
             const arr = this.recipe.comments
-            console.log(typeof arr)
             for (const each of arr) {
-                console.log(each)
                 each.editing = false
                 each.editedComment = each.comment
             }
@@ -310,7 +299,6 @@ export default {
                 }
                 axios.post(`http://localhost:3000/v1/users/${userId}/recipes/${id}/comments`, data)
                     .then((res) => {
-                        console.log(res.data)
                         const temp = {
                             _id: res.data._id,
                             ownerId: {
@@ -344,7 +332,6 @@ export default {
                 }
                 axios.put(`http://localhost:3000/v1/users/${userId}/comments/${commentId}`, data)
                     .then((res) => {
-                        console.log(res.data)
                         comment.editing = false
                         for (const each of this.commentList) {
                             if (each._id === commentId) {
@@ -365,10 +352,8 @@ export default {
                 alert('You must be logged in first')
             } else {
                 const userId = user.body._id
-                console.log(commentId)
                 axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${recipeId}/comments/${commentId}`)
                     .then((res) => {
-                        console.log(res.data)
                         comment.editing = false
                         this.commentList.splice(this.commentList.indexOf(comment), 1)
                         alert('Comment deleted successfully!')
@@ -379,7 +364,6 @@ export default {
             }
         },
         filterByTag(selectedTag) {
-        console.log(selectedTag)
      if (this.$router.currentRoute.name !== 'recipes') {
     this.$router.push({ name: 'recipes' })
   }

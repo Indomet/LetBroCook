@@ -27,6 +27,7 @@ export default {
         }
     },
     mounted() {
+        window.addEventListener('scroll', this.handleScroll)
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         axios.get(`http://localhost:3000/v1/users/${userId}/recipes`)
@@ -47,8 +48,17 @@ export default {
                 this.loading = false
             })
     },
+    unmounted () {
+    window.removeEventListener('scroll', this.handleScroll)
+  },
     methods: {
-        trimTagList(arr) {
+        handleScroll (event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+        console.log('bottom')
+        this.loadMore()
+    }
+},
+trimTagList(arr) {
             const maxNumberOfTags = 3 // Max number of tags to be shown
             let newArr = []
             if (arr.length > maxNumberOfTags) {
@@ -58,21 +68,27 @@ export default {
             return arr
         },
         mapArray() {
-    let newArr = []
-    const maxNumberOfRecipes = 7
-    const map = new Map()
-    if (this.recipeData.length > maxNumberOfRecipes) {
-        newArr = this.recipeData.slice(0, maxNumberOfRecipes)
-    } else {
-        newArr = this.recipeData
-    }
-    // console.log('new arr recipe is at ele 0 is: ' + JSON.stringify(newArr[0].links))
-    for (const each of newArr) {
-        each.recipe.tags = this.trimTagList(each.recipe.tags)
-        map.set(each.recipe._id, each)
-    }
-    this.recipeMap = map
-}
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        loadMore() {
+            this.numberOfRecipesToShow += 4
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        adjustMap(maxNumberOfRecipes) {
+            let newArr = []
+            const map = new Map()
+            if (this.recipeData.length > maxNumberOfRecipes) {
+                newArr = this.recipeData.slice(0, maxNumberOfRecipes)
+            } else {
+                newArr = this.recipeData
+            }
+            for (const each of newArr) {
+                each.tags = this.trimTagList(each.tags)
+                each.comments = this.trimCommentList(each.comments)
+                map.set(each._id, each)
+            }
+            this.recipeMap = map
+        }
     }
 
 }
