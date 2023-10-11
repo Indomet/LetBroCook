@@ -283,7 +283,9 @@ export default {
         },
         createCommentList() {
             const arr = this.recipe.comments
+            console.log(typeof arr)
             for (const each of arr) {
+                console.log(each)
                 each.editing = false
                 each.editedComment = each.comment
             }
