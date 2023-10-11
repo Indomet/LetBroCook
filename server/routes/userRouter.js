@@ -7,7 +7,7 @@ const { recipeModel, Tag ,Comment} = require("../models/recipeModel.js"); //. fo
 const userModel = require("../models/userModel.js");
 const serverUtil = require("../serverUtil.js")
 const userAuth = require("../basicAuth.js")
-
+var bcrypt = require("bcrypt")
 module.exports = router
 
 //GET----------------------------------
@@ -108,7 +108,6 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
 //POST----------------------------------
 
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
 
@@ -307,14 +306,38 @@ router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async functio
 //ADD BACK USER AUTHENTICAION
 router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
 
-    await userModel.findById(req.user.id).then(user=>{
+  // check if username already exists in database
+  const usernameExists = await userModel.findOne({ username: req.body.username });
+  if (usernameExists && usernameExists._id.toString() !== req.params.userId) {
+      return res.status(400).json({ message: "Username already exists" });
+  }
+
+  // heck if email already exists in database
+  const emailExists = await userModel.findOne({ email: req.body.email });
+  if (emailExists && emailExists._id.toString() !== req.params.userId) {
+      return res.status(400).json({ message: "Email already exists" });
+  }
+
+  bcrypt.compare(req.body.current_password, req.user.password, function (err, isMatch) {
+    console.log("isMatch: " + isMatch)
+    if (err){
+      console.log(err)
+    }
+    if (isMatch || !req.body.password) {
+      // if username and email are unique, update
+      userModel.findById(req.user.id).then(user => {
         Object.assign(user, req.body);
         user.save();
-        return res.status(200).json({message:"User updated"})
-    }).catch(err=>{
-      err.status=404
-      return next(err)
-    })
+        return res.status(200).json({ message: user })
+      }).catch(err => {
+        err.status = 404
+        return next(err)
+      })
+    }
+    else {
+      return res.status(403).json({ message: "Incorrect password" })
+    }
+  })
 })
 
 // edit a recipe
@@ -414,28 +437,24 @@ router.delete('/', async (req, res,next) => {
 //Delete favourite recipe
 //TODO ADD BACK USER AUTH THIS HAD ONE
 router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-    try{
-        const user = req.user
-        const recipeId= req.recipe.id
-        index = user.favouriteRecipes.indexOf(recipeId)
-        user.favouriteRecipes.splice(recipeId, 1)
-        user.save()
-        return res.status(200).json({message: "Favorite recipe removed"})
-    }catch(err){
-        return next(err)
+    const userId = req.params.userId;
+    const recipeId = req.params.recipeId;
+    try {
+      const user = await userModel.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const index = user.favouriteRecipes.indexOf(recipeId);
+      if (index === -1) {
+        throw new Error('Recipe not found in favourites');
+      }
+
+      user.favouriteRecipes.splice(index, 1);
+      await user.save();
+      return res.status(200).json({ message: 'Recipe removed from favourites' });
+    } catch (error) {
+      return next(error)
     }
 
-  /*
-  userModel.findById(userId).then((user)=>{
-    index = user.favouriteRecipes.indexOf(recipeId)
-    user.favouriteRecipes.splice(recipeId,1)
-    user.save()
-    return res.status(200).json({message: "Fav recipe removed"})
-  }
-  ).catch((err)=>{
-    err.message = "recipe doesnt exist"
-    err.status=404
-    return next(err)
-  })
-  */
 })
