@@ -236,6 +236,10 @@ export default {
         addToFavs(e) {
             console.log('THE DB ID IS ' + this.DB_ID)
             const user = JSON.parse(localStorage.getItem('user-info'))
+            if (!user) {
+                alert('You must be logged in first')
+                return
+            }
             const userId = user.body._id
             if (this.faved === false) {
                 const timeline = new mojs.Timeline()
@@ -521,6 +525,7 @@ export default {
     padding: 4px;
     margin: 5px;
     display: inline-block;
+    cursor: pointer;
 }
 
 .tags:hover {
