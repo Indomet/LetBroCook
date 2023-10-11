@@ -9,19 +9,19 @@ router.use(methodOverride('_method'))
 const axios = require('axios');
 
 
-//Next endpoints request from a python server that is running on port 8000 
+//Next endpoints request from a python server that is running on port 8000
 
 router.get('/Recommendation', async (req, res) => {
   serverUtil.writeToFile('./UserDataModel.json',userModel)
 
   const query = req.params.query
-  await axios.get('http://127.0.0.1:8000', { 
+  await axios.get('http://127.0.0.1:8000', {
     params: {
       content: query
     }
   }).then((response) => {
     return res.status(200).send(response.data);
-  
+
 }).catch((error) => {console.log(error)})})
 
 
@@ -46,14 +46,46 @@ router.get("/", function (req, res, next) {
     var recipes;
     //users can only filter or search not both
     if (tags && searchTerm) {
-      recipes = recipeModel.find({ "tags.name": { $in: tags }, $text: { $search: searchTerm } });
+      recipes = recipeModel.find({ "tags.name": { $in: tags }, $text: { $search: searchTerm } })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
     }
     else if (tags) {
-      recipes = recipeModel.find({ "tags.name": { $in: tags } });
+      recipes = recipeModel.find({ "tags.name": { $in: tags } })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
         } else if (searchTerm) {
-      recipes = recipeModel.find({ $text: { $search: searchTerm } });
+      recipes = recipeModel.find({ $text: { $search: searchTerm } })
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
     } else {
-      recipes = recipeModel.find({});
+      recipes = recipeModel.find({})
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
     }
 
     recipes

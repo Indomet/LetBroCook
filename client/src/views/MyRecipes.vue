@@ -3,7 +3,7 @@
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
-                <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :id="key" :allowFavRecipe="false"
+                <Card :recipe="recipe.recipe" @flip-card="flipCard" :recipeMap="recipeMap" :recipeId="key" :allowFavRecipe="false"
                     :DB_ID="recipe._id" :allowDropdown="true" :links="recipe.links"></Card>
             </div>
         </div>

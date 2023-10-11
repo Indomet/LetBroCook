@@ -32,7 +32,15 @@ router.get("/", function (req, res, next) {
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
     try {
-        const recipes = await recipeModel.find({owner: req.user.id});
+        const recipes = await recipeModel.find({owner: req.user.id})
+        .populate({
+            path: 'comments',
+            populate: {
+              path: 'ownerId',
+              select: 'username ownerId',
+              model: userModel // Assuming 'User' is the name of your User model
+            }
+          });
 
         const recipeList = recipes.map(recipe => {
             const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
@@ -161,18 +169,22 @@ router.post("/:userId/recipes/", async (req, res, next) => {
 */
 
 router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
-  userModel.findById(req.params.userId).then(user=>{
-    const favedArray = user.favouriteRecipes
-    recipeModel.find({ _id: { $in: favedArray } }).then(recipes => {
+    const favedArray = req.user.favouriteRecipes
+    recipeModel.find({ _id: { $in: favedArray } })
+    .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
+    .then(recipes => {
       res.status(200).json({favouriteRecipes: recipes});
     }).catch(err => {
       console.error(err);
       res.status(500).send("Error retrieving recipes");
     });
-  }).catch(err => {
-    console.error(err);
-    res.status(500).send("Error retrieving user");
-  });
 });
 
 //TODO ADD USER AUTH BACK
@@ -183,7 +195,6 @@ router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestDa
     userModel.findById(user.id).then(user=>{
       if(!recipeModel.findById(recipe.id))
       {return res.status(404).json({message: "Invalid recipe id"})}
-
       user.favouriteRecipes.push(recipe.id);
       return res.status(201).json({message: "recipe created"})
     })
@@ -221,7 +232,7 @@ router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestDa
 //add a comment by a user to a certain recipe
 //TODO ADD BACK USER AUTH
 //this only had userAuth.authUser
-router.post("/:userId/recipes/:recipeId/comments", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, (req, res, next) => {
+router.post("/:userId/recipes/:recipeId/comments", userAuth.setRequestData, userAuth.authUser, (req, res, next) => {
 
     const userId = req.user.id
     const recipeId = req.recipe.id
@@ -277,7 +288,7 @@ router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async functio
   const { username, email, password, name, recipes, favouriteRecipes } = req.body;
 
   try {
-    const updatedUser = await userModel.findById(userId) 
+    const updatedUser = await userModel.findById(userId)
     Object.assign(updatedUser, {username, email, password, name, recipes, favouriteRecipes});
     await updatedUser.save();
     res.status(200).json({ message: "User replaced", user: updatedUser });
@@ -350,11 +361,10 @@ router.patch("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.aut
 
 
 //Update comment by id
-//TODO: Make comment into separate model and create authorization
-router.patch('/:userId/comments/:commentId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfComment, async (req, res, next) => {
+router.put('/:userId/comments/:commentId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfComment, async (req, res, next) => {
     const newComment = req.body.comment
     const id = req.comment.id
-    await Comment.findByIdAndUpdate(id,{comment:newComment}).then((result)=>{
+    Comment.findByIdAndUpdate(id,{comment:newComment}).then((result)=>{
       return res.status(200).json({
         message: "Comment updated",
         body: result
@@ -434,12 +444,12 @@ router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequest
       if (!user) {
         throw new Error('User not found');
       }
-  
+
       const index = user.favouriteRecipes.indexOf(recipeId);
       if (index === -1) {
         throw new Error('Recipe not found in favourites');
       }
-  
+
       user.favouriteRecipes.splice(index, 1);
       await user.save();
       return res.status(200).json({ message: 'Recipe removed from favourites' });
