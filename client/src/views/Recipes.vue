@@ -55,7 +55,6 @@ export default {
             favedRecipes: [],
             numberOfRecipesToShow: 8,
             isAtBottom: false
-
         }
     },
     mounted() {

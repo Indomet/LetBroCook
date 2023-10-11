@@ -77,7 +77,7 @@ router.get("/", function (req, res, next) {
         }
       })
     } else {
-      recipes = recipeModel.find({})
+      recipes = recipeModel.find({}).sort({ _id: -1 })
       .populate({
         path: 'comments',
         populate: {
