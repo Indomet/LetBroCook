@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "ca2ce01d-dcf9-44c3-bfb4-17ef202b102f",
+		"_postman_id": "ec8ec583-85a4-4195-8100-3a6c580d9d76",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29691657"
+		"_exporter_id": "29736996"
 	},
 	"item": [
 		{
@@ -665,7 +665,7 @@
 				}
 			],
 			"request": {
-				"method": "PATCH",
+				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
