@@ -32,7 +32,15 @@ router.get("/", function (req, res, next) {
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
 
     try {
-        const recipes = await recipeModel.find({owner: req.user.id});
+        const recipes = await recipeModel.find({owner: req.user.id})
+        .populate({
+            path: 'comments',
+            populate: {
+              path: 'ownerId',
+              select: 'username ownerId',
+              model: userModel // Assuming 'User' is the name of your User model
+            }
+          });
 
         const recipeList = recipes.map(recipe => {
             const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
@@ -163,7 +171,16 @@ router.post("/:userId/recipes/", async (req, res, next) => {
 
 router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const favedArray = req.user.favouriteRecipes
-    recipeModel.find({ _id: { $in: favedArray } }).then(recipes => {
+    recipeModel.find({ _id: { $in: favedArray } })
+    .populate({
+        path: 'comments',
+        populate: {
+          path: 'ownerId',
+          select: 'username ownerId',
+          model: userModel // Assuming 'User' is the name of your User model
+        }
+      })
+    .then(recipes => {
       res.status(200).json({favouriteRecipes: recipes});
     }).catch(err => {
       console.error(err);
