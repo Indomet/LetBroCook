@@ -1,27 +1,37 @@
 <template>
     <div>
-        <div v-if="recipeData.length === 0">
-            <p style="font-size: 2rem; font-weight: bold; text-align: center">
-                No recipes found
-            </p>
-        </div>
-        <div v-else>
-            <div class="d-flex flex-wrap">
-                <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
-                    class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem">
-                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :recipeId="key" :allowFavRecipe="true"
-                    :DB_ID="recipe._id" :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
-                </div>
-            </div>
-        </div>
+      <div v-if="recipeData.length === 0">
+        <p style="font-size: 2rem; font-weight: bold; text-align: center">
+          No recipes found
+        </p>
+      </div>
+      <div v-else>
+        <div class="d-flex flex-wrap">
+          <div
+            v-for="[key, recipe] in recipeMap"
+            :key="recipe._id"
+            class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
+            style="margin-bottom: 4rem"
+          >
+            <Card
+              :recipe="recipe"
+              @flip-card="flipCard"
+              :recipeMap="recipeMap"
+              :recipeId="key"
+              :allowFavRecipe="true"
+              :DB_ID="recipe._id"
+              :isFaved="favedRecipes.includes(recipe._id)"
+            ></Card>
+          </div>
     </div>
-</template>
+      </div>
+</div>
+  </template>
 
 <script scoped>
 import { ref } from 'vue'
 import axios from 'axios'
 import Card from '../components/Card.vue'
-
 export default {
     el: '#sgf',
     components: {
@@ -42,13 +52,17 @@ export default {
         return {
             recipeData: [],
             recipeMap: {},
-            favedRecipes: []
+            favedRecipes: [],
+            numberOfRecipesToShow: 4,
+            isAtBottom: false
+
         }
     },
     mounted() {
         this.$emitter.on('recommendation', (data) => {
             this.getRecommendation()
         })
+        window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
             if (data) {
@@ -63,7 +77,16 @@ export default {
         // fetch all recipes
         this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
     },
+    unmounted () {
+    window.removeEventListener('scroll', this.handleScroll)
+  },
     methods: {
+        handleScroll (event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+        console.log('bottom')
+        this.loadMore()
+    }
+        },
         fetchData(url) {
             axios
                 .get(url)
@@ -137,8 +160,14 @@ export default {
             return arr
         },
         mapArray() {
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        loadMore() {
+            this.numberOfRecipesToShow += 4
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        adjustMap(maxNumberOfRecipes) {
             let newArr = []
-            const maxNumberOfRecipes = 7
             const map = new Map()
             if (this.recipeData.length > maxNumberOfRecipes) {
                 newArr = this.recipeData.slice(0, maxNumberOfRecipes)

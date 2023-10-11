@@ -28,6 +28,7 @@ export default {
         }
     },
     mounted() {
+        window.addEventListener('scroll', this.handleScroll)
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`)
@@ -48,7 +49,16 @@ export default {
                 this.loading = false
             })
     },
+    unmounted () {
+    window.removeEventListener('scroll', this.handleScroll)
+  },
     methods: {
+        handleScroll (event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+        console.log('bottom')
+        this.loadMore()
+    }
+},
         trimTagList(arr) {
             const maxNumberOfTags = 3 // Max number of tags to be shown
             let newArr = []
@@ -68,8 +78,14 @@ export default {
             return arr
         },
         mapArray() {
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        loadMore() {
+            this.numberOfRecipesToShow += 4
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        adjustMap(maxNumberOfRecipes) {
             let newArr = []
-            const maxNumberOfRecipes = 7
             const map = new Map()
             if (this.recipeData.length > maxNumberOfRecipes) {
                 newArr = this.recipeData.slice(0, maxNumberOfRecipes)
