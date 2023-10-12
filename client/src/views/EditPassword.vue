@@ -107,7 +107,7 @@ export default {
         const userId = user.body._id
         const response = await Api.patch(`http://localhost:3000/v1/users/${userId}`, data)
         console.log(response)
-        this.$router.push('/')
+        window.location.reload()
       } catch (error) {
         if (error.response && error.response.status === 403) {
           alert('Current password is incorrect. Please try again')
