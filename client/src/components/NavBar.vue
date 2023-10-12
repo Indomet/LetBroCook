@@ -47,12 +47,14 @@
             </ul>
             <input type="text" class="form-control" aria-label="Text input with dropdown button" @keydown.enter="search" v-model="searchQuery">
           </div>
-      <img  v-if="user" src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class = "userPic" @click="showSubMenu">
+      <img  v-if="user" :src = "image" class = "userPic" @click="showSubMenu">
       <div class="sub-menu-wrap" id="subMenu">
         <div class="sub-menu">
           <div class="user-info">
-            <img src = "https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop" class="rounded-circle hidden-xs" id ="lol">
-            <h2>John Doe</h2>
+            <div>
+            <img :src = "image" class="position rounded-circle hidden-xs" id ="lol">
+          </div>
+            <h2>{{username}}</h2>
           </div>
           <hr>
           <a href="/EditProfile" class = "sub-menu-link">
@@ -111,6 +113,17 @@ export default {
       .catch((err) => {
         console.log(err)
       })
+    const user = JSON.parse(localStorage.getItem('user-info'))
+    const userId = user.body._id
+    axios.get(`http://localhost:3000/v1/users/${userId}`)
+      .then(response => {
+        const { image, username } = response.data.User
+        this.image = image
+        this.username = username
+      })
+      .catch(error => {
+        console.error(error)
+      })
   },
   setup() {
     const user = ref(localStorage.getItem('user-info'))
@@ -153,6 +166,11 @@ getRecommendation() {
 </script>
 
 <style>
+.position {
+  /* position: absolute;
+  top: 8px;
+  left: 8px; */
+}
 .form-check-input:checked{
   background-color: rgb(41, 199, 41) !important;
   border-color: rgb(41, 199, 41) !important;

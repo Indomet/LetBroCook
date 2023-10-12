@@ -98,6 +98,25 @@ export default {
     this.email = email
   },
   methods: {
+    onFileChange(e) {
+      this.file = e.target.files[0]
+      const reader = new FileReader()
+      reader.onload = () => {
+        this.image = reader.result
+      }
+      reader.readAsDataURL(this.file)
+    },
+    async onFormSubmit() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        const response = await Api.patch(`http://localhost:3000/v1/users/${userId}`, { image: this.image })
+        console.log(response)
+      } catch (error) {
+        console.log(error)
+      }
+      window.location.reload()
+    },
     async handleSubmit() {
       // this sends the request just for data that is filled in, ... helps to separate the data
       const data = {
@@ -110,7 +129,7 @@ export default {
         const userId = user.body._id
         const response = await Api.patch(`http://localhost:3000/v1/users/${userId}`, data)
         console.log(response)
-        this.$router.push('/')
+        window.location.reload()
       } catch (error) {
         console.log(error)
         if (error.response) {
