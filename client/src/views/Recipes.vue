@@ -1,10 +1,13 @@
 <template>
     <div>
-      <div v-if="recipeData.length === 0">
-        <p style="font-size: 2rem; font-weight: bold; text-align: center">
-          No recipes found
-        </p>
-      </div>
+        <div v-if="recipeData.length<=0 || isSearching" class="loading-icon">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+    <div v-else-if="recipeData.length === 0">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                No recipes found
+            </p>
+        </div>
       <div v-else>
         <div class="d-flex flex-wrap">
           <div
@@ -54,17 +57,23 @@ export default {
             recipeMap: {},
             favedRecipes: [],
             numberOfRecipesToShow: 8,
-            isAtBottom: false
+            loading: true,
+            isAtBottom: false,
+            isSearching: false
         }
     },
     mounted() {
+        console.log(this.loading)
         this.$emitter.on('recommendation', (data) => {
             this.getRecommendation()
         })
         window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
+            this.isSearching = true
+            console.log('is sarching is ' + this.isSearching)
             if (data) {
+                this.isSearching = true
                 const searchQuery = data.searchQuery
                 const tagNames = data.tags.map(tag => tag.name)
                 const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
@@ -75,6 +84,7 @@ export default {
         })
         // fetch all recipes
         this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
+        this.loading = false
     },
     unmounted () {
     window.removeEventListener('scroll', this.handleScroll)
@@ -103,6 +113,9 @@ export default {
                 })
                 .finally(() => {
                     this.loading = false
+                    if (this.isSearching) {
+                        this.isSearching = false
+                    }
                 })
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (user) {
@@ -183,3 +196,13 @@ export default {
     }
 }
 </script>
+
+<style>
+.loading-icon {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+}
+</style>
