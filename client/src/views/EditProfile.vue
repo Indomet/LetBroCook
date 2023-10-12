@@ -75,7 +75,7 @@ export default {
   name: 'EditProfile',
   data() {
     return {
-      image: 'https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop',
+      image: '',
       username: '',
       name: '',
       email: '',
@@ -84,6 +84,7 @@ export default {
     }
   },
   async mounted() {
+  try {
     const user = JSON.parse(localStorage.getItem('user-info'))
     if (!user) {
       this.$router.push({ name: 'home' })
@@ -96,7 +97,11 @@ export default {
     this.username = username
     this.name = name
     this.email = email
-  },
+  } catch (error) {
+    console.error(error)
+  }
+},
+
   methods: {
     onFileChange(e) {
       this.file = e.target.files[0]
@@ -118,6 +123,10 @@ export default {
       window.location.reload()
     },
     async handleSubmit() {
+      if (this.username.length > 20) {
+        this.usernameError = 'Username must be 20 characters or less'
+        return
+      }
       // this sends the request just for data that is filled in, ... helps to separate the data
       const data = {
         ...(this.username ? { username: this.username } : {}),

@@ -12,7 +12,7 @@
             <a class="auth-button nav-link active" aria-current="page"  href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="auth-button nav-link active recommendBTN" aria-current="page"  @click="getRecommendation">Recommendations</a>
+            <a class="auth-button nav-link active recommendBTN" v-if="user" aria-current="page"  @click="getRecommendation">Recommendations</a>
           </li>
           <li class="nav-item">
             <router-link to= "/login"  v-if="!user" class="auth-button nav-link active">Login</router-link>
@@ -113,6 +113,7 @@
         .catch((err) => {
           console.log(err)
         })
+      if (!localStorage.getItem('user-info')) return
       const user = JSON.parse(localStorage.getItem('user-info'))
       const userId = user.body._id
       axios.get(`http://localhost:3000/v1/users/${userId}`)

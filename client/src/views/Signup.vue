@@ -120,7 +120,10 @@ export default {
         // notify user form is invalid
         return
       }
-
+      if (this.username.length > 20) {
+        this.usernameError = 'Username must be 20 characters or less'
+        return
+      }
       const data = {
         image: this.image,
         username: this.username,

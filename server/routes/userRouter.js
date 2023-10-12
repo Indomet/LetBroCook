@@ -285,11 +285,11 @@ router.post("/signup", (req, res, next) => {
 //replace a user
 router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async function (req, res, next) {
   const userId = req.user.id
-  const { username, email, password, name, recipes, favouriteRecipes } = req.body;
+  const { image, username, email, password, name, recipes, favouriteRecipes } = req.body;
 
   try {
     const updatedUser = await userModel.findById(userId)
-    Object.assign(updatedUser, {username, email, password, name, recipes, favouriteRecipes});
+    Object.assign(updatedUser, {image, username, email, password, name, recipes, favouriteRecipes});
     await updatedUser.save();
     res.status(200).json({ message: "User replaced", user: updatedUser });
   } catch (err) {
