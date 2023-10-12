@@ -39,6 +39,14 @@ export default {
     mounted() {
         window.addEventListener('scroll', this.handleScroll)
         const user = JSON.parse(localStorage.getItem('user-info'))
+        try {
+            if (!user) {
+                this.$router.push({ name: 'home' })
+                return // stop executing if user is not logged in
+            }
+        } catch (error) {
+            console.error(error)
+        }
         const userId = user.body._id
         axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`)
             .then((response) => {

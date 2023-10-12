@@ -7,7 +7,7 @@ import CreateRecipe from './views/CreateRecipe.vue'
 import EditRecipe from './views/EditRecipe.vue'
 import EditProfile from './views/EditProfile.vue'
 import EditPassword from './views/EditPassword.vue'
-
+import NotFound from './views/NotFound.vue'
 import FavoriteRecipes from './views/FavoriteRecipes.vue'
 import MyRecipes from './views/MyRecipes.vue'
 Vue.use(Router)
@@ -65,6 +65,11 @@ export default new Router({
       path: '/MyRecipes',
       name: 'MyRecipes',
       component: MyRecipes
+    },
+    {
+      path: '*',
+      name: 'NotFound',
+      component: NotFound // Use the NotFound component for unmatched routes
     }
   ]
 })
