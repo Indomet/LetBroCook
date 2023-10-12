@@ -1,27 +1,40 @@
 <template>
     <div>
-        <div v-if="recipeData.length === 0">
+        <div v-if="recipeData.length<=0 || isSearching" class="loading-icon">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+    <div v-else-if="recipeData.length === 0">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 No recipes found
             </p>
         </div>
-        <div v-else>
-            <div class="d-flex flex-wrap">
-                <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
-                    class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem">
-                    <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :recipeId="key" :allowFavRecipe="true"
-                    :DB_ID="recipe._id" :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
-                </div>
-            </div>
-        </div>
+      <div v-else>
+        <div class="d-flex flex-wrap">
+          <div
+            v-for="[key, recipe] in recipeMap"
+            :key="recipe._id"
+            class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex"
+            style="margin-bottom: 4rem"
+          >
+            <Card
+              :recipe="recipe"
+              @flip-card="flipCard"
+              :recipeMap="recipeMap"
+              :recipeId="key"
+              :allowFavRecipe="true"
+              :DB_ID="recipe._id"
+              :isFaved="favedRecipes.includes(recipe._id)"
+            ></Card>
+          </div>
     </div>
-</template>
+      </div>
+</div>
+  </template>
 
 <script scoped>
 import { ref } from 'vue'
 import axios from 'axios'
 import Card from '../components/Card.vue'
-
 export default {
     el: '#sgf',
     components: {
@@ -42,16 +55,25 @@ export default {
         return {
             recipeData: [],
             recipeMap: {},
-            favedRecipes: []
+            favedRecipes: [],
+            numberOfRecipesToShow: 8,
+            loading: true,
+            isAtBottom: false,
+            isSearching: false
         }
     },
     mounted() {
+        console.log(this.loading)
         this.$emitter.on('recommendation', (data) => {
             this.getRecommendation()
         })
+        window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
+            this.isSearching = true
+            console.log('is sarching is ' + this.isSearching)
             if (data) {
+                this.isSearching = true
                 const searchQuery = data.searchQuery
                 const tagNames = data.tags.map(tag => tag.name)
                 const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
@@ -62,8 +84,18 @@ export default {
         })
         // fetch all recipes
         this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
+        this.loading = false
     },
+    unmounted () {
+    window.removeEventListener('scroll', this.handleScroll)
+  },
     methods: {
+        handleScroll (event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+        console.log('bottom')
+        this.loadMore()
+    }
+        },
         fetchData(url) {
             axios
                 .get(url)
@@ -81,6 +113,9 @@ export default {
                 })
                 .finally(() => {
                     this.loading = false
+                    if (this.isSearching) {
+                        this.isSearching = false
+                    }
                 })
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (user) {
@@ -137,8 +172,14 @@ export default {
             return arr
         },
         mapArray() {
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        loadMore() {
+            this.numberOfRecipesToShow += 8
+            this.adjustMap(this.numberOfRecipesToShow)
+        },
+        adjustMap(maxNumberOfRecipes) {
             let newArr = []
-            const maxNumberOfRecipes = 7
             const map = new Map()
             if (this.recipeData.length > maxNumberOfRecipes) {
                 newArr = this.recipeData.slice(0, maxNumberOfRecipes)
@@ -155,3 +196,13 @@ export default {
     }
 }
 </script>
+
+<style>
+.loading-icon {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+}
+</style>

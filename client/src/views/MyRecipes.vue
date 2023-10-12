@@ -1,5 +1,14 @@
 <template>
     <div>
+        <div v-if="recipeData.length<=0" class="loading-icon">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+    <div v-else-if="recipeData.length === 0">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                No recipes found
+            </p>
+        </div>
+      <div v-else>
         <div class="d-flex flex-wrap">
             <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
@@ -7,6 +16,7 @@
                     :DB_ID="recipe._id" :allowDropdown="true" :links="recipe.links"></Card>
             </div>
         </div>
+                </div>
     </div>
 </template>
 
