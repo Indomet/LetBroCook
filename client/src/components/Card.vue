@@ -477,6 +477,14 @@ export default {
     font-size: x-large;
     margin-left: 3%;
     margin-right: 5%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-title:hover {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .card-image {

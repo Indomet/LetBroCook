@@ -1,14 +1,22 @@
 <template>
     <div>
-        <div class="d-flex flex-wrap">
-            <div v-for="[key, recipe] in recipeMap" :key="recipe._id"
+        <div v-if="recipeData.length<=0" class="loading-icon">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+    <div v-else-if="recipeData.length === 0">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                No recipes found
+            </p>
+        </div>
+        <div v-else class="d-flex flex-wrap">
+            <div  v-for="[key, recipe] in recipeMap" :key="recipe._id"
                 class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 d-flex" style="margin-bottom: 4rem;">
                 <Card :recipe="recipe" @flip-card="flipCard" :recipeMap="recipeMap" :recipeId="key" :allowFavRecipe="true" :DB_ID="recipe._id"
                 :allowDropdown="false"
                 :isFaved="this.favedRecipes.includes(recipe._id)"></Card>
             </div>
         </div>
-    </div>
+        </div>
 </template>
 
 <script scoped>
@@ -104,3 +112,13 @@ export default {
 
 }
 </script>
+
+<style scoped>
+.loading-icon {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+}
+</style>
