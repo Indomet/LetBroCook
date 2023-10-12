@@ -51,8 +51,10 @@
       <div class="sub-menu-wrap" id="subMenu">
         <div class="sub-menu">
           <div class="user-info">
-            <img :src = "image" class="rounded-circle hidden-xs" id ="lol">
-            <h2>{{name}}</h2>
+            <div>
+            <img :src = "image" class="position rounded-circle hidden-xs" id ="lol">
+          </div>
+            <h2>{{username}}</h2>
           </div>
           <hr>
           <a href="/EditProfile" class = "sub-menu-link">
@@ -115,9 +117,9 @@ export default {
     const userId = user.body._id
     axios.get(`http://localhost:3000/v1/users/${userId}`)
       .then(response => {
-        const { image, name } = response.data.User
+        const { image, username } = response.data.User
         this.image = image
-        this.name = name
+        this.username = username
       })
       .catch(error => {
         console.error(error)
@@ -164,6 +166,11 @@ getRecommendation() {
 </script>
 
 <style>
+.position {
+  /* position: absolute;
+  top: 8px;
+  left: 8px; */
+}
 .form-check-input:checked{
   background-color: rgb(41, 199, 41) !important;
   border-color: rgb(41, 199, 41) !important;
