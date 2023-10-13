@@ -69,7 +69,7 @@ export default new Router({
     {
       path: '*',
       name: 'NotFound',
-      component: NotFound // Use the NotFound component for unmatched routes
+      component: NotFound
     }
   ]
 })
