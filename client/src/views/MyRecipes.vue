@@ -16,7 +16,7 @@
                     :DB_ID="recipe._id" :allowDropdown="true" :links="recipe.links"></Card>
             </div>
         </div>
-                </div>
+        </div>
     </div>
 </template>
 
