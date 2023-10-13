@@ -80,9 +80,9 @@ class Recommendation:
         return recommendationPercentages.to_json(orient="records", force_ascii=False, default_handler=str)
 
 
- 
 
-    
+
+
 if __name__ == "__main__":
     client = pymongo.MongoClient("mongodb://localhost:27017/")
     db = client["LetBroCook"]

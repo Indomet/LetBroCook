@@ -144,6 +144,7 @@ export default {
             const recipeParams = favedRecipesIds.map((id) => `recipe=${id}`).join('&')
             await axios.get('http://localhost:8000?' + recipeParams).then((response) => {
                 this.recipeData = response.data
+                console.log(this.recipeData)
                 for (const recipe of this.recipeData) {
                         recipe.flipped = false
                     }
