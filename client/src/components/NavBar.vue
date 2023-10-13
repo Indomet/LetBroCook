@@ -92,30 +92,69 @@
   </div>
   </template>
 
-  <script scoped>
-  import { ref } from 'vue'
-  import axios from 'axios'
-  export default {
-    name: 'NavBar',
-    data() {
-      return {
-        searchQuery: '',
-        tags: [],
-        selectedTags: []
-      }
+<script scoped>
+import { ref } from 'vue'
+import axios from 'axios'
+export default {
+  name: 'NavBar',
+  data() {
+    return {
+      searchQuery: '',
+      tags: [],
+      selectedTags: [],
+      image: ''
+    }
+  },
+  mounted() {
+    axios
+      .get('http://localhost:3000/v1/recipes/tags')
+      .then((response) => {
+        this.tags = response.data.tags
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    if (!localStorage.getItem('user-info')) return
+    const user = JSON.parse(localStorage.getItem('user-info'))
+    const userId = user.body._id
+    this.updateProfilePicture(userId)
+  },
+  setup() {
+    const user = ref(localStorage.getItem('user-info'))
+    const logout = () => {
+      localStorage.removeItem('user-info')
+      user.value = null
+    }
+    return {
+      user,
+      logout
+    }
+  },
+  watch: {
+    '$route'() {
+      this.user = localStorage.getItem('user-info')
+    }
+  },
+  methods: {
+    showSubMenu() {
+      // Get a reference to the submenu-wrap element
+      const subMenuWrap = document.getElementById('subMenu')
+      // Toggle the sub-menu-wrap element's opacity class
+      subMenuWrap.classList.toggle('open-menu')
+      // subMenuWrap.style.display = subMenuWrap.style.display === 'none' ? 'block' : 'none'
     },
-    mounted() {
-      axios
-        .get('http://localhost:3000/v1/recipes/tags')
-        .then((response) => {
-          this.tags = response.data.tags
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-      if (!localStorage.getItem('user-info')) return
-      const user = JSON.parse(localStorage.getItem('user-info'))
-      const userId = user.body._id
+    search() {
+      if (this.$router.currentRoute.name !== 'recipes') {
+        this.$router.push({ name: 'recipes' })
+      }
+      setTimeout(() => {
+        this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
+      }, 500)
+    },
+    getRecommendation() {
+      this.$emitter.emit('recommendation')
+    },
+    updateProfilePicture(userId) {
       axios.get(`http://localhost:3000/v1/users/${userId}`)
         .then(response => {
           const { image, username } = response.data.User
@@ -125,52 +164,18 @@
         .catch(error => {
           console.error(error)
         })
-    },
-    setup() {
-      const user = ref(localStorage.getItem('user-info'))
-      const logout = () => {
-        localStorage.removeItem('user-info')
-        user.value = null
-      }
-      return {
-        user,
-        logout
-      }
-    },
-    watch: {
-      '$route'() {
-        this.user = localStorage.getItem('user-info')
-      }
-    },
-    methods: {
-      showSubMenu() {
-        // Get a reference to the submenu-wrap element
-        const subMenuWrap = document.getElementById('subMenu')
-        // Toggle the sub-menu-wrap element's opacity class
-        subMenuWrap.classList.toggle('open-menu')
-        // subMenuWrap.style.display = subMenuWrap.style.display === 'none' ? 'block' : 'none'
-      },
-      search() {
-        if (this.$router.currentRoute.name !== 'recipes') {
-      this.$router.push({ name: 'recipes' })
     }
-    setTimeout(() => {
-      this.$emitter.emit('search', { tags: this.selectedTags, searchQuery: this.searchQuery })
-    }, 500)
-  },
-  getRecommendation() {
-    this.$emitter.emit('recommendation')
-  }
 
-    }
   }
-  </script>
+}
+</script>
 
   <style>
   .username {
   float: right;
   width: 70%;
   overflow: ellipsis;
+  word-wrap: break-word;
 }
 
   .form-check-input:checked{
