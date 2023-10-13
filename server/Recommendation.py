@@ -78,15 +78,11 @@ class Recommendation:
             recipesCursor = self.recipesCollections.find({})
             recipesDF = pd.DataFrame(list(recipesCursor))
             recommendationPercentages = pd.merge(recipesDF, recommendationPercentages, left_on="_id", right_on="favouriteRecipes").drop(["Scores","all","similar"], axis=1)
-            print(recommendationPercentages["comments"])
-            timestamp = 1697220263649 / 1000  # divide by 1000 to convert to seconds
             for recipeComments in recommendationPercentages["comments"]:
                 for i, comment in enumerate(recipeComments):
                     comment_id = ObjectId(comment)
                     try:
-                        print(f"comment_id: {comment_id}")
                         populatedComment = self.commentsCollection.find_one({"_id": comment_id})
-                        print(f"populatedComment: {populatedComment}")
                         owner_id = populatedComment["ownerId"]
                         username = populatedComment["author"]
                         populatedComment["ownerId"] = {"username": username,"_id": owner_id}
