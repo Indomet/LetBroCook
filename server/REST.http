@@ -197,3 +197,7 @@ Content-Type: application/json
     "commentId": "650305f02bf4f7c72945d662",
     "comment":"PLES BE EDITED"
 }
+
+### 
+
+DELETE http://localhost:3000/v1/users/65216a6bebbc0679beb60617/recipes/65216938ebbc0679beb5a457/comments/6522fc45c2f558a2baaa2f1c
