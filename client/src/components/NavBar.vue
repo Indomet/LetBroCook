@@ -152,8 +152,12 @@ export default {
       }, 500)
     },
     getRecommendation() {
-      this.$emitter.emit('recommendation')
-    },
+      if (this.$route.path !== '/recipes') {
+  this.$router.push('/recipes')
+} this.$nextTick(() => {
+    this.$emitter.emit('recommendation')
+  })
+},
     updateProfilePicture(userId) {
       axios.get(`http://localhost:3000/v1/users/${userId}`)
         .then(response => {
