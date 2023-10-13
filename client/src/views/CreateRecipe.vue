@@ -294,7 +294,9 @@ export default {
       reader.onload = () => {
         this.url = reader.result
       }
-      reader.readAsDataURL(this.file)
+      if (this.file) {
+        reader.readAsDataURL(this.file)
+      }
     },
     resize() {
       const textareas = document.querySelectorAll('.resizable')
