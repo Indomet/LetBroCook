@@ -145,7 +145,7 @@ export default {
         console.log(response)
         if (response.status === 200) {
           localStorage.setItem('user-info', JSON.stringify(response.data))
-          this.$router.push({ name: 'home' })
+          window.location.href = '/'
         }
       } catch (errorMessage) {
         this.errorMessage = 'Either email or password is incorrect'

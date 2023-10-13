@@ -112,6 +112,10 @@ export default {
       reader.readAsDataURL(this.file)
     },
     async onFormSubmit() {
+      if (!this.file) {
+        alert('Please upload an image')
+        return
+      }
       try {
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
