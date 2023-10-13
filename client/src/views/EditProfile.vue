@@ -109,7 +109,9 @@ export default {
       reader.onload = () => {
         this.image = reader.result
       }
-      reader.readAsDataURL(this.file)
+      if (this.file) {
+        reader.readAsDataURL(this.file)
+      }
     },
     async onFormSubmit() {
       if (!this.file) {

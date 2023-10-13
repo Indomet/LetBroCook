@@ -65,19 +65,6 @@ export default {
     mounted() {
         window.addEventListener('scroll', this.handleScroll)
 
-        this.$emitter.on('search', (data) => {
-            this.isSearching = true
-            console.log('is sarching is ' + this.isSearching)
-            if (data) {
-                this.isSearching = true
-                const searchQuery = data.searchQuery
-                const tagNames = data.tags.map(tag => tag.name)
-                const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
-                // console.log(tagString)
-                const url = `http://localhost:3000/v1/recipes?${tagString}&title=${searchQuery}`
-                this.fetchData(url) // Call fetchData method to refresh data
-            }
-        })
         // fetch all recipes
         this.getRecommendation() // Call fetchData method to fetch data on component mounted
         const user = JSON.parse(localStorage.getItem('user-info'))
