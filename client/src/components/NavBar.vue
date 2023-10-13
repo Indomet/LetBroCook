@@ -152,10 +152,19 @@ export default {
       }, 500)
     },
     getRecommendation() {
-  this.$router.push('/recommendation')
-this.$nextTick(() => {
-    this.$emitter.emit('recommendation')
-  })
+      const user = JSON.parse(localStorage.getItem('user-info'))
+            if (user) {
+                const userId = user.body._id
+                axios
+                    .get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then((response) => {
+                          this.recipeData = response.data.favouriteRecipes
+                          if (response.data.favouriteRecipes.length === 0) {
+                            alert('You have no favorite recipes yet!')
+                          } else if (this.$route.path !== '/recommendation') {
+                            this.$router.push('/recommendation')
+                          }
+})
+}
 },
     updateProfilePicture(userId) {
       axios.get(`http://localhost:3000/v1/users/${userId}`)
