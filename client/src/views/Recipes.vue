@@ -101,7 +101,7 @@ export default {
                 .get(url)
                 .then((response) => {
                     this.recipeData = response.data.recipes
-                    console.log(this.recipeData.comments)
+                    console.log(JSON.stringify('THE HOME APGE RECIPES ARE ' + JSON.stringify(this.recipeData[0].comments)))
                     for (const recipe of this.recipeData) {
                         recipe.flipped = false
                     }
@@ -136,7 +136,6 @@ export default {
             }
         },
         getRecommendation() {
-            console.log('get recommendation')
             const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then(async (response) => {
