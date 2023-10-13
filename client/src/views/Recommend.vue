@@ -63,7 +63,6 @@ export default {
         }
     },
     mounted() {
-        console.log(this.loading)
         window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
@@ -80,41 +79,8 @@ export default {
             }
         })
         // fetch all recipes
-        this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
-        this.loading = false
-    },
-    unmounted () {
-    window.removeEventListener('scroll', this.handleScroll)
-  },
-    methods: {
-        handleScroll (event) {
-            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
-        console.log('bottom')
-        this.loadMore()
-    }
-        },
-        fetchData(url) {
-            axios
-                .get(url)
-                .then((response) => {
-                    this.recipeData = response.data.recipes
-                    console.log(JSON.stringify('THE HOME APGE RECIPES ARE ' + JSON.stringify(this.recipeData[0].comments)))
-                    for (const recipe of this.recipeData) {
-                        recipe.flipped = false
-                    }
-                    this.mapArray()
-                })
-                .catch((err) => {
-                    console.log(err)
-                    this.error = true
-                })
-                .finally(() => {
-                    this.loading = false
-                    if (this.isSearching) {
-                        this.isSearching = false
-                    }
-                })
-            const user = JSON.parse(localStorage.getItem('user-info'))
+        this.getRecommendation() // Call fetchData method to fetch data on component mounted
+        const user = JSON.parse(localStorage.getItem('user-info'))
             if (user) {
                 const userId = user.body._id
                 axios
@@ -131,6 +97,35 @@ export default {
                         console.log(err)
                     })
             }
+        this.loading = false
+    },
+    unmounted () {
+    window.removeEventListener('scroll', this.handleScroll)
+  },
+    methods: {
+        handleScroll (event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+        console.log('bottom')
+        this.loadMore()
+    }
+        },
+        getRecommendation() {
+            const user = JSON.parse(localStorage.getItem('user-info'))
+        const userId = user.body._id
+        axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then(async (response) => {
+            const favedRecipesIds = response.data.favouriteRecipes.map((recipe) => recipe._id).filter((id) => id)
+            const recipeParams = favedRecipesIds.map((id) => `recipe=${id}`).join('&')
+            await axios.get('http://localhost:8000?' + recipeParams).then((response) => {
+                this.recipeData = response.data
+                console.log(this.recipeData)
+                for (const recipe of this.recipeData) {
+                        recipe.flipped = false
+                    }
+                    this.mapArray()
+                })
+        }).catch((err) => {
+            console.log(err)
+        })
         },
         trimTagList(arr) {
             const maxNumberOfTags = 4 // Max number of tags to be shown

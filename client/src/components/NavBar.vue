@@ -152,9 +152,8 @@ export default {
       }, 500)
     },
     getRecommendation() {
-      if (this.$route.path !== '/recipes') {
-  this.$router.push('/recipes')
-} this.$nextTick(() => {
+  this.$router.push('/recommendation')
+this.$nextTick(() => {
     this.$emitter.emit('recommendation')
   })
 },
