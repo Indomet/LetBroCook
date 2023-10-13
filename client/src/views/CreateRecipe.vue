@@ -254,7 +254,7 @@ export default {
         // eslint-disable-next-line spaced-comment
         console.log('selected tags before making them ' + this.selectedTags)
         const selectedTagNames = this.selectedTags.map(tag => tag.name)
-        console.log('selected tags after making them ' + selectedTagNames)
+        console.log(this.selectedTags)
         const recipeData = {
           title: this.title,
           image: this.url,

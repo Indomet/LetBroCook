@@ -53,7 +53,7 @@ export default {
       } else {
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
-
+        console.log(this.selectedTags)
         const recipeData = {
           title: createRecipeComponent.title,
           image: createRecipeComponent.url,
