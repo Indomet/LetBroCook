@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="recipeData.length<=0" class="loading-icon">
+        <div v-if="recipeData.length<=0 && loading" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
     <div v-else-if="recipeData.length === 0">
@@ -33,7 +33,8 @@ export default {
         return {
             recipeData: [],
             recipeMap: {},
-            favedRecipes: []
+            favedRecipes: [],
+            loading: true
         }
     },
     mounted() {
