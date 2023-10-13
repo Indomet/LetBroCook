@@ -29,14 +29,15 @@
                 <img class="card-image" b-card-img-top :src="recipe.image" alt="Thumbnail Image" />
                 <p class="card-title">{{ recipe.title }}</p>
                 <div class="tag-block">
-                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px" @click="filterByTag(tags)">
+                    <span v-for="tags in recipe.tags" :key="tags" class="tags" style="margin-bottom: 20px"
+                        @click="filterByTag(tags)">
                         {{ tags.name }}
                     </span>
                 </div>
                 <div class="button-container">
                     <div @click="flipCard(recipeId)" class="flip-button">More info</div>
                     <div v-if="allowFavRecipe" id="heart" class="button" :class="{ active: faved }" @click="addToFavs">
-    <i class="fa fa-heart"></i>
+                        <i class="fa fa-heart"></i>
                     </div>
                     <div class="wrapper" v-if="allowDropdown">
                         <div class="btn-group dropup">
@@ -124,17 +125,21 @@
                                         </div>
                                         <hr style="margin-top: 5px; margin-bottom: 2px;">
                                         <div v-if="each.editing">
-                                            <form @submit.prevent="updateComment(each)">
+                                            <form @submit.prevent>
                                                 <div class="form-group" style="margin-bottom: 0;">
                                                     <label for="input-1" id="comment-field">Editing comment:</label>
                                                     <input class="form-control" id="input-1" rows="2" required
                                                         v-model="each.editedComment">
-                                                    <button type="submit" id="submit-comment-btn" class="btn btn-success"
+                                                </div>
+                                                <div style="display: flex; justify-content: center;">
+                                                    <button @click="updateComment(each)" type="submit"
+                                                        id="submit-comment-btn" class="btn btn-success"
                                                         style="text-align: center; margin-top: 5px;">Save</button>
                                                     <button @click="deleteComment(each, recipeId)" class="btn btn-danger"
                                                         id="delete-comment-btn">Delete</button>
                                                 </div>
                                             </form>
+
                                         </div>
                                         <div v-else class="align-items-left">
                                             <div style="text-align: left;">{{ each.comment }}</div>
@@ -157,7 +162,7 @@ import $ from 'jquery'
 import axios from 'axios'
 
 export default {
-  name: 'Card',
+    name: 'Card',
     data() {
         return {
             comment: '',
@@ -318,6 +323,7 @@ export default {
             }
         },
         updateComment(comment) {
+            console.log('its also calling me')
             const commentId = comment._id
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (!user) {
@@ -346,6 +352,7 @@ export default {
             }
         },
         deleteComment(comment, recipeId) {
+            console.log(recipeId)
             const commentId = comment._id
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (!user) {
@@ -364,16 +371,16 @@ export default {
             }
         },
         filterByTag(selectedTag) {
-     if (this.$router.currentRoute.name !== 'recipes') {
-    this.$router.push({ name: 'recipes' })
-  }
-  setTimeout(() => {
-    const tag = [selectedTag]
-    this.$emitter.emit('search', { tags: tag, searchQuery: '' })
-  }, 500)
-}
+            if (this.$router.currentRoute.name !== 'recipes') {
+                this.$router.push({ name: 'recipes' })
+            }
+            setTimeout(() => {
+                const tag = [selectedTag]
+                this.$emitter.emit('search', { tags: tag, searchQuery: '' })
+            }, 500)
+        }
 
-}
+    }
 }
 </script>
 
@@ -481,10 +488,11 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .card-title:hover {
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
 }
 
 .card-image {
@@ -796,5 +804,4 @@ button:active .icon svg {
 
 .wrapper {
     margin-bottom: -1.5px !important;
-}
-</style>
+}</style>
