@@ -148,30 +148,6 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
 });
 
-//TODO ADD BACK USER AUUTH
-//THIS HAD BOTH
-router.post("/:userId/tags", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
-  const newTag = req.body.tag
-  console.log("the tag is"  + newTag)
-  const existingTag = await Tag.find({name:newTag})//will return empty array if no tag exists
-  if(existingTag.length>0){return res.status(409).json({messsage:"Tag already exists"})}
-  else{
-    await new Tag({
-        name:newTag,
-        ownerId: req.user.id
-    }).save().then((result)=>{
-      return res.status(201).json({
-        message: "Tag posted",
-        tag: result
-    })
-    }).catch(err=>{
-      err.status=400
-      return next(err)
-    })
-  }
-})
-
-
 //THIS USED TO BE IN USER ROUTER PUT BACK IF BREAKS
 //Replaces a recipe by id
 router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {

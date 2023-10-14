@@ -92,9 +92,11 @@ app.use(express.urlencoded({ extended: true, limit: '60mb' }));
 //Routers
 const userRouter = require('./routes/userRouter.js');
 const recipeRouter = require('./routes/recipeRouter.js')
+const tagRouter = require('./routes/tagRouter.js')
 
 app.use('/v1/users', userRouter)
 app.use('/v1/recipes', recipeRouter)
+app.use('/v1/tags', tagRouter)
 
 // Import routes
 app.get("/api", function (req, res) {
