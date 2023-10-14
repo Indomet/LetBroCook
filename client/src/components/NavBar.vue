@@ -259,6 +259,7 @@ export default {
     position: relative;
     width:80px;
     height: 80px;
+    aspect-ratio: 1/1;
     margin-right: 75px;
     border-radius: 50%;
     cursor: pointer;

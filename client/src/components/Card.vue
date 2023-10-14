@@ -86,7 +86,7 @@
                 <div @click="flipCard(recipeId)" class="flip-button">Back</div>
                 <button @click="showComment()" class=" btn btn-secondary" id="show-comment-button">Show comments</button>
                 <div class="comment-section" v-if="this.showComments">
-                    <form @submit.prevent="postComment(recipeId)">
+                    <form v-if="this.user" @submit.prevent="postComment(recipeId)">
                         <div class="form-group">
                             <label for="input-1" id="comment-field">Write a comment:</label>
                             <textarea class="form-control" id="input-1" v-model="this.comment" rows="1" required></textarea>
@@ -94,6 +94,7 @@
                                 style="text-align: center; margin-top: 5px;">Submit</button>
                         </div>
                     </form>
+                    <h5 v-else>You must be logged in to comment</h5>
                     <div v-if="recipe.comments.length == 0">
                         <h5>Nothing to show here~</h5>
                     </div>
@@ -102,20 +103,26 @@
                             <div class="row d-flex">
                                 <div class="card mb-1">
                                     <div class="card-body" style="margin-bottom: 0px; padding: 5px;">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <img id="comment-pfp"
-                                                src="https://gachax.com/anime/wp-content/uploads/sites/29/2023/06/cute-anime-girl-pfp-profile-pictures-chibi.png"
-                                                alt="avatar" width="40" height="40" />
-                                            <div v-if="this.user">
-                                                <div v-if="each.ownerId._id == this.user.body._id">
-                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
-                                                        {{ each.ownerId.username }} (You)</div>
-                                                </div>
-                                                <div v-else>
-                                                    <div class="small mb-0 ms-2" style="margin-left: 10px;">
-                                                        {{ each.ownerId.username }}</div>
-                                                </div>
+                                        <div v-if="this.user">
+                                            <div v-if="each.ownerId._id == this.user.body._id"
+                                                class="d-flex flex-row align-items-center">
+                                                <img id="comment-pfp" :src="this.user.body.image" alt="avatar" width="40"
+                                                    height="40" />
+                                                <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                    {{ each.ownerId.username }} (You)</div>
                                             </div>
+                                            <div v-else class="d-flex flex-row align-items-center">
+                                                <img id="comment-pfp" :src="each.ownerId.image" alt="avatar" width="40"
+                                                    height="40" />
+                                                <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                    {{ each.ownerId.username }}</div>
+                                            </div>
+                                        </div>
+                                        <div v-else class="d-flex flex-row align-items-center">
+                                            <img id="comment-pfp" :src="each.ownerId.image" alt="avatar" width="40"
+                                                height="40" />
+                                            <div class="small mb-0 ms-2" style="margin-left: 10px;">
+                                                {{ each.ownerId.username }}</div>
                                         </div>
                                         <div v-if="this.user">
                                             <div v-if="each.ownerId._id == this.user.body._id">
@@ -387,7 +394,6 @@ export default {
                 this.$emitter.emit('search', { tags: tag, searchQuery: '' })
             }, 500)
         }
-
     }
 }
 </script>
@@ -812,4 +818,5 @@ button:active .icon svg {
 
 .wrapper {
     margin-bottom: -1.5px !important;
-}</style>
+}
+</style>
