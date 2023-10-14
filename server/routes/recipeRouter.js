@@ -51,7 +51,7 @@ router.get("/", function (req, res, next) {
         path: 'comments',
         populate: {
           path: 'ownerId',
-          select: 'username ownerId',
+          select: 'username ownerId image',
           model: userModel // Assuming 'User' is the name of your User model
         }
       })
@@ -62,7 +62,7 @@ router.get("/", function (req, res, next) {
         path: 'comments',
         populate: {
           path: 'ownerId',
-          select: 'username ownerId',
+          select: 'username ownerId image',
           model: userModel // Assuming 'User' is the name of your User model
         }
       })
@@ -72,7 +72,7 @@ router.get("/", function (req, res, next) {
         path: 'comments',
         populate: {
           path: 'ownerId',
-          select: 'username ownerId',
+          select: 'username ownerId image',
           model: userModel // Assuming 'User' is the name of your User model
         }
       })
@@ -82,7 +82,7 @@ router.get("/", function (req, res, next) {
         path: 'comments',
         populate: {
           path: 'ownerId',
-          select: 'username ownerId',
+          select: 'username ownerId image',
           model: userModel // Assuming 'User' is the name of your User model
         }
       })
