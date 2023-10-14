@@ -207,7 +207,6 @@ export default {
             for (const [id, recipe] of this.recipeMap) {
                 if (key !== id) {
                     if (isInMyRecipes) {
-                        console.log('flipped')
                         recipe.recipe.flipped = false
                     } else {
                         recipe.flipped = false
@@ -225,12 +224,10 @@ export default {
         editOrDelete(operation) {
             const link = this.links.find(link => link.rel === operation)
             if (operation === 'edit') {
-                console.log(`The edit link is ${link.href}`)
                 this.$router.push(link.href)
             } else if (operation === 'delete') {
                 axios.delete(link.href)
                     .then((response) => {
-                        console.log(response)
                         window.location.reload()
                     })
                     .catch((err) => {
@@ -288,10 +285,12 @@ export default {
             for (const each of arr) {
                 each.editing = false
                 each.editedComment = each.comment
+                console.log(each)
             }
             return arr
         },
         editComment(comment) {
+        comment.editedComment = comment.comment
             comment.editing = !comment.editing
         },
         postComment(id) {
@@ -330,7 +329,6 @@ export default {
             }
         },
         updateComment(comment) {
-            console.log('its also calling me')
             const commentId = comment._id
             const user = JSON.parse(localStorage.getItem('user-info'))
             if (!user) {
@@ -346,6 +344,7 @@ export default {
                 axios.put(`http://localhost:3000/v1/users/${userId}/comments/${commentId}`, data)
                     .then((res) => {
                         comment.editing = false
+                        comment.comment = comment.editedComment // update the comment property
                         for (const each of this.commentList) {
                             if (each._id === commentId) {
                                 each.comment = comment.editedComment
@@ -359,24 +358,33 @@ export default {
             }
         },
         deleteComment(comment, recipeId) {
-            console.log(recipeId)
-            const commentId = comment._id
-            const user = JSON.parse(localStorage.getItem('user-info'))
-            if (!user) {
-                alert('You must be logged in first')
-            } else {
-                const userId = user.body._id
-                axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${recipeId}/comments/${commentId}`)
-                    .then((res) => {
-                        comment.editing = false
-                        this.commentList.splice(this.commentList.indexOf(comment), 1)
-                        alert('Comment deleted successfully!')
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    })
-            }
-        },
+    const commentId = comment._id
+    const user = JSON.parse(localStorage.getItem('user-info'))
+    if (!user) {
+        alert('You must be logged in first')
+    } else {
+        const userId = user.body._id
+        axios.delete(`http://localhost:3000/v1/users/${userId}/recipes/${recipeId}/comments/${commentId}`)
+            .then((res) => {
+                comment.editing = false
+                console.log('THE COMMENT IS ' + JSON.stringify(comment))
+                const index = this.commentList.findIndex((c) => c._id === comment._id)
+                console.log('THE LIST BEFORE IS ' + JSON.stringify(this.commentList))
+                if (index !== -1) {
+                    this.commentList.splice(index, 1)
+                    console.log('THE LIST AFTER IS ' + JSON.stringify(this.commentList))
+                }
+                if (window.location.href.includes('/recipes')) {
+                    // window.location.reload()
+
+                }
+                alert('Comment deleted successfully!')
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+},
         filterByTag(selectedTag) {
             if (this.$router.currentRoute.name !== 'recipes') {
                 this.$router.push({ name: 'recipes' })
