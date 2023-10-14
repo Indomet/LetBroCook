@@ -37,7 +37,7 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
             path: 'comments',
             populate: {
               path: 'ownerId',
-              select: 'username ownerId',
+              select: 'username ownerId image',
               model: userModel // Assuming 'User' is the name of your User model
             }
           });
@@ -175,7 +175,7 @@ router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUs
         path: 'comments',
         populate: {
           path: 'ownerId',
-          select: 'username ownerId',
+          select: 'username ownerId image',
           model: userModel // Assuming 'User' is the name of your User model
         }
       })
