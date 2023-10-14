@@ -189,6 +189,12 @@ export default {
   overflow: ellipsis;
   word-wrap: break-word;
 }
+.navbar-nav .nav-item .nav-link {
+  background-color: transparent;
+}
+.navbar-nav .nav-item .nav-link:hover {
+  background-color: rgb(140, 140, 140);
+}
 
   .form-check-input:checked{
     background-color: rgb(41, 199, 41) !important;
@@ -320,7 +326,8 @@ export default {
     display: flex;
     align-items: center;
     text-decoration: none !important; /* Remove link underline */
-    color: #000000;
+    color: #a8a4a4 !important;
+    background-color: #777;
     margin-bottom: 10px;
     outline: none;
   }
