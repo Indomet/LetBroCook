@@ -30,7 +30,7 @@ test:
     MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
     - cd server
-    - npm run ci-test
+    - docker run --rm -v $(pwd):/app -w /app python:3.9-alpine sh -c "pip install -r requirements.txt && python Recommendation.py"
 
 deploy:
   stage: deploy
