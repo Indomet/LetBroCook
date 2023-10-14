@@ -17,6 +17,12 @@ cache:
   paths:
     - .cache/pip
 
+install_dependencies:
+  stage: setup
+  script:
+    - apk add --no-cache python3
+    - python3 --version
+    
 before_script:
   - python --version ; pip --version  # For debugging
   - pip install virtualenv
