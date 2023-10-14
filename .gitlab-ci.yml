@@ -1,5 +1,4 @@
-image: node:14-alpine
-
+image: node:14-alpine, python:3.7-alpine3.9
 # Cache modules in between jobs per-branch
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -9,8 +8,9 @@ cache:
 stages:
   - build
   - test
+  - setup
   - deploy
-
+  
 build:
   stage: build
   tags:
@@ -18,6 +18,14 @@ build:
   script:
     - cd server
     - npm install
+
+install_dependencies:
+  stage: setup
+  script:
+    - apk update && apk add git curl python3 py3-pip
+    - pip3 install pandas regex scikit-learn pymongo Flask flask-cors
+    - python3 -m pip install -U pip
+    - pip3 install numpy
 
 test:
   stage: test
@@ -38,8 +46,6 @@ deploy:
     - docker
   image: ruby:alpine
   script:
-    - apk update && apk add git curl python3 py3-pip
-    - pip3 install pandas regex scikit-learn pymongo Flask flask-cors
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
   environment:
