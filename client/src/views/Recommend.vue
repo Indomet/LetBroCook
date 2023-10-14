@@ -79,6 +79,7 @@ export default {
                     `http://localhost:3000/v1/users/${userId}/favorite-recipes`
                 )
                 .then((response) => {
+                    console.log(response.data)
                     this.favedRecipes = response.data.favouriteRecipes.map(
                         (recipe) => recipe._id
                     )
