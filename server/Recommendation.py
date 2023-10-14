@@ -15,7 +15,7 @@ import datetime
 from flask import Flask
 from flask_cors import CORS
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:8080"}})
 PORT =8000
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
@@ -32,7 +32,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         res = rec.findSimilarRecipes(recipes)
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')  # Replace with the appropriate origin URL
+        self.send_header('Access-Control-Allow-Origin', 'http://localhost:8080')  # Replace with the appropriate origin URL
         self.send_header('Access-Control-Allow-Methods', 'GET')  # Add more methods if needed
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')  # Add more headers if needed
         self.end_headers()
@@ -88,9 +88,12 @@ class Recommendation:
                         populatedComment = self.commentsCollection.find_one({"_id": comment_id})
                         owner_id = populatedComment["ownerId"]
                         username = populatedComment["author"]
-                        populatedComment["ownerId"] = {"username": username,"_id": owner_id}
+                        userImage = self.usersCollection.find_one({"_id": owner_id}, {"image": 1})
+                        print(userImage)
+                        populatedComment["ownerId"] = {"username": username,"_id": owner_id, "image": userImage.get("image")}
                         populatedComment["editing"] = False  # Add the editing attribute and set it to False
                         recipeComments[i] = populatedComment
+                    
                     except Exception as e:
                         print(f"Error: {e}")
                         continue
