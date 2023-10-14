@@ -8,8 +8,8 @@ cache:
 
 stages:
   - build
-  - test
   - setup
+  - test
   - deploy
 
 build:
