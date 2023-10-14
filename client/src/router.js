@@ -10,6 +10,7 @@ import EditPassword from './views/EditPassword.vue'
 import NotFound from './views/NotFound.vue'
 import FavoriteRecipes from './views/FavoriteRecipes.vue'
 import MyRecipes from './views/MyRecipes.vue'
+import Recommend from './views/Recommend.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -50,6 +51,11 @@ export default new Router({
       path: '/EditPassword',
       name: 'EditPassword',
       component: EditPassword
+    },
+    {
+      path: '/recommendation',
+      name: 'Recommend',
+      component: Recommend
     },
     {
       path: '/recipes',

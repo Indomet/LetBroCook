@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div v-if="recipeData.length<=0" class="loading-icon">
+        <div v-if="recipeData.length<=0 && loading" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
-    <div v-else-if="recipeData.length === 0">
+    <div v-else-if="recipeData.length === 0 && !loading">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 No recipes found
             </p>
@@ -33,7 +33,8 @@ export default {
             recipeData: [],
             recipeMap: {},
             favedRecipes: [],
-            numberOfRecipesToShow: 8
+            numberOfRecipesToShow: 8,
+            loading: true
         }
     },
     mounted() {

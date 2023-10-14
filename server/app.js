@@ -7,14 +7,29 @@ var history = require("connect-history-api-fallback");
 const { recipeModel, Tag } = require("./models/recipeModel.js"); //. for windows
 const userModel = require("./models/userModel.js");
 const serverUtil = require('./serverUtil.js')
-const axios = require('axios');
+const { spawn } = require('child_process');
+
+if (process.env.CI !== 'true') {
+  // Spawn a new process for your Python server
+  const pythonServer = spawn('python', ['Recommendation.py']);
+
+  // Log any errors from the Python server
+  pythonServer.stderr.on('data', (data) => {
+    console.error(`Python server error: ${data}`);
+  });
+
+  // Log any output from the Python server
+  pythonServer.stdout.on('data', (data) => {
+    console.log(`Python server output: ${data}`);
+  });
+}
 
 const corsOptions ={
-  origin:'http://localhost:8080', 
+  origin:'http://localhost:8080/', 
   credentials:true,            //access-control-allow-credentials:true
   optionSuccessStatus:200
 }
- 
+
 // Variables
 var mongoURI =
   process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/LetBroCook";

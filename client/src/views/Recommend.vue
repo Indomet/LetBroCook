@@ -3,7 +3,7 @@
         <div v-if="recipeData.length<=0 || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
-    <div v-else-if="recipeData.length === 0">
+    <div v-else-if="recipeData.length === 0 && !loading">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 No recipes found
             </p>
@@ -63,74 +63,67 @@ export default {
         }
     },
     mounted() {
-        console.log(this.loading)
         window.addEventListener('scroll', this.handleScroll)
-
-        this.$emitter.on('search', (data) => {
-            this.isSearching = true
-            console.log('is sarching is ' + this.isSearching)
-            if (data) {
-                this.isSearching = true
-                const searchQuery = data.searchQuery
-                const tagNames = data.tags.map(tag => tag.name)
-                const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
-                // console.log(tagString)
-                const url = `http://localhost:3000/v1/recipes?${tagString}&title=${searchQuery}`
-                this.fetchData(url) // Call fetchData method to refresh data
-            }
-        })
+        const userInfo = localStorage.getItem('user-info')
+        if (!userInfo) {
+            this.$router.push({ name: 'home' })
+            return
+        }
         // fetch all recipes
-        this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
-        this.loading = false
-    },
-    unmounted () {
-    window.removeEventListener('scroll', this.handleScroll)
-  },
-    methods: {
-        handleScroll (event) {
-            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
-        console.log('bottom')
-        this.loadMore()
-    }
-        },
-        fetchData(url) {
+        this.getRecommendation() // Call fetchData method to fetch data on component mounted
+        const user = JSON.parse(localStorage.getItem('user-info'))
+        if (user) {
+            const userId = user.body._id
             axios
-                .get(url)
+                .get(
+                    `http://localhost:3000/v1/users/${userId}/favorite-recipes`
+                )
                 .then((response) => {
-                    this.recipeData = response.data.recipes
-                    console.log(JSON.stringify('THE HOME APGE RECIPES ARE ' + JSON.stringify(this.recipeData[0].comments)))
-                    for (const recipe of this.recipeData) {
-                        recipe.flipped = false
-                    }
-                    this.mapArray()
+                    console.log(response.data)
+                    this.favedRecipes = response.data.favouriteRecipes.map(
+                        (recipe) => recipe._id
+                    )
+                    console.log(this.favedRecipes)
                 })
                 .catch((err) => {
                     console.log(err)
-                    this.error = true
                 })
-                .finally(() => {
-                    this.loading = false
-                    if (this.isSearching) {
-                        this.isSearching = false
-                    }
-                })
+        }
+        this.loading = false
+    },
+    unmounted() {
+        window.removeEventListener('scroll', this.handleScroll)
+    },
+    methods: {
+        handleScroll(event) {
+            if ((window.innerHeight + Math.round(window.scrollY)) >= document.body.offsetHeight - 2) {
+                console.log('bottom')
+                this.loadMore()
+            }
+        },
+        getRecommendation() {
             const user = JSON.parse(localStorage.getItem('user-info'))
-            if (user) {
-                const userId = user.body._id
-                axios
-                    .get(
-                        `http://localhost:3000/v1/users/${userId}/favorite-recipes`
-                    )
-                    .then((response) => {
-                        this.favedRecipes = response.data.favouriteRecipes.map(
-                            (recipe) => recipe._id
-                        )
-                        console.log(this.favedRecipes)
-                    })
-                    .catch((err) => {
+            const userId = user.body._id
+            axios.get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then(async (response) => {
+                const favedRecipesIds = response.data.favouriteRecipes.map((recipe) => recipe._id).filter((id) => id)
+                const recipeParams = favedRecipesIds.map((id) => `recipe=${id}`).join('&')
+                if (favedRecipesIds.length === 0) {
+                    console.log('no favedq  recipes')
+                    this.recipeData = []
+                    this.loading = false
+                } else {
+                    await axios.get('http://localhost:8000?' + recipeParams).then((response) => {
+                        this.recipeData = response.data
+                        console.log(this.recipeData)
+                        for (const recipe of this.recipeData) {
+                            recipe.flipped = false
+                        }
+                        this.mapArray()
+                    }).catch((err) => {
                         console.log(err)
                     })
-            }
+                }
+            })
         },
         trimTagList(arr) {
             const maxNumberOfTags = 4 // Max number of tags to be shown

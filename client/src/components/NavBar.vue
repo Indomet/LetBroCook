@@ -152,8 +152,20 @@ export default {
       }, 500)
     },
     getRecommendation() {
-      this.$emitter.emit('recommendation')
-    },
+      const user = JSON.parse(localStorage.getItem('user-info'))
+            if (user) {
+                const userId = user.body._id
+                axios
+                    .get(`http://localhost:3000/v1/users/${userId}/favorite-recipes`).then((response) => {
+                          this.recipeData = response.data.favouriteRecipes
+                          if (response.data.favouriteRecipes.length === 0) {
+                            alert('You have no favorite recipes yet!')
+                          } else if (this.$route.path !== '/recommendation') {
+                            this.$router.push('/recommendation')
+                          }
+})
+}
+},
     updateProfilePicture(userId) {
       axios.get(`http://localhost:3000/v1/users/${userId}`)
         .then(response => {
@@ -176,6 +188,12 @@ export default {
   width: 70%;
   overflow: ellipsis;
   word-wrap: break-word;
+}
+.navbar-nav .nav-item .nav-link {
+  background-color: transparent;
+}
+.navbar-nav .nav-item .nav-link:hover {
+  background-color: rgb(140, 140, 140);
 }
 
   .form-check-input:checked{
@@ -309,14 +327,17 @@ export default {
     display: flex;
     align-items: center;
     text-decoration: none !important; /* Remove link underline */
-    color: #000000;
+    color: #a8a4a4 !important;
+    background-color: #777;
     margin-bottom: 10px;
     outline: none;
+    background-color: transparent;
   }
 
   .sub-menu-link p{
     width: 100%;
     margin: auto;
+    color: #000000;
   }
 
   .sub-menu-link img{
@@ -333,6 +354,7 @@ export default {
   }
 
   .sub-menu-link:hover span{
+    color: #000000;
     transform: translateX(10px);
   }
 

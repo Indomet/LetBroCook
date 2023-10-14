@@ -381,9 +381,22 @@ router.delete('/:userId/recipes/:recipeId/comments/:commentId', userAuth.setRequ
   const commentId = req.comment.id
   const recipeId = req.recipe.id
 
-  try {
+  console.log("THE RECIPE ID RAEFKAE IS " + recipeId)
+ 
+  console.log("THE comment ID RAEFKAE IS " + commentId)
 
-    await recipeModel.findByIdAndUpdate(recipeId,{ $pull: { comments: { _id: commentId } } });
+  const commentObjectId = new mongoose.Types.ObjectId(commentId);
+  try {
+    recipeModel.find({_id: recipeId}).then((result)=>{
+      const index = result[0].comments.indexOf(commentObjectId);
+      console.log(index)
+      if (index === -1) {
+        err.message = "comment not found in recipes"
+        return next(err)
+      }
+      result[0].comments.splice(index, 1);
+      result[0].save();
+    })
     await Comment.findOneAndRemove({_id: commentId})
     res.status(200).json({ message: "comment deleted " });
 
