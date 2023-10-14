@@ -11,13 +11,6 @@ stages:
   - test
   - deploy
 
-install_python:
-  stage: build
-  tags:
-    - docker
-  script:
-    - apk add python3
-
 build:
   stage: build
   tags:
@@ -57,3 +50,4 @@ deploy:
     variables:
       - $HEROKU_APP_NAME
       - $HEROKU_API_KEY
+
