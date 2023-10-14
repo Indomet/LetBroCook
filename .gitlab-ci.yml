@@ -1,6 +1,5 @@
-image:
-  name: node:14-alpine
-  name: python:3.9
+image: node:14-alpine
+
 # Cache modules in between jobs per-branch
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -9,19 +8,8 @@ cache:
 
 stages:
   - build
-  - python
   - test
   - deploy
-
-python:
-  stage: python
-  tags:
-    - docker
-  script:
-    - apt-get update -y 
-    - apt-get install -y python3  
-    - python3 --version
-
 
 build:
   stage: build
