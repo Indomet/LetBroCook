@@ -2,6 +2,7 @@ from calendar import c
 from urllib.parse import urlparse, parse_qs
 from numpy import rec
 import pandas as pd
+from regex import F
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import http.server
@@ -11,8 +12,10 @@ import pymongo
 import bson
 from bson.objectid import ObjectId
 import datetime
-
-
+from flask import Flask
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 PORT =8000
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
@@ -29,7 +32,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         res = rec.findSimilarRecipes(recipes)
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', 'http://localhost:8080')  # Replace with the appropriate origin URL
+        self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')  # Replace with the appropriate origin URL
         self.send_header('Access-Control-Allow-Methods', 'GET')  # Add more methods if needed
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')  # Add more headers if needed
         self.end_headers()
@@ -37,7 +40,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
 class Recommendation:
     def __init__(self) -> None:
-        self.client = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.client = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         self.db = self.client["LetBroCook"]
         self.usersCollection = self.db["users"]
         self.recipesCollections = self.db["recipes"]
@@ -48,8 +51,8 @@ class Recommendation:
         usersDF = pd.DataFrame(list(usersCursor))
         try:
             favRecipes = [bson.ObjectId(recipe) for recipe in favRecipes]
-
             similarUsers = usersDF.loc[usersDF["favouriteRecipes"].apply(lambda row: any(recipe in row for recipe in favRecipes))]
+            
             #find the users with the recipeid in their favourite recipes from csv
             #and account for this error TypeError: string indices must be integers, not 'str'
             #get a unqiue list of all other recipes other users favourited
@@ -100,8 +103,9 @@ class Recommendation:
 if __name__ == "__main__":
     try:
             with socketserver.TCPServer(('localhost', PORT), RequestHandler) as server:
+
                 print(f'Serving at port {PORT}')
                 server.serve_forever()
     except Exception as e:
-        print(f"Error: {e}")
-        server.shutdown()
+            print(f"Error: {e}")
+            server.shutdown()
