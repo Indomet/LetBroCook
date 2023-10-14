@@ -1,17 +1,11 @@
-from calendar import c
 from urllib.parse import urlparse, parse_qs
-from numpy import rec
 import pandas as pd
-from regex import F
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import http.server
 import socketserver
 import json
 import pymongo
 import bson
 from bson.objectid import ObjectId
-import datetime
 from flask import Flask
 from flask_cors import CORS
 app = Flask(__name__)
