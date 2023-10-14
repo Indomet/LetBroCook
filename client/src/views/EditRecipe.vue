@@ -34,6 +34,7 @@ export default {
     createRecipeComponent.ingredients = recipeData.sectionsAndIngredients.Ingredients
     createRecipeComponent.url = recipeData.image
     createRecipeComponent.selectedTags = recipeData.tags
+    console.log('THE SELCTED TAGS ARE ON MOUNTED' + JSON.stringify(createRecipeComponent.selectedTags))
     const submitRecipeBtn = createRecipeComponent.$refs.submitRecipeBtn
     submitRecipeBtn.textContent = 'Update Recipe'
     const header = createRecipeComponent.$refs.header
@@ -51,9 +52,10 @@ export default {
       ) {
         alert('Please fill in all fields and upload an image')
       } else {
+        const selectedTagNames = createRecipeComponent.selectedTags.map(tag => tag.name)
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
-        console.log(this.selectedTags)
+        console.log('THE BEFORE SUBMIT SELCTED names TAGS ARE ON SUBMIT' + JSON.stringify(selectedTagNames))
         const recipeData = {
           title: createRecipeComponent.title,
           image: createRecipeComponent.url,
@@ -63,7 +65,7 @@ export default {
           servings: createRecipeComponent.servings,
           description: createRecipeComponent.description,
           steps: splitToArray(createRecipeComponent.steps),
-          tags: createRecipeComponent.selectedTags,
+          tags: selectedTagNames,
           nutritionalInfo: splitToArray(createRecipeComponent.nutritionalInfo)
         }
 

@@ -240,6 +240,7 @@ export default {
 },
   methods: {
     async submitRecipe() {
+      console.log(this.selectedTags)
       if (this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
