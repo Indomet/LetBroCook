@@ -24,6 +24,12 @@ if (process.env.CI !== 'true') {
   });
 }
 
+const corsOptions ={
+  origin:'http://localhost:8080/', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200
+}
+
 // Variables
 var mongoURI =
   process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/LetBroCook";
