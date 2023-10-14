@@ -1,7 +1,6 @@
-image: node:14-alpine
-
-# include:
-# - '/Python.gitlab-ci.yml'
+image:
+  name: node:14-alpine
+  name: python:3.9
 # Cache modules in between jobs per-branch
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -13,16 +12,21 @@ stages:
   - test
   - deploy
 
+# python:
+#   stage: python
+#   tags:
+#     - docker
+#   script:
+#     - 
+
+
 build:
   stage: build
   tags:
     - docker
   script:
-  - apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-  - python3 -m ensurepip
-  - pip3 install --no-cache --upgrade pip setuptools
-  - cd server
-  - npm install
+    - cd server
+    - npm install
 
 test:
   stage: test
