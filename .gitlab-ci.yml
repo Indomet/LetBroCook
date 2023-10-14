@@ -11,6 +11,13 @@ stages:
   - test
   - deploy
 
+install_python:
+  stage: build
+  tags:
+    - docker
+  script:
+    - apk add python3
+
 build:
   stage: build
   tags:
@@ -30,7 +37,7 @@ test:
     MONGODB_URI: "mongodb://mongo:27017/serverTestDB"
   script:
     - cd server
-    - docker run --rm -v $(pwd):/app -w /app python:3.9-alpine sh -c "pip install -r requirements.txt && python Recommendation.py"
+    - npm run ci-test
 
 deploy:
   stage: deploy
