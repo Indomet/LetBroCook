@@ -63,7 +63,7 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
 });
 
 //User sign in
-router.post("/sign-in", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     if(!req.body){
         return res.status(404).json({ message: "Missing body" })
     }
@@ -143,30 +143,6 @@ router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, asyn
             });
         })
 })
-
-/* Not working
-//TODO ADD AUTH BACK
-router.post("/:userId/recipes/", async (req, res, next) => {
-
-    const recipeData = req.body;
-
-    var formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag)
-    recipeData.tags = formattedTags;
-
-    recipeData.owner = req.params.userId;
-
-    await userModel.findById(req.params.userId).then(async user=>{
-      const newRecipe = new recipeModel(recipeData);
-      await newRecipe.save()
-      return res.status(201).json({Recipe: newRecipe})
-    }).catch(err=>{
-      err.status=404
-      err.message="User not found"
-      return next(err)
-    })
-
-})
-*/
 
 router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const favedArray = req.user.favouriteRecipes
