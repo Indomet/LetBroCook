@@ -121,6 +121,7 @@ export default {
         const userId = user.body._id
         const response = await Api.patch(`http://localhost:3000/v1/users/${userId}`, { image: this.image })
         console.log(response)
+        localStorage.setItem('user-info', JSON.stringify(response.data))
       } catch (error) {
         console.log(error)
       }
