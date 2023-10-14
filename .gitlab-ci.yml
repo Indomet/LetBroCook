@@ -9,15 +9,18 @@ cache:
 
 stages:
   - build
+  - python
   - test
   - deploy
 
-# python:
-#   stage: python
-#   tags:
-#     - docker
-#   script:
-#     - 
+python:
+  stage: python
+  tags:
+    - docker
+  script:
+    - apt-get update -y 
+    - apt-get install -y python3  
+    - python3 --version
 
 
 build:
