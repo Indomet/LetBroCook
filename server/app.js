@@ -10,7 +10,7 @@ const serverUtil = require('./serverUtil.js')
 const { spawn } = require('child_process');
 
 // Spawn a new process for your zPython server
-if(process.env.CI !== true){
+if (process.env.CI !== 'true'){
 const pythonServer = spawn('python', ['Recommendation.py']);
 
 // Log any errors from the Python server
