@@ -38,7 +38,8 @@ deploy:
     - docker
   image: ruby:alpine
   script:
-    - apk update && apk add git curl
+    - apk update && apk add git curl && apk add python3
+    - pip3 install pandas regex scikit-learn pymongo Flask flask-cor
     - gem install dpl
     - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
   environment:
