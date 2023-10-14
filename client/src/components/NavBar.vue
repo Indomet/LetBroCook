@@ -330,11 +330,13 @@ export default {
     background-color: #777;
     margin-bottom: 10px;
     outline: none;
+    background-color: transparent;
   }
 
   .sub-menu-link p{
     width: 100%;
     margin: auto;
+    color: #000000;
   }
 
   .sub-menu-link img{
@@ -351,6 +353,7 @@ export default {
   }
 
   .sub-menu-link:hover span{
+    color: #000000;
     transform: translateX(10px);
   }
 
