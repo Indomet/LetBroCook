@@ -196,7 +196,7 @@ export default {
       }
     })
     axios
-      .get('http://localhost:3000/v1/recipes/tags')
+      .get('http://localhost:3000/v1/tags')
       .then((response) => {
         this.tags = response.data.tags
       })
@@ -304,8 +304,12 @@ export default {
     },
     createTag() {
       const user = JSON.parse(localStorage.getItem('user-info'))
-      const userId = user.body._id
-      axios.post(`http://localhost:3000/v1/recipes/${userId}/tags`, { tag: this.tagName })
+      const id = user.body._id
+      axios.post('http://localhost:3000/v1/tags',
+        {
+         tag: this.tagName,
+         userId: id
+        })
         .then((response) => {
           console.log(response)
           this.tags.push(response.data.tag)

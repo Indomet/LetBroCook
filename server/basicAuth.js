@@ -71,7 +71,7 @@ function isOwnerOfTag(req, res, next){
 // No longer need to call model.find() to get the request objects anywhere else in the code.
 async function setRequestData(req, res, next) {
     const userId = req.params.userId || req.body.userId
-    const recipeId = req.params.recipeId
+    const recipeId = req.params.recipeId || req.body.recipeId
     const commentId = req.params.commentId
     const tagId = req.params.tagId
 

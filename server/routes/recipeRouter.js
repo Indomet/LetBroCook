@@ -9,22 +9,6 @@ router.use(methodOverride('_method'))
 const axios = require('axios');
 
 
-//Next endpoints request from a python server that is running on port 8000
-
-router.get('/Recommendation', async (req, res) => {
-  serverUtil.writeToFile('./UserDataModel.json',userModel)
-
-  const query = req.params.query
-  await axios.get('http://127.0.0.1:8000', {
-    params: {
-      content: query
-    }
-  }).then((response) => {
-    return res.status(200).send(response.data);
-
-}).catch((error) => {console.log(error)})})
-
-
 const { recipeModel, Tag } = require("../models/recipeModel.js"); //. for windows
 const userModel = require("../models/userModel.js");
 const userAuth = require("../basicAuth.js")
@@ -98,38 +82,10 @@ router.get("/", function (req, res, next) {
       });
   });
 
-//Get all tags
-router.get("/tags", function (req, res, next) {
-    //label cache-ability
-    res.set("Cache-control", `no-store`);
-    Tag.find({})
-      .then(function (tags) {
-        res.status(200).json({ tags: tags });
-      })
-      .catch(function (error) {
-        error.status=400
-        return next(error); // Handle the error using Express's error handling middleware
-    });
-});
-
-router.get("/tags/:tagId", userAuth.setRequestData, function(req, res, next){
-    res.status(200).json({tag : req.tag})
-    /*
-  Tag.findById(req.tag.id).then(tag=>{
-    res.status(200).json({tag:tag})
-  }).catch(err=>{
-     err.status=404
-     return next(err)
-  })
-  */
-})
-
-
-
 // hateoas
 router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
-  const recipeId = req.params.recipeId
+  const recipeId = req.recipe.id
   console.log(recipeId)
   recipeModel.findById(recipeId).then(recipe => {
     const links = [
@@ -148,9 +104,8 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
 });
 
-//THIS USED TO BE IN USER ROUTER PUT BACK IF BREAKS
 //Replaces a recipe by id
-router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.put("/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
   const recipeId = req.recipe.id
   const { title, image, sectionsAndIngredients, steps, servings, description,  nutritionalInfo } = req.body;
 
@@ -175,7 +130,7 @@ router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUse
 
 
 //Delete recipe by id
-router.delete('/:recipeId/users/:userId/delete', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
+router.delete('/:recipeId/users/:userId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
     var recipeId = req.recipe.id
     var userId = req.user.id
 
@@ -199,7 +154,6 @@ router.delete('/:recipeId/users/:userId/delete', userAuth.setRequestData, userAu
 
   })
 
-//TODO: Admin permission only
 router.delete("/tags",async function(req,res,next){
     Tag.deleteMany({}).then(()=>{
         return res.status(200).json({message:"All tags are deleted"})}
