@@ -240,6 +240,7 @@ export default {
 },
   methods: {
     async submitRecipe() {
+      console.log(this.selectedTags)
       if (this.title === '' ||
         this.description === '' ||
         this.ingredients === '' ||
@@ -254,7 +255,7 @@ export default {
         // eslint-disable-next-line spaced-comment
         console.log('selected tags before making them ' + this.selectedTags)
         const selectedTagNames = this.selectedTags.map(tag => tag.name)
-        console.log('selected tags after making them ' + selectedTagNames)
+        console.log(this.selectedTags)
         const recipeData = {
           title: this.title,
           image: this.url,
@@ -294,7 +295,9 @@ export default {
       reader.onload = () => {
         this.url = reader.result
       }
-      reader.readAsDataURL(this.file)
+      if (this.file) {
+        reader.readAsDataURL(this.file)
+      }
     },
     resize() {
       const textareas = document.querySelectorAll('.resizable')
