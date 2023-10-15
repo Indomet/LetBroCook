@@ -11,6 +11,7 @@ const axios = require('axios');
 const { Tag } = require("../models/recipeModel.js"); //. for windows
 const userAuth = require("../basicAuth.js")
 
+module.exports = router
 
 //Get all tags
 router.get("/", function (req, res, next) {
@@ -26,6 +27,17 @@ router.get("/", function (req, res, next) {
     });
 });
 
+//Delete all tags
+router.delete("/",async function(req,res,next){
+  Tag.deleteMany({}).then(()=>{
+      return res.status(200).json({message:"All tags are deleted"})}
+  ).catch(err=>{
+      err.status=404
+      return next(err)
+  })
+})
+
+//Get tag by id
 router.get("/:tagId", userAuth.setRequestData, function(req, res, next){
   try{
     res.status(200).json({tag : req.tag})
@@ -36,8 +48,7 @@ router.get("/:tagId", userAuth.setRequestData, function(req, res, next){
   }
 })
 
-module.exports = router
-
+//delete one tag by ID
 router.delete("/:tagId", async function(req,res,next){
     const tagId = req.params.tagId
     await Tag.deleteOne({_id:tagId}).then((result)=>{
@@ -51,7 +62,7 @@ router.delete("/:tagId", async function(req,res,next){
     })
   })
 
-  
+//Update one tag by id
 router.patch("/:tagId", userAuth.setRequestData, userAuth.authUser, async function (req, res, next) {
   const tagId = req.params.tagId
   const tag = await Tag.findById(tagId)
@@ -69,6 +80,7 @@ router.patch("/:tagId", userAuth.setRequestData, userAuth.authUser, async functi
     })
 })
 
+//Create a tag
 //Must have userId in request body
 router.post("/", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
     const newTag = req.body.tag

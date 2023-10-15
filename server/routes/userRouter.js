@@ -74,11 +74,10 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
           });
 
         const recipeList = recipes.map(recipe => {
-            const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
+            const links = [
                 // HATEOAS links
                 { rel: "edit", href: `/editrecipe/${recipe._id}` },
-                //http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete
-                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}/delete` }
+                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}` }
             ];
             return { recipe: recipe, links: links };
         });
@@ -135,6 +134,8 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
         const user = req.user
         res.status(200).json({ User: user });
 });
+
+
 
 //POST----------------------------------
 
@@ -454,3 +455,4 @@ router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequest
     }
 
 })
+
