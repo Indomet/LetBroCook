@@ -18,6 +18,7 @@ img {
   display: block;
   margin: 0 auto;
   margin-top: 20px;
+  border-radius: 20px;
 }
 
 @media screen and (max-width: 375px) {
