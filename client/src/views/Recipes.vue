@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div v-if="recipeData.length<=0 || isSearching" class="loading-icon">
+        <div v-if="loading || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
-    <div v-else-if="recipeData.length === 0">
+    <div v-else-if="noRecipes && !loading">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 No recipes found
             </p>
@@ -59,29 +59,28 @@ export default {
             numberOfRecipesToShow: 8,
             loading: true,
             isAtBottom: false,
-            isSearching: false
+            isSearching: false,
+            noRecipes: false
         }
     },
-    mounted() {
+    async mounted() {
         console.log(this.loading)
         window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
             this.isSearching = true
-            console.log('is sarching is ' + this.isSearching)
             if (data) {
                 this.isSearching = true
                 const searchQuery = data.searchQuery
                 const tagNames = data.tags.map(tag => tag.name)
                 const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
-                // console.log(tagString)
                 const url = `http://localhost:3000/v1/recipes?${tagString}&title=${searchQuery}`
                 this.fetchData(url) // Call fetchData method to refresh data
             }
         })
         // fetch all recipes
         this.fetchData('http://localhost:3000/v1/recipes') // Call fetchData method to fetch data on component mount
-        this.loading = false
+        console.log(this.recipeMap)
     },
     unmounted () {
     window.removeEventListener('scroll', this.handleScroll)
@@ -98,7 +97,10 @@ export default {
                 .get(url)
                 .then((response) => {
                     this.recipeData = response.data.recipes
-                    console.log(JSON.stringify('THE HOME APGE RECIPES ARE ' + JSON.stringify(this.recipeData[0].comments)))
+                    console.log(this.recipeData)
+                    if (this.recipeData.length === 0) {
+                        this.noRecipes = true
+                    }
                     for (const recipe of this.recipeData) {
                         recipe.flipped = false
                     }
@@ -125,7 +127,6 @@ export default {
                         this.favedRecipes = response.data.favouriteRecipes.map(
                             (recipe) => recipe._id
                         )
-                        console.log(this.favedRecipes)
                     })
                     .catch((err) => {
                         console.log(err)
