@@ -271,7 +271,7 @@ export default {
                         $(this).removeClass('active')
                         if (
                             window.location.href.toLowerCase() ===
-                            'http://localhost:8080/favoriterecipes'
+                            'http://localhost:3000/favoriterecipes'
                         ) {
                             window.location.reload()
                         }
