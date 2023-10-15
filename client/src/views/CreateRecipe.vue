@@ -230,10 +230,10 @@ export default {
         this.file = null
         alert('Please upload an image file.')
       })
-    } else if (newFile.size > 1024 * 1024) {
+    } else if (newFile.size > 12 * 1024 * 1024) {
       this.$nextTick(() => {
         this.file = null
-        alert('Please upload an image file smaller than 16MB.')
+        alert('Please upload an image file smaller than 12MB.')
       })
     }
   }
@@ -306,6 +306,10 @@ export default {
       })
     },
     createTag() {
+      if (!this.tagName) {
+        alert('Please enter a tag name')
+        return
+      }
       const user = JSON.parse(localStorage.getItem('user-info'))
       const id = user.body._id
       axios.post('http://localhost:3000/v1/tags',

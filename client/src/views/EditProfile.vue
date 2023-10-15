@@ -17,7 +17,7 @@
               <form @submit.prevent="onFormSubmit">
                 <div class="field mb-3" style="display: flex; flex-direction: column; margin-top: 30px">
                   <b-form-file v-model="file" placeholder="Upload a picture" drop-placeholder="Drop picture here"
-                    @change="onFileChange"></b-form-file>
+                    accept=".png, .jpg,   .jpeg"></b-form-file>
                 </div>
                 <button class="btn btn-primary" type="submit">Upload new image</button>
               </form>
@@ -68,7 +68,8 @@ export default {
       name: '',
       email: '',
       usernameError: '',
-      emailError: ''
+      emailError: '',
+      file: ''
     }
   },
   async mounted() {
@@ -89,12 +90,33 @@ export default {
       console.error(error)
     }
   },
+  watch: {
+  file: function(newFile, oldFile) {
+    if (!newFile) {
+      return
+    }
+    if (!newFile.type.startsWith('image/')) {
+      this.$nextTick(() => {
+        this.file = null
+        alert('Please upload an image file.')
+      })
+    } else if (newFile.size > 12 * 1024 * 1024) {
+      this.$nextTick(() => {
+        this.file = null
+        alert('Please upload an image file smaller than 12MB.')
+      })
+    } else {
+      this.onFileChange(newFile)
+    }
+  }
+},
 
   methods: {
-    onFileChange(e) {
-      this.file = e.target.files[0]
+    onFileChange(newFile) {
+      this.file = newFile
       const reader = new FileReader()
       reader.onload = () => {
+        console.log('read the file and setting img')
         this.image = reader.result
       }
       if (this.file) {

@@ -292,9 +292,18 @@ export default {
       transform: translateX(-50%);
     }
     .userPic{
-      margin-right: 35px;
+      margin-right: 25px ;
     }
   }
+  @media (min-width: 769px) and (max-width: 1024px) {
+  .sub-menu-wrap {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .userPic{
+    margin-right: 35px;
+  }
+}
 
   .sub-menu{
     background: rgb(255, 255, 255);
