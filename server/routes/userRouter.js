@@ -314,7 +314,7 @@ router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,
       userModel.findById(req.user.id).then(user => {
         Object.assign(user, req.body);
         user.save();
-        return res.status(200).json({ message: user })
+        return res.status(200).json({body: user })
       }).catch(err => {
         err.status = 404
         return next(err)
