@@ -4,8 +4,6 @@ const router = express.Router();
 //just specify in the query options for example such as _method=PATCH to use a patch method
 //but the actual form method is post/get
 //will be used when deleting all tags for example
-var methodOverride = require('method-override')
-router.use(methodOverride('_method'))
 const axios = require('axios');
 
 
@@ -82,19 +80,34 @@ router.get("/", function (req, res, next) {
       });
   });
 
-// hateoas
-router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
+//Delete all recipes from specific userId !!!!!!!!
+//TODO:
+router.delete('/:userId/', userAuth.setRequestData, userAuth.authUser, function(req, res, next) {
+  const userId = req.user.id;
+  updateManyUserRecipe(req, userId)
+  recipeModel.find({ owner: userId }).then(function(recipes) {
+      if (recipes.length === 0) {
+          return res.status(404).json({ message: "No recipes to delete" });
+      }
+      const recipeIds = recipes.map(recipe => recipe.id);
+      recipeModel.deleteMany({ _id: { $in: recipeIds } })
+          .then(function(result) {
+              return res.status(200).json({ message: "Recipes deleted", body: result });
+          })
+          .catch(function(error) {
+              return next(error);
+          });
+  }).catch(function(error) {
+      return next(error);
+  });
+});
 
+
+router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
   const recipeId = req.recipe.id
   console.log(recipeId)
   recipeModel.findById(recipeId).then(recipe => {
-    const links = [
-        // HATEOAS links
-      { rel: "itself", href: `/v1/recipes/${recipe._id}` },
-      { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
-      { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
-    ];
-    res.status(200).json({ recipe: recipe, links: links});
+    res.status(200).json({ recipe: recipe});
   })
   .catch(function(error){
     console.log(error)
@@ -154,35 +167,6 @@ router.delete('/:recipeId/users/:userId', userAuth.setRequestData, userAuth.auth
 
   })
 
-router.delete("/tags",async function(req,res,next){
-    Tag.deleteMany({}).then(()=>{
-        return res.status(200).json({message:"All tags are deleted"})}
-    ).catch(err=>{
-        err.status=404
-        return next(err)
-    })
-})
-
-//Delete all recipes from specific userId
-router.delete('/user/:userId/deleteAll', userAuth.setRequestData, userAuth.authUser, function(req, res, next) {
-    const userId = req.user.id;
-    updateManyUserRecipe(req, userId)
-    recipeModel.find({ owner: userId }).then(function(recipes) {
-        if (recipes.length === 0) {
-            return res.status(404).json({ message: "No recipes to delete" });
-        }
-        const recipeIds = recipes.map(recipe => recipe.id);
-        recipeModel.deleteMany({ _id: { $in: recipeIds } })
-            .then(function(result) {
-                return res.status(200).json({ message: "Recipes deleted", body: result });
-            })
-            .catch(function(error) {
-                return next(error);
-            });
-    }).catch(function(error) {
-        return next(error);
-    });
-  });
 
 
 //Deletes the reference of one recipeId
@@ -197,6 +181,7 @@ function updateOneUserRecipe(userId, recipeId){
         })
 }
 
+
 //Deletes the reference of many recipeId
 async function updateManyUserRecipe(req, userId){
     var recipesToRemove = []
@@ -206,4 +191,4 @@ async function updateManyUserRecipe(req, userId){
         }).catch(function(err){
                 console.error("Error updating user:", err);
         })
-}
+    }
