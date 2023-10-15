@@ -102,7 +102,7 @@ export default {
       }
       try {
         const response = await Api.post(
-          'http://localhost:3000/v1/users/sign-in',
+          'http://localhost:3000/v1/users/',
           {
             email: this.email,
             password: this.password

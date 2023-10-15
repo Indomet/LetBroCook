@@ -4,25 +4,7 @@ const router = express.Router();
 //just specify in the query options for example such as _method=PATCH to use a patch method
 //but the actual form method is post/get
 //will be used when deleting all tags for example
-var methodOverride = require('method-override')
-router.use(methodOverride('_method'))
 const axios = require('axios');
-
-
-//Next endpoints request from a python server that is running on port 8000
-
-router.get('/Recommendation', async (req, res) => {
-  serverUtil.writeToFile('./UserDataModel.json',userModel)
-
-  const query = req.params.query
-  await axios.get('http://127.0.0.1:8000', {
-    params: {
-      content: query
-    }
-  }).then((response) => {
-    return res.status(200).send(response.data);
-
-}).catch((error) => {console.log(error)})})
 
 
 const { recipeModel, Tag } = require("../models/recipeModel.js"); //. for windows
@@ -98,47 +80,34 @@ router.get("/", function (req, res, next) {
       });
   });
 
-//Get all tags
-router.get("/tags", function (req, res, next) {
-    //label cache-ability
-    res.set("Cache-control", `no-store`);
-    Tag.find({})
-      .then(function (tags) {
-        res.status(200).json({ tags: tags });
-      })
-      .catch(function (error) {
-        error.status=400
-        return next(error); // Handle the error using Express's error handling middleware
-    });
+//Delete all recipes from specific userId !!!!!!!!
+//TODO:
+router.delete('/:userId/', userAuth.setRequestData, userAuth.authUser, function(req, res, next) {
+  const userId = req.user.id;
+  updateManyUserRecipe(req, userId)
+  recipeModel.find({ owner: userId }).then(function(recipes) {
+      if (recipes.length === 0) {
+          return res.status(404).json({ message: "No recipes to delete" });
+      }
+      const recipeIds = recipes.map(recipe => recipe.id);
+      recipeModel.deleteMany({ _id: { $in: recipeIds } })
+          .then(function(result) {
+              return res.status(200).json({ message: "Recipes deleted", body: result });
+          })
+          .catch(function(error) {
+              return next(error);
+          });
+  }).catch(function(error) {
+      return next(error);
+  });
 });
 
-router.get("/tags/:tagId", userAuth.setRequestData, function(req, res, next){
-    res.status(200).json({tag : req.tag})
-    /*
-  Tag.findById(req.tag.id).then(tag=>{
-    res.status(200).json({tag:tag})
-  }).catch(err=>{
-     err.status=404
-     return next(err)
-  })
-  */
-})
 
-
-
-// hateoas
 router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
-
-  const recipeId = req.params.recipeId
+  const recipeId = req.recipe.id
   console.log(recipeId)
   recipeModel.findById(recipeId).then(recipe => {
-    const links = [
-        // HATEOAS links
-      { rel: "itself", href: `/v1/recipes/${recipe._id}` },
-      { rel: "edit", href: `/v1/users/${recipe.owner}/edit-recipe/${recipe._id}` },
-      { rel: "delete", href: `/v1/users/${recipe.owner}/deleteOne/${recipe._id}` }
-    ];
-    res.status(200).json({ recipe: recipe, links: links});
+    res.status(200).json({ recipe: recipe});
   })
   .catch(function(error){
     console.log(error)
@@ -148,33 +117,8 @@ router.get("/:recipeId", userAuth.setRequestData, async (req, res, next) => {
 
 });
 
-//TODO ADD BACK USER AUUTH
-//THIS HAD BOTH
-router.post("/:userId/tags", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
-  const newTag = req.body.tag
-  console.log("the tag is"  + newTag)
-  const existingTag = await Tag.find({name:newTag})//will return empty array if no tag exists
-  if(existingTag.length>0){return res.status(409).json({messsage:"Tag already exists"})}
-  else{
-    await new Tag({
-        name:newTag,
-        ownerId: req.user.id
-    }).save().then((result)=>{
-      return res.status(201).json({
-        message: "Tag posted",
-        tag: result
-    })
-    }).catch(err=>{
-      err.status=400
-      return next(err)
-    })
-  }
-})
-
-
-//THIS USED TO BE IN USER ROUTER PUT BACK IF BREAKS
 //Replaces a recipe by id
-router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+router.put("/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
   const recipeId = req.recipe.id
   const { title, image, sectionsAndIngredients, steps, servings, description,  nutritionalInfo } = req.body;
 
@@ -199,7 +143,7 @@ router.put("/:recipeId/users/:userId", userAuth.setRequestData, userAuth.authUse
 
 
 //Delete recipe by id
-router.delete('/:recipeId/users/:userId/delete', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
+router.delete('/:recipeId/users/:userId', userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, function (req, res, next) {
     var recipeId = req.recipe.id
     var userId = req.user.id
 
@@ -223,36 +167,6 @@ router.delete('/:recipeId/users/:userId/delete', userAuth.setRequestData, userAu
 
   })
 
-//TODO: Admin permission only
-router.delete("/tags",async function(req,res,next){
-    Tag.deleteMany({}).then(()=>{
-        return res.status(200).json({message:"All tags are deleted"})}
-    ).catch(err=>{
-        err.status=404
-        return next(err)
-    })
-})
-
-//Delete all recipes from specific userId
-router.delete('/user/:userId/deleteAll', userAuth.setRequestData, userAuth.authUser, function(req, res, next) {
-    const userId = req.user.id;
-    updateManyUserRecipe(req, userId)
-    recipeModel.find({ owner: userId }).then(function(recipes) {
-        if (recipes.length === 0) {
-            return res.status(404).json({ message: "No recipes to delete" });
-        }
-        const recipeIds = recipes.map(recipe => recipe.id);
-        recipeModel.deleteMany({ _id: { $in: recipeIds } })
-            .then(function(result) {
-                return res.status(200).json({ message: "Recipes deleted", body: result });
-            })
-            .catch(function(error) {
-                return next(error);
-            });
-    }).catch(function(error) {
-        return next(error);
-    });
-  });
 
 
 //Deletes the reference of one recipeId
@@ -267,6 +181,7 @@ function updateOneUserRecipe(userId, recipeId){
         })
 }
 
+
 //Deletes the reference of many recipeId
 async function updateManyUserRecipe(req, userId){
     var recipesToRemove = []
@@ -276,4 +191,4 @@ async function updateManyUserRecipe(req, userId){
         }).catch(function(err){
                 console.error("Error updating user:", err);
         })
-}
+    }

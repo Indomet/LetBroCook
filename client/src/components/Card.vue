@@ -223,6 +223,7 @@ export default {
         },
         editOrDelete(operation) {
             const link = this.links.find(link => link.rel === operation)
+            console.log('link is: ' + link)
             if (operation === 'edit') {
                 this.$router.push(link.href)
             } else if (operation === 'delete') {
