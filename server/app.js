@@ -54,7 +54,7 @@ mongoose.connection.once("open", async function () {
   var originalOGuser = new userModel(
     {
       email:"gusalmual@student.gu.se",
-      password:"Admin123",
+      password:"asimzepeialiareallgs",
       username:"Chef Chef",
       name:"Ali"
     }
