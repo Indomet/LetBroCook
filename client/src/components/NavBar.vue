@@ -107,7 +107,7 @@ export default {
   },
   mounted() {
     axios
-      .get('http://localhost:3000/v1/recipes/tags')
+      .get('http://localhost:3000/v1/tags')
       .then((response) => {
         this.tags = response.data.tags
       })
