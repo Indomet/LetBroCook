@@ -20,6 +20,10 @@
           <li  class="nav-item">
             <router-link  to= "/signup" v-if="!user" class="auth-button nav-link active" >Signup</router-link>
           </li>
+          <!--The next one only the original psuedo admin user can use to delete all tags-->
+          <li  class="nav-item">
+            <a v-if="_id === '4eb6e7e7e9b7f4194e000001'" class="auth-button nav-link active"  style="cursor: pointer;" @click="deleteAllTags()">Delete tags</a>
+          </li>
         </ul>
             <div class="input-group mb-3 ms-auto mb-2 mb-lg-0" >
               <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tags</button>
@@ -169,9 +173,19 @@ export default {
     updateProfilePicture(userId) {
       axios.get(`http://localhost:3000/v1/users/${userId}`)
         .then(response => {
-          const { image, username } = response.data.User
+          const { image, username, _id } = response.data.User
           this.image = image
           this.username = username
+          this._id = _id
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    },
+    deleteAllTags() {
+      axios.delete('http://localhost:3000/v1/tags')
+        .then(response => {
+          console.log(response)
         })
         .catch(error => {
           console.error(error)
@@ -295,7 +309,7 @@ export default {
       margin-right: 25px ;
     }
   }
-  @media (min-width: 769px) and (max-width: 1024px) {
+  @media (min-width: 769px) and (max-width: 991px) {
   .sub-menu-wrap {
     left: 50%;
     transform: translateX(-50%);
