@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ec8ec583-85a4-4195-8100-3a6c580d9d76",
+		"_postman_id": "88e38b8f-93c6-4d9b-85ea-87138cbc693e",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "29736996"
@@ -84,7 +84,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/users/sign-in",
+					"raw": "http://localhost:3000/v1/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -92,8 +92,7 @@
 					"port": "3000",
 					"path": [
 						"v1",
-						"users",
-						"sign-in"
+						"users"
 					]
 				}
 			},
@@ -401,7 +400,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": " {\r\n\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"REPLACEhttps://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"REPLACECalories 468\",\r\n            \"REPLACEFat 43g\",\r\n            \"REPLACECarbs 1g\",\r\n            \"REPLACEFiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ]\r\n    }",
+					"raw": " {\r\n\r\n        \"title\": \"Chimichurri Wings-REPLACED\",\r\n        \"image\": \"REPLACEhttps://img.buzzfeed.com/thumbnailer-prod-us-east-1/video-api/assets/465250.jpg?resize=300:*&output-format=jpg&output-quality=auto\",\r\n        \"sectionsAndIngredients\": {\r\n            \"Ingredients\": [\r\n                \"REPLACE large shallot, minced\",\r\n                \"REPLACE5 cloves garlic, minced\",\r\n                \"REPLACE1 large jalapeño, minced\",\r\n                \"REPLACE½ cup red wine vinegar\",\r\n                \"REPLACE2 teaspoons kosher salt\",\r\n                \"REPLACE1 teaspoon freshly ground black pepper\",\r\n                \"REPLACE1 teaspoon red pepper flakes\",\r\n                \"REPLACE¼ cup finely chopped fresh parsley\",\r\n                \"REPLACE¼ cup finely chopped fresh cilantro\",\r\n                \"REPLACE½ cup extra-virgin olive oil\",\r\n                \"REPLACE1 lb chicken wings\"\r\n            ]\r\n        },\r\n        \"servings\": \"REPLACEfor 4 servings\",\r\n        \"description\": \"REPLACETry these herby, garlicky wings for game day or any day!\",\r\n        \"steps\": [\r\n            \"REPLACEIn a large bowl, combine the shallot, garlic, jalapeño, and red wine vinegar. Let sit for about 10 minutes.\",\r\n            \"REPLACESeason the mixture with the salt, black pepper, and red pepper flakes. Add the parsley and cilantro and mix to incorporate.\",\r\n            \"REPLACEWhile whisking, slowly and evenly stream in the olive oil. The chimichurri should be thick and slightly chunky.\",\r\n            \"REPLACEAdd the chicken wings to a baking dish or large bowl. Pour about two-thirds of the chimichurri sauce evenly over the wings (reserve the rest for serving). Cover and marinate in the refrigerator for at least 2 hours, or overnight.\",\r\n            \"REPLACEPreheat oven to 400°F (200°C) and line a large baking sheet with parchment paper.\",\r\n            \"REPLACEArrange the marinated wings on the prepared baking sheet, spacing about 1 inch apart. Bake for 45 minutes, or until deep golden brown and the internal temperature reaches 165°F (75°C).\",\r\n            \"REPLACEServe the wings immediately with the reserved chimichurri sauce for dipping.\",\r\n            \"REPLACEEnjoy!\"\r\n        ],\r\n        \"tags\": [\r\n            \"REPLACEAppliance\",\r\n            \"REPLACEBaking\",\r\n            \"REPLACEChicken\",\r\n            \"REPLACEHigh-Protein\",\r\n            \"REPLACEUnder 1 Hour\",\r\n            \"REPLACEWeeknight\",\r\n            \"REPLACEParty\",\r\n            \"REPLACEGame Day\",\r\n            \"REPLACEDinner\",\r\n            \"REPLACEAppetizers\",\r\n            \"REPLACEEasy\",\r\n            \"REPLACELow-Carb\",\r\n            \"Healthy\",\r\n            \"Gluten-Free\",\r\n            \"Dairy-Free\"\r\n        ],\r\n        \"nutritionalInfo\": [\r\n            \"REPLACECalories 468\",\r\n            \"REPLACEFat 43g\",\r\n            \"REPLACECarbs 1g\",\r\n            \"REPLACEFiber 25g\",\r\n            \"Sugar 0g\",\r\n            \"Protein 17g\"\r\n        ],\r\n        \"userId\": \"{{user_id}}\"\r\n    }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -409,7 +408,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}",
+					"raw": "http://localhost:3000/v1/recipes/{{recipe_id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -418,9 +417,7 @@
 					"path": [
 						"v1",
 						"recipes",
-						"{{recipe_id}}",
-						"users",
-						"{{user_id}}"
+						"{{recipe_id}}"
 					]
 				}
 			},
@@ -551,6 +548,54 @@
 					"port": "3000",
 					"path": [
 						"v1",
+						"recipes",
+						"{{recipe_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRecipeFromUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/users/{{user_id}}/recipes/{{recipe_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"users",
+						"{{user_id}}",
 						"recipes",
 						"{{recipe_id}}"
 					]
@@ -767,7 +812,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/tags",
+					"raw": "http://localhost:3000/v1/tags",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -775,7 +820,6 @@
 					"port": "3000",
 					"path": [
 						"v1",
-						"recipes",
 						"tags"
 					]
 				}
@@ -859,7 +903,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete",
+					"raw": "http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -870,8 +914,7 @@
 						"recipes",
 						"{{recipe_id}}",
 						"users",
-						"{{user_id}}",
-						"delete"
+						"{{user_id}}"
 					]
 				}
 			},
@@ -900,7 +943,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"tag\":\"NEW lL\"\r\n}",
+					"raw": "{\r\n    \"tag\":\"NEW lL\",\r\n    \"userId\": \"{{user_id}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -908,7 +951,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/{{user_id}}/tags",
+					"raw": "http://localhost:3000/v1/tags",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -916,9 +959,50 @@
 					"port": "3000",
 					"path": [
 						"v1",
-						"recipes",
-						"{{user_id}}",
 						"tags"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EditTagByID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tag\":\"EDITED TAG\",\r\n    \"userId\": \"{{user_id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/tags/{{tag_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"tags",
+						"{{tag_id}}"
 					]
 				}
 			},
@@ -955,7 +1039,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/tags",
+					"raw": "http://localhost:3000/v1/tags",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -963,7 +1047,6 @@
 					"port": "3000",
 					"path": [
 						"v1",
-						"recipes",
 						"tags"
 					]
 				}
@@ -1001,7 +1084,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/v1/recipes/tags/{{tag_id}}",
+					"raw": "http://localhost:3000/v1/tags/{{tag_id}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1009,7 +1092,6 @@
 					"port": "3000",
 					"path": [
 						"v1",
-						"recipes",
 						"tags",
 						"{{tag_id}}"
 					]
@@ -1097,6 +1179,49 @@
 					"path": [
 						"v1",
 						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteOneTag",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/v1/tags/{{tag_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"v1",
+						"tags",
+						"{{tag_id}}"
 					]
 				}
 			},
