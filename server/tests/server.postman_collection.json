@@ -3,7 +3,7 @@
 		"_postman_id": "88e38b8f-93c6-4d9b-85ea-87138cbc693e",
 		"name": "serverworking",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29736996"
+		"_exporter_id": "29691657"
 	},
 	"item": [
 		{
@@ -356,7 +356,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\":\"recplaceuser\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"aki\",\r\n    \"password\":\"1234\",\r\n    \"recipes\": [],\r\n    \"favouriteRecipes\": []\r\n}",
+					"raw": "{\r\n    \"image\": \"https://images.theconversation.com/files/521751/original/file-20230419-18-hg9dc3.jpg?ixlib=rb-1.1.0&rect=53%2C17%2C1898%2C949&q=45&auto=format&w=1356&h=668&fit=crop\",\r\n    \"username\":\"recplaceuser\",\r\n    \"email\":\"asim@gmail.com\",\r\n    \"name\":\"Mehmet Asim\",\r\n    \"password\":\"1234\",\r\n    \"recipes\": [],\r\n    \"favouriteRecipes\": []\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
