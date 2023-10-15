@@ -27,6 +27,37 @@ router.get("/", function (req, res, next) {
       });
   });
 
+  //get a single recipe from a given user
+  router.get("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+    const recipeId = req.recipe.id
+    const userId = req.user.id
+    await recipeModel.findOne({_id : recipeId, owner: userId}).then(recipe=>{
+      if(!recipe){
+        return res.status(404).json({message: "Recipe not found"})
+      }
+      res.status(200).json({recipe: recipe})
+    }).catch(err=>{
+      err.status=404
+      return next(err)
+    })
+  })
+
+router.delete("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
+    const recipeId = req.recipe.id
+    const userId = req.user.id
+    await recipeModel.findOneAndDelete({_id : recipeId, owner: userId}).then(recipe=>{
+      if(!recipe){
+        return res.status(404).json({message: "Recipe not found"})
+      }
+      res.status(200).json({message: "Recipe deleted"})
+    }).catch(err=>{
+      err.status=404
+      return next(err)
+    })
+  })
+
+  
+
 
 //Get all recipes of user
 router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, res, next) {
@@ -43,11 +74,10 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
           });
 
         const recipeList = recipes.map(recipe => {
-            const links = [//http://localhost:8080/editrecipe/652081fff0206a5b8b12d25a
+            const links = [
                 // HATEOAS links
                 { rel: "edit", href: `/editrecipe/${recipe._id}` },
-                //http://localhost:3000/v1/recipes/{{recipe_id}}/users/{{user_id}}/delete
-                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}/delete` }
+                { rel: "delete", href: `http://localhost:3000/v1/recipes/${recipe._id}/users/${recipe.owner}` }
             ];
             return { recipe: recipe, links: links };
         });
@@ -63,7 +93,7 @@ router.get("/:userId/recipes/", userAuth.setRequestData, async function (req, re
 });
 
 //User sign in
-router.post("/sign-in", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     if(!req.body){
         return res.status(404).json({ message: "Missing body" })
     }
@@ -105,68 +135,43 @@ router.get("/:userId", userAuth.setRequestData, userAuth.authUser, (req, res, ne
         res.status(200).json({ User: user });
 });
 
+
+
 //POST----------------------------------
 
 router.post("/:userId/recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const recipeData = req.body;
     const unformattedTags = req.body.tags;
-
-
     try {
-    var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
-      recipeData.tags = formattedTags;
+        var formattedTags = await serverUtil.handleExistingTags(unformattedTags, Tag, req.user.id)
+            recipeData.tags = formattedTags;
+            var recipe = new recipeModel(recipeData);
+            const user = req.user
+            recipe.owner = user.id
+        recipe.save()
+        .then(function (recipe) {
+            try{
+                user.recipes.push(recipe.id);
+            }catch(error){
+                console.log("Invalid user")
+                return next(error)
+            }
+            user.save()
+                .then(function () {
+                    res.status(201).json({ message: "Recipe created", Recipe: recipe });
+                })
+                .catch((err) => {
+                    res.status(404).json({ message: "user not found" });
+                    return next(err);
+                });
+            })
     }
     catch (err) {
       err.status=400//bad tags request
     return next(err);
     }
-
-    var recipe = new recipeModel(recipeData);
-    const user = req.user
-    recipe.owner = user.id
-
-    recipe.save()
-    .then(function (recipe) {
-        try{
-            user.recipes.push(recipe.id);
-        }catch(error){
-            console.log("Invalid user")
-            return next(error)
-        }
-        user.save()
-            .then(function () {
-                res.status(201).json({ message: "Recipe created", Recipe: recipe });
-            })
-            .catch((err) => {
-                res.status(404).json({ message: "user not found" });
-                return next(err);
-            });
-        })
+    
 })
-
-/* Not working
-//TODO ADD AUTH BACK
-router.post("/:userId/recipes/", async (req, res, next) => {
-
-    const recipeData = req.body;
-
-    var formattedTags = await serverUtil.handleExistingTags(req.body.tags, Tag)
-    recipeData.tags = formattedTags;
-
-    recipeData.owner = req.params.userId;
-
-    await userModel.findById(req.params.userId).then(async user=>{
-      const newRecipe = new recipeModel(recipeData);
-      await newRecipe.save()
-      return res.status(201).json({Recipe: newRecipe})
-    }).catch(err=>{
-      err.status=404
-      err.message="User not found"
-      return next(err)
-    })
-
-})
-*/
 
 router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const favedArray = req.user.favouriteRecipes
@@ -187,23 +192,9 @@ router.get("/:userId/favorite-recipes", userAuth.setRequestData, userAuth.authUs
     });
 });
 
-//TODO ADD USER AUTH BACK
 router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const user = req.user
     const recipe = req.recipe
-    /*
-    userModel.findById(user.id).then(user=>{
-      if(!recipeModel.findById(recipe.id))
-      {return res.status(404).json({message: "Invalid recipe id"})}
-      user.favouriteRecipes.push(recipe.id);
-      return res.status(201).json({message: "recipe created"})
-    })
-    .catch(err=>{
-      err.status=404
-      err.message="User not found"
-      return next(err)
-    })
-    */
     try {
         // Prevent duplicate ids from being added to favoriteRecipes
         for(var each of user.favouriteRecipes){
@@ -230,8 +221,6 @@ router.post("/:userId/recipes/:recipeId/favorite-recipes", userAuth.setRequestDa
 );
 
 //add a comment by a user to a certain recipe
-//TODO ADD BACK USER AUTH
-//this only had userAuth.authUser
 router.post("/:userId/recipes/:recipeId/comments", userAuth.setRequestData, userAuth.authUser, (req, res, next) => {
 
     const userId = req.user.id
@@ -267,7 +256,6 @@ router.post("/:userId/recipes/:recipeId/comments", userAuth.setRequestData, user
 });
 
 //Create user account
-//TODO: user should be auto logged in after successful sign up
 router.post("/signup", (req, res, next) => {
     var user = new userModel(req.body);
     user
@@ -303,7 +291,6 @@ router.put("/:userId", userAuth.setRequestData, userAuth.authUser, async functio
 //PATCH----------------------------------
 
 // edit a user
-//ADD BACK USER AUTHENTICAION
 router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
 
   // check if username already exists in database
@@ -328,7 +315,7 @@ router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,
       userModel.findById(req.user.id).then(user => {
         Object.assign(user, req.body);
         user.save();
-        return res.status(200).json({"body" : user})
+        return res.status(200).json({body: user })
       }).catch(err => {
         err.status = 404
         return next(err)
@@ -341,7 +328,6 @@ router.patch("/:userId", userAuth.setRequestData, userAuth.authUser, async (req,
 })
 
 // edit a recipe
-//TODO: weird bug that takes 2 requests for recipe to change
 router.patch("/:userId/recipes/:recipeId", userAuth.setRequestData, userAuth.authUser, userAuth.isOwnerOfRecipe, async (req, res, next) => {
 
   const updatedRecipeData = req.body;
@@ -425,7 +411,6 @@ router.delete("/:userId", userAuth.setRequestData, userAuth.authUser, async (req
 
 // DANGER ZONE -------------------------------------------------------
 // Method to delete everything
-//TODO: Admin permission only
 router.delete('/', async (req, res,next) => {
   try {
     // First, delete all recipes associated with users
@@ -448,7 +433,6 @@ router.delete('/', async (req, res,next) => {
 
 //DELETE----------------------------------
 //Delete favourite recipe
-//TODO ADD BACK USER AUTH THIS HAD ONE
 router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequestData, userAuth.authUser, async (req, res, next) => {
     const userId = req.params.userId;
     const recipeId = req.params.recipeId;
@@ -471,3 +455,4 @@ router.delete("/:userId/recipes/:recipeId/favoriteDeletion", userAuth.setRequest
     }
 
 })
+
