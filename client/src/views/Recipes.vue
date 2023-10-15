@@ -101,7 +101,7 @@ export default {
                 .get(url)
                 .then((response) => {
                     this.recipeData = response.data.recipes
-                    console.log(this.recipeData.comments)
+                    console.log(this.recipeData)
                     for (const recipe of this.recipeData) {
                         recipe.flipped = false
                     }

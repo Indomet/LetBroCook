@@ -12,7 +12,62 @@ const { Tag } = require("../models/recipeModel.js"); //. for windows
 const userAuth = require("../basicAuth.js")
 
 
+//Get all tags
+router.get("/", function (req, res, next) {
+    //label cache-ability
+    res.set("Cache-control", `no-store`);
+    Tag.find({})
+      .then(function (tags) {
+        res.status(200).json({ tags: tags });
+      })
+      .catch(function (error) {
+        error.status=400
+        return next(error); // Handle the error using Express's error handling middleware
+    });
+});
+
+router.get("/:tagId", userAuth.setRequestData, function(req, res, next){
+  try{
+    res.status(200).json({tag : req.tag})
+  }
+  catch(err){
+    err.status = 404
+    return next(err)
+  }
+})
+
 module.exports = router
+
+router.delete("/:tagId", async function(req,res,next){
+    const tagId = req.params.tagId
+    await Tag.deleteOne({_id:tagId}).then((result)=>{
+      return res.status(200).json({
+        message: "Tag deleted",
+        tag: result
+    })
+    }).catch(err=>{
+      err.status=400
+      return next(err)
+    })
+  })
+
+  
+router.patch("/:tagId", userAuth.setRequestData, userAuth.authUser, async function (req, res, next) {
+  const tagId = req.params.tagId
+  const tag = await Tag.findById(tagId)
+  if (tag.ownerId != req.user.id) { return res.status(401).json({ message: "Unauthorized" }) }
+  await Tag.findById({
+        _id: tagId, 
+    })
+    .then(tag => {
+      Object.assign(tag, req.body);
+      tag.save();
+      return res.status(200).json(tag)
+    }).catch(err => {
+      err.status = 404
+      return next(err)
+    })
+})
 
 //Must have userId in request body
 router.post("/", userAuth.setRequestData, userAuth.authUser, async function(req,res,next){
