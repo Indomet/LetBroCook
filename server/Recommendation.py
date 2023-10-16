@@ -84,7 +84,7 @@ class Recommendation:
                         username = populatedComment["author"]
                         userImage = self.usersCollection.find_one({"_id": owner_id}, {"image": 1})
                         populatedComment["ownerId"] = {"username": username,"_id": owner_id, "image": userImage.get("image")}
-                        populatedComment["editing"] = False  # Add the editing attribute and set it to False
+                        populatedComment["editing"] = False 
                         recipeComments[i] = populatedComment
                     
                     except Exception as e:
