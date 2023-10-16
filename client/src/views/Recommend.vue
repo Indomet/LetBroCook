@@ -1,6 +1,11 @@
 <template>
     <div>
-        <div v-if="recipeData.length<=0 || isSearching" class="loading-icon">
+        <div v-if=serverIsDown class="loading-icon">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                Server is down
+            </p>
+        </div>
+        <div v-else-if="recipeData.length<=0 || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
     <div v-else-if="recipeData.length === 0 && !loading">
@@ -59,10 +64,11 @@ export default {
             numberOfRecipesToShow: 8,
             loading: true,
             isAtBottom: false,
-            isSearching: false
+            isSearching: false,
+            serverIsDown: false
         }
     },
-    mounted() {
+    async mounted() {
         window.addEventListener('scroll', this.handleScroll)
         const userInfo = localStorage.getItem('user-info')
         if (!userInfo) {
@@ -85,8 +91,9 @@ export default {
                     )
                     console.log(this.favedRecipes)
                 })
-                .catch((err) => {
-                    console.log(err)
+                .catch(() => {
+                    this.serverIsDown = true
+                    console.log('error')
                 })
         }
         this.loading = false
@@ -119,10 +126,14 @@ export default {
                             recipe.flipped = false
                         }
                         this.mapArray()
-                    }).catch((err) => {
-                        console.log(err)
+                    }).catch(() => {
+                        console.log('second error')
+                        this.serverIsDown = true
                     })
                 }
+            }).catch(() => {
+                console.log('first error')
+                this.serverIsDown = true
             })
         },
         trimTagList(arr) {

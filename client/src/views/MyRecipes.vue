@@ -1,6 +1,11 @@
 <template>
     <div>
-        <div v-if="recipeData.length <= 0 && loading" class="loading-icon">
+        <div v-if=serverIsDown class="loading-icon">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                Server is down
+            </p>
+        </div>
+        <div v-else-if="recipeData.length <= 0 && loading" class="loading-icon">
             <i class="fas fa-spinner fa-spin"></i> Loading...
         </div>
         <div v-else-if="recipeData.length === 0 && !loading">
@@ -47,7 +52,8 @@ export default {
             recipeMap: {},
             favedRecipes: [],
             numberOfRecipesToShow: 8,
-            loading: true
+            loading: true,
+            serverIsDown: false
         }
     },
     mounted() {
@@ -68,7 +74,7 @@ export default {
             })
             .catch((err) => {
                 console.log(err)
-                this.error = true
+                this.serverIsDown = true
             })
             .finally(() => {
                 this.loading = false
