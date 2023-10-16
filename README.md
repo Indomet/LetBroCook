@@ -90,8 +90,21 @@ Initial paper sketch of what the systems frontend could look like:
 
 ### Entity-Relationship (ER) Diagram
 
-![ER Diagram](./images/er_diagram.png)
+![ER Diagram](./images/ER-diagram.png)
 
 ## Teaser (MS3)
 
-![Teaser](./images/teaser.png)
+![Home Page Desktop](./images/home-screen.png)
+![Home Page Ipad](./images/ipad-homepage.png)
+![Home Page Mobile](./images/mobile-screen.png)
+![Signup page](./images/signup-page.png)
+![Login page](./images/login-page.png)
+![Create recipe Desktop](./images/widescreen-createRecipe.png)
+![Edit profile](./images/edit-profile.png)
+![User security page](./images/security-page.png)
+![Create recipe Mobile](./images/mobile-createRecipe.png)
+![Backside of card](./images/card-flip.png)
+![Card show comment button](./images/comment-button.png)
+![Card comment section](./images/comment-section.png)
+![Card other peopls comments](./images/other-comments.png)
+![Card edit comment](./images/edit-comment.png)
