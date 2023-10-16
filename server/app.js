@@ -50,6 +50,7 @@ mongoose.connection.on("error", function (error) {
 });
 mongoose.connection.once("open", async function () {
   console.log("Connected to database");
+  // Populate database with some recipes upon first time startup
   const count = await recipeModel.countDocuments().exec();
   var originalOGuser = new userModel(
     {

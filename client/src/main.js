@@ -9,7 +9,25 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.use(BootstrapVue)
 Vue.use(infiniteScroll)
-
+Vue.mixin({
+  methods: {
+    onFileChange(e, theFile, theImage) {
+      theFile = e.target.files[0]
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          console.log('read the file and setting img')
+          console.log(reader.result)
+          resolve(reader.result)
+        }
+        reader.onerror = reject
+        if (theFile) {
+          reader.readAsDataURL(theFile)
+        }
+      })
+    }
+  }
+})
 Vue.config.productionTip = false
 const emitter = mitt()
 Vue.prototype.$emitter = emitter

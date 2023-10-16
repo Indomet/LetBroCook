@@ -171,7 +171,6 @@ label {
   max-width: 400px;
   margin: 40px auto 30px;
   width: 100%;
-  /* thickness of the divider */
   height: 1px;
   background-color: #ccc;
 }
