@@ -306,7 +306,7 @@ export default {
       })
     },
     createTag() {
-      if (!this.tagName) {
+      if (!this.tagName || this.tagName === ' ') {
         alert('Please enter a tag name')
         return
       }
