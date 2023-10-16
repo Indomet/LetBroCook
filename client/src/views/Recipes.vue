@@ -3,7 +3,8 @@
         <div v-if=serverIsDown class="loading-icon">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 Server is down
-            </p>    </div>
+            </p>
+        </div>
         <div v-else-if="loading || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
@@ -135,6 +136,7 @@ export default {
                         )
                     })
                     .catch((err) => {
+                        this.serverIsDown = true
                         console.log(err)
                     })
             }
@@ -184,6 +186,7 @@ export default {
 </script>
 
 <style>
+
 .loading-icon {
   position: fixed;
   top: 50%;
@@ -191,4 +194,17 @@ export default {
   transform: translate(-50%, -50%);
   font-size: 3rem;
 }
+
+@media (max-width: 576px) {
+  .d-flex.flex-wrap {
+    display: flex !important;
+    flex:none !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important; /* Center the cards horizontally */
+
+    align-items: center; /* Center the cards vertically */
+
+  }
+}
+
 </style>
