@@ -248,7 +248,6 @@ export default {
             if (this.faved === false) {
                 const timeline = new mojs.Timeline()
                 timeline.play()
-                // eslint-disable-next-line vue/no-mutating-props
                 this.faved = true
                 $(this).addClass('active')
                 axios
@@ -375,10 +374,6 @@ export default {
                     this.commentList.splice(index, 1)
                     console.log('THE LIST AFTER IS ' + JSON.stringify(this.commentList))
                 }
-                if (window.location.href.includes('/recipes')) {
-                    // window.location.reload()
-
-                }
                 alert('Comment deleted successfully!')
             })
             .catch((err) => {
@@ -406,16 +401,12 @@ export default {
 
 .btn.dropdown-toggle {
     padding: 5px 10px;
-    /* Adjust the padding to make the button smaller */
     font-size: 14px;
-    /* Adjust the font size to make the text smaller */
 }
 
 .dropdown-item {
     padding: 5px 10px;
-    /* Adjust the padding for each dropdown item */
     font-size: 14px;
-    /* Adjust the font size for each dropdown item */
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
@@ -633,27 +624,21 @@ export default {
     object-fit: cover;
 }
 
-/* Scrollbar styling */
-
-/* width */
 ::-webkit-scrollbar {
     width: 11px;
     margin-right: 5px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
     background: #a2a2a2;
     border-radius: 1rem;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
     background: #8dcc91;
     border-radius: 1rem;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #3a8e66;
 }
@@ -702,9 +687,7 @@ h5 {
 
 #heart {
     width: 50px;
-    /* reduce the width */
     height: 45px;
-    /* reduce the height */
 }
 
 #heart:before,
@@ -713,15 +696,11 @@ h5 {
     position: absolute;
     content: '';
     left: 25px;
-    /* adjust the position */
     top: 0;
     width: 25px;
-    /* adjust the width */
     height: 40px;
-    /* adjust the height */
     background: dimgrey;
     border-radius: 25px 25px 0 0;
-    /* adjust the border-radius */
     transform: rotate(-45deg);
     transform-origin: 0 100%;
 }
@@ -739,7 +718,6 @@ h5 {
     right: 0;
     display: flex;
     padding: 10px;
-    /* Add padding if necessary */
 }
 
 #deleteBTN {
@@ -789,9 +767,7 @@ button svg {
 
 #deleteBTN:hover .icon {
     opacity: 1;
-    /* Show the icon on hover */
     transform: translateX(-55%);
-    /* Move the icon to the center horizontally */
 }
 
 button:hover .text {

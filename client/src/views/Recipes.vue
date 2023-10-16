@@ -8,7 +8,7 @@
         <div v-else-if="loading || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
-    <div v-else-if="noRecipes && !loading">
+    <div v-else-if="recipeData.length===0 && !loading">
             <p style="font-size: 2rem; font-weight: bold; text-align: center">
                 No recipes found
             </p>
@@ -70,7 +70,6 @@ export default {
         }
     },
     async mounted() {
-        console.log(this.loading)
         window.addEventListener('scroll', this.handleScroll)
 
         this.$emitter.on('search', (data) => {
@@ -81,7 +80,7 @@ export default {
                 const tagNames = data.tags.map(tag => tag.name)
                 const tagString = tagNames.map(tag => `tags=${tag}`).join('&') // &tags=${tagString}
                 const url = `http://localhost:3000/v1/recipes?${tagString}&title=${searchQuery}`
-                this.fetchData(url) // Call fetchData method to refresh data
+                this.fetchData(url) // Call fetchData method to r3efresh data
             }
         })
         // fetch all recipes
