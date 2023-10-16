@@ -1,6 +1,10 @@
 <template>
     <div>
-        <div v-if="loading || isSearching" class="loading-icon">
+        <div v-if=serverIsDown class="loading-icon">
+            <p style="font-size: 2rem; font-weight: bold; text-align: center">
+                Server is down
+            </p>    </div>
+        <div v-else-if="loading || isSearching" class="loading-icon">
       <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>
     <div v-else-if="noRecipes && !loading">
@@ -60,7 +64,8 @@ export default {
             loading: true,
             isAtBottom: false,
             isSearching: false,
-            noRecipes: false
+            noRecipes: false,
+            serverIsDown: false
         }
     },
     async mounted() {
@@ -108,7 +113,8 @@ export default {
                 })
                 .catch((err) => {
                     console.log(err)
-                    this.error = true
+                    console.log('error loading server down')
+                    this.serverIsDown = true
                 })
                 .finally(() => {
                     this.loading = false
