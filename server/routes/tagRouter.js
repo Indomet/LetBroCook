@@ -1,6 +1,6 @@
 const express = require('express');
-var mongoose = require("mongoose");
 const router = express.Router();
+
 //just specify in the query options for example such as _method=PATCH to use a patch method
 //but the actual form method is post/get
 //will be used when deleting all tags for example

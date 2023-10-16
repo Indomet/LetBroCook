@@ -15,6 +15,10 @@ const serverUtil = require("../serverUtil.js")
 
 module.exports = router
 
+function thenAndCatch(query, modelMethod, thenFunction, catchFunction) {
+  modelMethod(query).then(thenFunction).catch(catchFunction);
+}
+
 //GET----------------------------------
 
 //Get all recipes
@@ -81,10 +85,10 @@ router.get("/", function (req, res, next) {
   });
 
 //Delete all recipes from specific userId !!!!!!!!
-//TODO:
 router.delete('/:userId/', userAuth.setRequestData, userAuth.authUser, function(req, res, next) {
   const userId = req.user.id;
   updateManyUserRecipe(req, userId)
+  
   recipeModel.find({ owner: userId }).then(function(recipes) {
       if (recipes.length === 0) {
           return res.status(404).json({ message: "No recipes to delete" });

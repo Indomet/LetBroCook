@@ -26,7 +26,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         res = rec.findSimilarRecipes(recipes)
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')  # Replace with the appropriate origin URL
+        self.send_header('Access-Control-Allow-Origin', value='http://localhost:3000')  # Replace with the appropriate origin URL
         self.send_header('Access-Control-Allow-Methods', value='GET')  # Add more methods if needed
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')  # Add more headers if needed
         self.end_headers()
