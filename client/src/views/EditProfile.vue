@@ -2,7 +2,7 @@
   <div class="container-xl px-4 mt-4">
     <nav class="nav nav-border">
       <router-link class="nav-link active ms-0" to="/EditProfile">Profile</router-link>
-      <router-link class="nav-link" to="/EditPassword">Password</router-link>
+      <router-link class="nav-link" to="/EditPassword">Security</router-link>
     </nav>
     <hr class="mt-0 mb-4">
     <div class="row">
