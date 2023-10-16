@@ -2,7 +2,7 @@
   <div class="container-xl px-4 mt-4">
     <nav class="nav nav-border">
       <router-link class="nav-link  ms-0" to="/EditProfile">Profile</router-link>
-      <router-link class="nav-link active" to="/EditPassword">Password</router-link>
+      <router-link class="nav-link active" to="/EditPassword">Security</router-link>
     </nav>
     <hr class="mt-0 mb-4">
     <div class="row">
@@ -107,8 +107,9 @@ export default {
         const user = JSON.parse(localStorage.getItem('user-info'))
         const userId = user.body._id
         const response = await Api.patch(`http://localhost:3000/v1/users/${userId}`, data)
+        alert('Password updated successfully')
         console.log(response)
-        window.location.reload()
+        this.$router.push({ name: 'EditProfile' })
       } catch (error) {
         if (error.response && error.response.status === 403) {
           alert('Current password is incorrect. Please try again')
