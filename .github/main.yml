@@ -14,4 +14,4 @@ jobs:
       with:
         username: '{{Indomet}}'
         reponame: '{{LetBroCook}}'
-        token: ${{ secrets.GITHUB_TOKEN }} # no need to change this line this is used to create the branch in your application repository
+        token: ${{ secrets.GITHUB_TOKEN }} # no need to change this line this is used to create the branch in your application repository 
