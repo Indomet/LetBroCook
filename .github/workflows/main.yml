@@ -1,8 +1,8 @@
 name: Build and Deploy Vue Application to Github Pages
 on: 
     push:
-        branch:
-            -master
+        branches:
+            - master
 jobs:
   build_deploy_vue:
     runs-on: ubuntu-latest
