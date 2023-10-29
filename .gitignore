@@ -145,7 +145,7 @@ typings/
 ### Vuejs ###
 # Recommended template: Node.gitignore
 
-dist/
+
 npm-debug.log
 yarn-error.log
 
